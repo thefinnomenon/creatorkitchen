@@ -1,18 +1,17 @@
-import { EditorContent, useEditor } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-import { applyDevTools } from 'prosemirror-dev-toolkit'
-import { useEffect } from 'react'
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import { applyDevTools } from 'prosemirror-dev-toolkit';
+import { useEffect } from 'react';
 
 const DEBUG = process && process.env.NODE_ENV === 'development';
 
 const Tiptap = () => {
   const editor = useEditor({
-    extensions: [
-      StarterKit,
-    ],
+    extensions: [StarterKit],
     editorProps: {
       attributes: {
-        class: 'p-6 prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none',
+        class:
+          'p-6 prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none',
       },
     },
     content: `
@@ -57,17 +56,15 @@ const Tiptap = () => {
     autofocus: true,
     editable: true,
     injectCSS: false,
-  })
+  });
 
   useEffect(() => {
     if (editor && DEBUG) {
       applyDevTools(editor.view);
     }
-  }, [editor])
+  }, [editor]);
 
-  return (
-    <EditorContent editor={editor} />
-  )
-}
+  return <EditorContent editor={editor} />;
+};
 
 export default Tiptap;
