@@ -1,4 +1,4 @@
-import Tiptap from '../components/Tiptap'
+import Tiptap from '../components/TipTap'
 
 export default function Home() {
   return (
