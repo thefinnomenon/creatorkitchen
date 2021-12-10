@@ -13,7 +13,11 @@ const DEBUG = process && process.env.NODE_ENV === 'development';
 const Tiptap = () => {
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3, 4],
+        },
+      }),
       Highlight,
       Typography,
       Underline,
