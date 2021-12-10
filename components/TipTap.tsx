@@ -5,6 +5,7 @@ import Underline from '@tiptap/extension-underline';
 import Typography from '@tiptap/extension-typography';
 import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
+import Focus from '@tiptap/extension-focus';
 import { applyDevTools } from 'prosemirror-dev-toolkit';
 import { useEffect } from 'react';
 
@@ -21,6 +22,7 @@ const Tiptap = () => {
       Highlight,
       Typography,
       Underline,
+      Focus,
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),

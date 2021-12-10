@@ -15,3 +15,7 @@ h4.is-empty::before
   pointer-events: none;
   height: 0;
 }
+
+hr.has-focus, img.has-focus {
+   @apply outline;
+}
