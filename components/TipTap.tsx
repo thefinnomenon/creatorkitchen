@@ -1,5 +1,11 @@
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import Highlight from '@tiptap/extension-highlight';
+import Underline from '@tiptap/extension-underline';
+import Typography from '@tiptap/extension-typography';
+import Strike from '@tiptap/extension-strike';
+import TextAlign from '@tiptap/extension-text-align';
+import Placeholder from '@tiptap/extension-placeholder';
 import { applyDevTools } from 'prosemirror-dev-toolkit';
 import { useEffect } from 'react';
 
@@ -7,7 +13,25 @@ const DEBUG = process && process.env.NODE_ENV === 'development';
 
 const Tiptap = () => {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+      Highlight,
+      Typography,
+      Strike,
+      Underline,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      Placeholder.configure({
+        placeholder: ({ node }) => {
+          if (node.type.name === 'heading') {
+            return `Heading ${node.attrs.level}`;
+          }
+
+          return "Type '/' for commands";
+        },
+      }),
+    ],
     editorProps: {
       attributes: {
         class:

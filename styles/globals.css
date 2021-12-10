@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.ProseMirror 
+p.is-empty::before,
+h1.is-empty::before,
+h2.is-empty::before,
+h3.is-empty::before,
+h4.is-empty::before
+ {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
