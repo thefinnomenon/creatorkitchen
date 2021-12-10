@@ -3,7 +3,6 @@ import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
 import Underline from '@tiptap/extension-underline';
 import Typography from '@tiptap/extension-typography';
-import Strike from '@tiptap/extension-strike';
 import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
 import { applyDevTools } from 'prosemirror-dev-toolkit';
@@ -17,7 +16,6 @@ const Tiptap = () => {
       StarterKit,
       Highlight,
       Typography,
-      Strike,
       Underline,
       TextAlign.configure({
         types: ['heading', 'paragraph'],
