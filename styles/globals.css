@@ -16,6 +16,43 @@ h4.is-empty::before
   height: 0;
 }
 
-hr.has-focus, img.has-focus {
+.ProseMirror hr.has-focus, img.has-focus {
    @apply outline;
+}
+
+.ProseMirror kbd {
+   background-color: #eee;
+   border-radius: 3px;
+   border: 1px solid #b4b4b4;
+   box-shadow: 0 1px 1px rgba(0, 0, 0, .2), 0 2px 0 0 rgba(255, 255, 255, .7) inset;
+   color: #333;
+   display: inline-block;
+   font-size: .85em;
+   font-weight: 700;
+   line-height: 1;
+   padding: 2px 4px;
+   white-space: nowrap;
+}
+
+.ProseMirror pre {
+    border-radius: 5px; 
+    -moz-border-radius: 5px; 
+    -webkit-border-radius: 5px;
+    border: 1px solid #BCBEC0;
+    background: #F1F3F5;
+    font-family: Monaco,Consolas,"Andale  Mono","DejaVu Sans Mono",monospace
+}
+
+blockquote p::before,
+blockquote p::after {
+   content: none !important;
+}
+
+code::before,
+code::after {
+   content: none !important;
+}
+
+.ProseMirror code {
+   @apply bg-gray-100 border-2 box-decoration-clone text-[0.9em] p-[0.25em];
 }
