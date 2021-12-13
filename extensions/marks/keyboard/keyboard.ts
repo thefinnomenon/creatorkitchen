@@ -20,7 +20,7 @@ declare module '@tiptap/core' {
 }
 
 export const inputRegex = /(?:^|\s)((?:\[\[)((?:[^*]+))(?:\]\]))$/;
-export const pasteRegex = /(?:^|\s)((?:\[\[])((?:[^*]+))(?:\]\]))/g;
+export const pasteRegex = /(?:^|\s)((?:\[\[)((?:[^*]+))(?:\]\]))/g;
 
 export const Keyboard = Mark.create<KeyboardOptions>({
   name: 'keyboard',
