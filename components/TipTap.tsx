@@ -4,10 +4,14 @@ import Highlight from '@tiptap/extension-highlight';
 import Underline from '@tiptap/extension-underline';
 import Typography from '@tiptap/extension-typography';
 import TextAlign from '@tiptap/extension-text-align';
+import Subscript from '@tiptap/extension-subscript';
+import Superscript from '@tiptap/extension-superscript';
 import Placeholder from '@tiptap/extension-placeholder';
 import Focus from '@tiptap/extension-focus';
+import Keyboard from '../extensions/marks/keyboard';
 import { applyDevTools } from 'prosemirror-dev-toolkit';
 import { useEffect } from 'react';
+import TextFloatingToolbar from './TextFloatingToolbar';
 
 const DEBUG = process && process.env.NODE_ENV === 'development';
 
@@ -22,7 +26,10 @@ const Tiptap = () => {
       Highlight,
       Typography,
       Underline,
+      Subscript,
+      Superscript,
       Focus,
+      Keyboard,
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
@@ -92,7 +99,12 @@ const Tiptap = () => {
     }
   }, [editor]);
 
-  return <EditorContent editor={editor} />;
+  return (
+    <>
+      {editor && <TextFloatingToolbar editor={editor} />}
+      <EditorContent editor={editor} />
+    </>
+  );
 };
 
 export default Tiptap;
