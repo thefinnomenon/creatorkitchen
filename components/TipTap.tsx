@@ -9,6 +9,8 @@ import Superscript from '@tiptap/extension-superscript';
 import Placeholder from '@tiptap/extension-placeholder';
 import Focus from '@tiptap/extension-focus';
 import Keyboard from '../extensions/marks/keyboard';
+import Command from '../extensions/nodes/command';
+import suggestion from '../extensions/nodes/command/suggestion';
 import { applyDevTools } from 'prosemirror-dev-toolkit';
 import { useEffect } from 'react';
 import TextFloatingToolbar from './TextFloatingToolbar';
@@ -30,6 +32,9 @@ const Tiptap = () => {
       Superscript,
       Focus,
       Keyboard,
+      Command.configure({
+        suggestion,
+      }),
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),

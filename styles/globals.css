@@ -56,3 +56,7 @@ code::after {
 .ProseMirror code {
    @apply bg-gray-100 border-2 box-decoration-clone text-[0.9em] p-[0.25em];
 }
+
+.ProseMirror hr {
+   @apply m-4;
+}
