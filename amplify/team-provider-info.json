@@ -1,0 +1,15 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-creatorkitchen-staging-202119-authRole",
+      "UnauthRoleArn": "arn:aws:iam::177450493151:role/amplify-creatorkitchen-staging-202119-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::177450493151:role/amplify-creatorkitchen-staging-202119-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-creatorkitchen-staging-202119-deployment",
+      "UnauthRoleName": "amplify-creatorkitchen-staging-202119-unauthRole",
+      "StackName": "amplify-creatorkitchen-staging-202119",
+      "StackId": "arn:aws:cloudformation:us-east-1:177450493151:stack/amplify-creatorkitchen-staging-202119/66276240-5d1b-11ec-97cf-0e933c830599",
+      "AmplifyAppId": "d2e6pafscko1l"
+    }
+  }
+}

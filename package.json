@@ -21,15 +21,18 @@
     "@tiptap/extension-text-align": "^2.0.0-beta.29",
     "@tiptap/extension-typography": "^2.0.0-beta.19",
     "@tiptap/extension-underline": "^2.0.0-beta.22",
+    "@tiptap/html": "^2.0.0-beta.153",
     "@tiptap/react": "^2.0.0-beta.98",
     "@tiptap/starter-kit": "^2.0.0-beta.154",
     "@tiptap/suggestion": "^2.0.0-beta.85",
+    "aws-amplify": "^4.3.10",
     "lint": "next lint",
     "match-sorter": "^6.3.1",
     "next": "^12.0.7",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-icons": "^4.3.1"
+    "react-icons": "^4.3.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",
