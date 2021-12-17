@@ -9,14 +9,17 @@ type Props = {} & typeof defaultProps;
 
 const defaultProps = Object.freeze({});
 const initialState = Object.freeze({
+  post: null,
   isNew: false,
+  preview: false,
 });
 
 export default function EditPost() {
   const router = useRouter();
   const { id } = router.query;
-  const [post, setPost] = useState(null);
+  const [post, setPost] = useState(initialState.post);
   const [isNew, setIsNew] = useState(initialState.isNew);
+  const [preview, setPreview] = useState(initialState.preview);
 
   useEffect(() => {
     fetchPost();
@@ -68,6 +71,10 @@ export default function EditPost() {
     router.push(`/posts/${id}`);
   }
 
+  function togglePreview() {
+    setPreview(!preview);
+  }
+
   return (
     <>
       <button
@@ -84,9 +91,21 @@ export default function EditPost() {
           View Post
         </button>
       )}
+      <button
+        className="m-4 bg-blue-600 text-white font-semibold px-8 py-2 rounded-lg"
+        onClick={togglePreview}
+      >
+        {preview ? 'Edit' : 'Preview'}
+      </button>
       <div className="w-full min-h-screen bg-gray-200 flex justify-center items-stretch">
         <div className="md:mt-4 flex-1 max-w-4xl min-w-0 bg-white shadow-xl">
-          {post && <Tiptap content={post.content} onChange={onChange} />}
+          {post && (
+            <Tiptap
+              content={post.content}
+              preview={preview}
+              onChange={onChange}
+            />
+          )}
         </div>
       </div>
     </>

@@ -62,6 +62,11 @@ export const suggestion = {
         title: 'Divider',
         section: 'Basic',
       },
+      {
+        key: 'callout',
+        title: 'Callout',
+        section: 'Basic',
+      },
     ];
 
     return matchSorter(commands, query, {

@@ -2,6 +2,7 @@ import API from '@aws-amplify/api';
 import { route } from 'next/dist/server/router';
 import { useRouter } from 'next/router';
 import { getPost, listPosts } from '../../graphql/queries';
+import Tiptap from '../../components/TipTap';
 
 export default function Post({ post }) {
   const router = useRouter();
@@ -21,10 +22,11 @@ export default function Post({ post }) {
       </button>
       <div className="w-full min-h-screen bg-gray-200 flex justify-center items-stretch">
         <div className="md:mt-4 flex-1 max-w-4xl min-w-0 bg-white shadow-xl">
-          <div
+          {/* <div
             className="ProseMirror p-6 prose prose-sm sm:prose lg:prose-lg xl:prose-2xl"
             dangerouslySetInnerHTML={{ __html: post.content }}
-          />
+          /> */}
+          <Tiptap content={post.content} preview={true} onChange={() => {}} />
         </div>
       </div>
     </>

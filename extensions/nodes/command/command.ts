@@ -28,7 +28,7 @@ export const Command = Node.create<CommandOptions>({
         pluginKey: CommandPluginKey,
         command: ({ editor, range, props }) => {
           const { section, type } = props;
-          console.log(section, type);
+
           switch (type) {
             case 'p':
               editor.chain().focus().deleteRange(range).setParagraph().run();
@@ -102,6 +102,9 @@ export const Command = Node.create<CommandOptions>({
                 .deleteRange(range)
                 .setHorizontalRule()
                 .run();
+              break;
+            case 'callout':
+              editor.chain().focus().deleteRange(range).wrapIn('callout').run();
               break;
             default:
               console.log('Command not implemented yet');

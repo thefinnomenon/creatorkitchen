@@ -10,9 +10,10 @@ import Placeholder from '@tiptap/extension-placeholder';
 import Focus from '@tiptap/extension-focus';
 import Keyboard from '../extensions/marks/keyboard';
 import Command from '../extensions/nodes/command';
+import Callout from '../components/Callout';
 import suggestion from '../extensions/nodes/command/suggestion';
 import { applyDevTools } from 'prosemirror-dev-toolkit';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import TextFloatingToolbar from './TextFloatingToolbar';
 
 const DEBUG = process && process.env.NODE_ENV === 'development';
@@ -20,12 +21,19 @@ const DEBUG = process && process.env.NODE_ENV === 'development';
 type Props = {
   content: string;
   onChange(value: string): void;
+  preview: boolean;
 } & typeof defaultProps;
 
-const defaultProps = Object.freeze({});
+const defaultProps = Object.freeze({
+  preview: false,
+});
 const initialState = Object.freeze({});
 
-export default function Tiptap({ content, onChange }) {
+export default function Tiptap({ content, preview, onChange }) {
+  const [previewContent, setPreviewContent] = useState('');
+  const editorClass =
+    'p-6 prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none';
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -40,6 +48,7 @@ export default function Tiptap({ content, onChange }) {
       Superscript,
       Focus,
       Keyboard,
+      Callout,
       Command.configure({
         suggestion,
       }),
@@ -58,8 +67,7 @@ export default function Tiptap({ content, onChange }) {
     ],
     editorProps: {
       attributes: {
-        class:
-          'p-6 prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none',
+        class: editorClass,
       },
     },
     content: content
@@ -71,6 +79,7 @@ export default function Tiptap({ content, onChange }) {
       <p>
         Type <code>/</code> to add different blocks or elect some text to access the toolbar to set (<strong>bold</strong>, <em>italics</em>, etc). The editor also supports markdown syntax -- try typing <code>#</code> followed by a space in an empty block.
       </p>
+      <div [data-type="callout"]></div>
     `,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
@@ -85,9 +94,15 @@ export default function Tiptap({ content, onChange }) {
       applyDevTools(editor.view);
     }
     if (editor) {
-      onChange(editor.getHTML());
+      onChange(editor.getJSON());
     }
   }, [editor]);
+
+  useEffect(() => {
+    if (editor) {
+      editor.setEditable(!preview);
+    }
+  }, [editor, preview]);
 
   return (
     <>
