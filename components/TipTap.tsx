@@ -106,7 +106,7 @@ export default function Tiptap({ content, preview, onChange }) {
 
   return (
     <>
-      {editor && <TextFloatingToolbar editor={editor} />}
+      {editor && !preview && <TextFloatingToolbar editor={editor} />}
       <EditorContent editor={editor} />
     </>
   );

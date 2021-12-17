@@ -91,12 +91,12 @@ export default function EditPost() {
           View Post
         </button>
       )}
-      <button
+      {/* <button
         className="m-4 bg-blue-600 text-white font-semibold px-8 py-2 rounded-lg"
         onClick={togglePreview}
       >
         {preview ? 'Edit' : 'Preview'}
-      </button>
+      </button> */}
       <div className="w-full min-h-screen bg-gray-200 flex justify-center items-stretch">
         <div className="md:mt-4 flex-1 max-w-4xl min-w-0 bg-white shadow-xl">
           {post && (
