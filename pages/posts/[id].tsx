@@ -23,7 +23,7 @@ export default function Post({ post }) {
       <div className="w-full min-h-screen bg-gray-200 flex justify-center items-stretch">
         <div className="md:mt-4 flex-1 max-w-4xl min-w-0 bg-white shadow-xl">
           <div
-            className="ProseMirror p-6 prose prose-sm sm:prose lg:prose-lg xl:prose-2xl"
+            className="ProseMirror p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
           {/* <Tiptap content={post.content} preview={true} onChange={() => {}} /> */}

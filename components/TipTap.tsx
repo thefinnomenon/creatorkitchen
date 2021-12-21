@@ -32,7 +32,7 @@ const initialState = Object.freeze({});
 export default function Tiptap({ content, preview, onChange }) {
   const [previewContent, setPreviewContent] = useState('');
   const editorClass =
-    'p-6 prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none';
+    'p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor';
 
   const editor = useEditor({
     extensions: [

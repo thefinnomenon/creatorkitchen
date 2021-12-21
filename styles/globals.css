@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.center-editor {
+   margin: 0 auto;
+}
+
 .ProseMirror
 p.is-empty::before,
 h1.is-empty::before,
