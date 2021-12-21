@@ -33,11 +33,23 @@ export default Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return [
-      'div',
-      mergeAttributes(HTMLAttributes, { 'data-type': 'callout' }),
-      0,
-    ];
+    const dom = document.createElement('div');
+    dom.innerHTML = ReactDOMServer.renderToStaticMarkup(
+      // @ts-ignore
+      <Callout editor={null} node={{ attrs: { ...HTMLAttributes } }} />
+    );
+
+    dom.setAttribute('data-type', this.name);
+    Object.keys(HTMLAttributes).map((attribute) => {
+      dom.setAttribute(attribute, HTMLAttributes[attribute]);
+    });
+
+    const contentDOM = dom.querySelector('[data-node-view-content]');
+
+    return {
+      dom,
+      contentDOM,
+    };
   },
 
   addNodeView() {
@@ -48,7 +60,7 @@ export default Node.create({
 type CalloutType = 'note' | 'tip' | 'warning' | 'important';
 
 type Props = {
-  editor: Editor;
+  editor: Editor | null;
   node: { attrs: { type: CalloutType } };
   updateAttributes({}): void;
 } & typeof defaultProps;
@@ -91,11 +103,11 @@ export function Callout(props: Props): JSX.Element {
       <button
         className="p-2 text-3xl"
         contentEditable={false}
-        disabled={!props.editor.isEditable}
+        disabled={!props.editor || !props.editor.isEditable}
         onClick={setCalloutType}
       >
         {type.icon}
-        <VisuallyHidden>{props.node.attrs.type}</VisuallyHidden>
+        {/* <VisuallyHidden>{props.node.attrs.type}</VisuallyHidden> */}
       </button>
       <NodeViewContent className="pb-2 px-10" />
     </NodeViewWrapper>
