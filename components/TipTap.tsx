@@ -12,6 +12,7 @@ import Link from '@tiptap/extension-link';
 import Keyboard from '../extensions/marks/keyboard';
 import Command from '../extensions/nodes/command';
 import Callout from '../components/Callout';
+import Media from '../components/Media';
 import suggestion from '../extensions/nodes/command/suggestion';
 import { applyDevTools } from 'prosemirror-dev-toolkit';
 import { useEffect, useRef, useState } from 'react';
@@ -81,6 +82,7 @@ export default function Tiptap({ content, preview, onChange }) {
       Focus,
       Keyboard,
       Callout,
+      Media,
       Command.configure({
         suggestion,
       }),
@@ -123,7 +125,7 @@ export default function Tiptap({ content, preview, onChange }) {
 
   useEffect(() => {
     if (editor && DEBUG) {
-      applyDevTools(editor.view);
+      // applyDevTools(editor.view);
     }
     if (editor) {
       onChange(editor.getJSON());

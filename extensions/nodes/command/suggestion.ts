@@ -67,6 +67,11 @@ export const suggestion = {
         title: 'Callout',
         section: 'Basic',
       },
+      {
+        key: 'media',
+        title: 'Media',
+        section: 'Basic',
+      },
     ];
 
     return matchSorter(commands, query, {

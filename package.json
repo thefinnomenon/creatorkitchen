@@ -11,6 +11,8 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@headlessui/react": "^1.4.2",
+    "@reach/tabs": "^0.16.4",
     "@reach/visually-hidden": "^0.16.0",
     "@tippyjs/react": "^4.2.6",
     "@tiptap/extension-focus": "^2.0.0-beta.38",
@@ -27,6 +29,7 @@
     "@tiptap/react": "^2.0.0-beta.98",
     "@tiptap/starter-kit": "^2.0.0-beta.154",
     "@tiptap/suggestion": "^2.0.0-beta.85",
+    "add": "^2.0.6",
     "aws-amplify": "^4.3.10",
     "lint": "next lint",
     "match-sorter": "^6.3.1",
@@ -35,7 +38,8 @@
     "react-dom": "^17.0.2",
     "react-icons": "^4.3.1",
     "tippy.js": "^6.3.7",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "yarn": "^1.22.17"
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",

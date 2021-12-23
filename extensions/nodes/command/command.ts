@@ -106,6 +106,16 @@ export const Command = Node.create<CommandOptions>({
             case 'callout':
               editor.chain().focus().deleteRange(range).wrapIn('callout').run();
               break;
+            case 'media':
+              editor
+                .chain()
+                .focus()
+                .deleteRange(range)
+                .insertContent({
+                  type: 'media',
+                })
+                .run();
+              break;
             default:
               console.log('Command not implemented yet');
           }
