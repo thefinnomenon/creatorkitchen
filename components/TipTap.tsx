@@ -1,4 +1,4 @@
-import { EditorContent, useEditor } from '@tiptap/react';
+import { EditorContent, isTextSelection, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
 import Underline from '@tiptap/extension-underline';
@@ -8,13 +8,15 @@ import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
 import Placeholder from '@tiptap/extension-placeholder';
 import Focus from '@tiptap/extension-focus';
+import Link from '@tiptap/extension-link';
 import Keyboard from '../extensions/marks/keyboard';
 import Command from '../extensions/nodes/command';
 import Callout from '../components/Callout';
 import suggestion from '../extensions/nodes/command/suggestion';
 import { applyDevTools } from 'prosemirror-dev-toolkit';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import TextFloatingToolbar from './TextFloatingToolbar';
+import LinkInput from './LinkInput';
 
 const DEBUG = process && process.env.NODE_ENV === 'development';
 
@@ -29,10 +31,37 @@ const defaultProps = Object.freeze({
 });
 const initialState = Object.freeze({});
 
+export type MenuState = 'show' | 'hide';
+
 export default function Tiptap({ content, preview, onChange }) {
   const [previewContent, setPreviewContent] = useState('');
+  const linkToolbar = useRef<MenuState>('hide');
+  const textToolbar = useRef<MenuState>('show');
+
   const editorClass =
     'p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor';
+
+  const LinkWithShortcut = Link.extend({
+    // @ts-ignore
+    addKeyboardShortcuts() {
+      return {
+        'Mod-k': () => {
+          // Unset active link
+          if (this.editor.isActive('link')) {
+            this.editor.commands.unsetLink();
+          } else {
+            linkToolbar.current = 'show';
+            textToolbar.current = 'hide';
+            // This will cancel out, but will trigger the toolbar
+            this.editor.commands.toggleLink({ href: '' });
+            this.editor.commands.toggleLink({ href: '' });
+            linkToolbar.current = 'hide';
+            textToolbar.current = 'show';
+          }
+        },
+      };
+    },
+  });
 
   const editor = useEditor({
     extensions: [
@@ -46,6 +75,9 @@ export default function Tiptap({ content, preview, onChange }) {
       Underline,
       Subscript,
       Superscript,
+      LinkWithShortcut.configure({
+        openOnClick: false,
+      }),
       Focus,
       Keyboard,
       Callout,
@@ -106,8 +138,17 @@ export default function Tiptap({ content, preview, onChange }) {
 
   return (
     <>
-      {editor && !preview && <TextFloatingToolbar editor={editor} />}
-      <EditorContent editor={editor} />
+      {editor && !preview && (
+        <TextFloatingToolbar
+          editor={editor}
+          textToolbar={textToolbar}
+          linkToolbar={linkToolbar}
+        />
+      )}
+      {editor && !preview && (
+        <LinkInput editor={editor} linkToolbar={linkToolbar} />
+      )}
+      <EditorContent editor={editor} id="editor" />
     </>
   );
 }

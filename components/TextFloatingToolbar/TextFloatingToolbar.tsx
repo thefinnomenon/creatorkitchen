@@ -1,4 +1,4 @@
-import { BubbleMenu } from '@tiptap/react';
+import { BubbleMenu, isTextSelection } from '@tiptap/react';
 import { Editor } from '@tiptap/core';
 import { BiHighlight, BiCodeAlt } from 'react-icons/bi';
 import {
@@ -14,19 +14,46 @@ import {
   MdSubscript,
   MdSuperscript,
 } from 'react-icons/md';
+import { RiLinkM } from 'react-icons/ri';
 import ToolbarButton from '../ToolbarButton';
+import { MutableRefObject } from 'react';
 
 type Props = {
   editor: Editor;
+  textToolbar: MutableRefObject<string>;
+  linkToolbar: MutableRefObject<string>;
 } & typeof defaultProps;
 
 const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
-export default function TextFloatingToolbar({ editor }: Props): JSX.Element {
+export default function TextFloatingToolbar({
+  editor,
+  textToolbar,
+  linkToolbar,
+}: Props): JSX.Element {
+  function shouldShow() {
+    return ({ editor, view, state, oldState, from, to }) => {
+      // Force hide
+      if (textToolbar.current === 'hide') return false;
+
+      // Sometime check for `empty` is not enough
+      const isEmptyTextBlock =
+        !state.doc.textBetween(from, to).length &&
+        isTextSelection(state.selection);
+
+      if (!view.hasFocus() || state.selection.empty || isEmptyTextBlock)
+        return false;
+
+      return true;
+    };
+  }
+
   return (
     <BubbleMenu
       editor={editor}
+      pluginKey="textToolbar"
+      shouldShow={shouldShow()}
       tippyOptions={{ maxWidth: '500px' }}
       className="bg-gray-100 text-lg rounded-sm shadow-lg"
     >
@@ -71,6 +98,21 @@ export default function TextFloatingToolbar({ editor }: Props): JSX.Element {
         altText="Keyboard"
         onClick={() => editor.chain().focus().toggleKeyboard().run()}
         isActive={editor.isActive('keyboard')}
+      />
+      <ToolbarButton
+        icon={<RiLinkM />}
+        altText="Link"
+        onClick={() => {
+          textToolbar.current = 'hide';
+          linkToolbar.current = 'show';
+          editor.chain().focus().run();
+          // HACK: I don't love this, but it works for now...
+          setTimeout(() => {
+            textToolbar.current = 'show';
+            linkToolbar.current = 'hide';
+          }, 200);
+        }}
+        isActive={editor.getAttributes('link').href}
       />
       <ToolbarButton
         icon={<MdSubscript />}
