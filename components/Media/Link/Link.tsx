@@ -8,7 +8,7 @@ type Props = {
 const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
-export default function LinkOrUpload({ setMedia }: Props): JSX.Element {
+export default function Link({ setMedia }: Props): JSX.Element {
   const [src, setSrc] = useState('');
   const [alt, setAlt] = useState('');
 
@@ -68,4 +68,4 @@ export default function LinkOrUpload({ setMedia }: Props): JSX.Element {
   );
 }
 
-LinkOrUpload.defaultProps = defaultProps;
+Link.defaultProps = defaultProps;

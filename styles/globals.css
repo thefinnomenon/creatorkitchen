@@ -64,3 +64,11 @@ code::after {
 .ProseMirror hr {
    @apply m-4;
 }
+
+.ProseMirror .has-focus img {
+   @apply ring-4
+}
+
+.ProseMirror .has-focus video {
+   @apply ring-4
+}

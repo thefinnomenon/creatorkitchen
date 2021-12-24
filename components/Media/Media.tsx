@@ -9,7 +9,7 @@ import {
 import { Tab } from '@headlessui/react';
 import ReactDOMServer from 'react-dom/server';
 import { RiLinkM } from 'react-icons/ri';
-import LinkOrUpload from './LinkOrUpload';
+import Link from './Link';
 import React from 'react';
 
 export default Node.create({
@@ -41,7 +41,22 @@ export default Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'media' })];
+    const dom = document.createElement('div');
+    const contentDom = document.createElement('div');
+    dom.innerHTML = ReactDOMServer.renderToStaticMarkup(
+      // @ts-ignore
+      <Media editor={null} node={{ attrs: { ...HTMLAttributes } }} />
+    );
+
+    dom.setAttribute('data-type', this.name);
+    Object.keys(HTMLAttributes).map((attribute) => {
+      dom.setAttribute(attribute, HTMLAttributes[attribute]);
+    });
+
+    return {
+      dom,
+      contentDom,
+    };
   },
 
   addNodeView() {
@@ -67,10 +82,11 @@ const initialState = Object.freeze({});
 
 const SOURCES = [
   // @ts-ignore
-  { label: 'Link/Upload', icon: <RiLinkM />, panel: <LinkOrUpload /> },
+  { label: 'Link', icon: <RiLinkM />, panel: <Link /> },
+  { label: 'Upload', icon: <RiLinkM />, panel: <div /> },
   { label: 'Unsplash', icon: <RiLinkM />, panel: <div /> },
   { label: 'Giphy', icon: <RiLinkM />, panel: <div /> },
-  { label: 'Memengine', icon: <RiLinkM />, panel: <div /> },
+  // { label: 'Memengine', icon: <RiLinkM />, panel: <div /> },
 ];
 
 function classNames(...classes) {
@@ -110,7 +126,7 @@ const renderImage = (src, alt) => {
     <NodeViewWrapper contentEditable={false}>
       <div
         data-drag-handle
-        className="flex justify-center items-center object-none group"
+        className="flex justify-center object-none group border-blue-500 focus:border-8"
       >
         <img src={src} alt={alt} className="rounded-md shadow-2xl" />
       </div>
