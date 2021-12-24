@@ -108,13 +108,10 @@ export function Media(props: Props): JSX.Element {
 const renderImage = (src, alt) => {
   return (
     <NodeViewWrapper contentEditable={false}>
-      <div className="flex justify-center items-center object-none group">
-        <div
-          className="drag-handle"
-          contentEditable="false"
-          draggable="true"
-          data-drag-handle
-        />
+      <div
+        data-drag-handle
+        className="flex justify-center items-center object-none group"
+      >
         <img src={src} alt={alt} className="rounded-md shadow-2xl" />
       </div>
     </NodeViewWrapper>
@@ -124,13 +121,10 @@ const renderImage = (src, alt) => {
 const renderVideo = (src) => {
   return (
     <NodeViewWrapper contentEditable={false}>
-      <div className="flex justify-center items-center object-none group">
-        <div
-          className="drag-handle"
-          contentEditable="false"
-          draggable="true"
-          data-drag-handle
-        />
+      <div
+        data-drag-handle
+        className="flex justify-center items-center object-none group"
+      >
         <video src={src} className="rounded-md shadow-2xl" controls />
       </div>
     </NodeViewWrapper>
