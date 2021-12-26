@@ -128,7 +128,7 @@ export default function Tiptap({ content, preview, onChange }) {
       // applyDevTools(editor.view);
     }
     if (editor) {
-      onChange(editor.getJSON());
+      onChange(editor.getHTML());
     }
   }, [editor]);
 

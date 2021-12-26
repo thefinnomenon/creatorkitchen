@@ -44,6 +44,8 @@ export async function getStaticProps({ params }) {
   });
   // @ts-ignore
   const post = postData.data.getPost;
+  console.log('Retrieved Post');
+  console.log(post.content);
 
   // By returning { props: { posts } }, the Blog component
   // will receive `posts` as a prop at build time

@@ -10,9 +10,8 @@ import { Tab } from '@headlessui/react';
 import ReactDOMServer from 'react-dom/server';
 import { RiLinkM } from 'react-icons/ri';
 import Link from './Link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Unsplash from './Unsplash';
-import Iframely from './Iframely';
 
 export default Node.create({
   name: 'media',
@@ -54,6 +53,8 @@ export default Node.create({
     Object.keys(HTMLAttributes).map((attribute) => {
       dom.setAttribute(attribute, HTMLAttributes[attribute]);
     });
+
+    //console.log(dom);
 
     return {
       dom,
@@ -97,10 +98,10 @@ function classNames(...classes) {
 
 export function Media(props: Props): JSX.Element {
   const { type, src, alt } = props.node.attrs;
-  console.log('attrs: ', type, src);
+  //console.log('attrs: ', type, src);
 
   const setMedia = (media: MediaObject) => {
-    console.log(media);
+    //console.log(media);
     props.updateAttributes({
       type: media.type,
       src: media.src,
@@ -123,15 +124,22 @@ export function Media(props: Props): JSX.Element {
 }
 
 const renderEmbed = (src) => {
+  const API_KEY = process.env.NEXT_PUBLIC_IFRAMELY_API_KEY;
+
   return (
     <NodeViewWrapper contentEditable={false}>
-      <div
-        contentEditable={false}
-        data-drag-handle
-        className=" border-blue-500 focus:border-8"
-      >
-        {/* <Iframely url={src} /> */}
-        <a contentEditable={false} className="embedly-card" href={src} />
+      <div contentEditable={false} data-drag-handle className="">
+        <div className="iframely-embed " contentEditable={false}>
+          <div className="iframely-responsive" contentEditable={false}>
+            <iframe
+              contentEditable={false}
+              src={`https://cdn.iframe.ly/api/iframe?app=1&url=${src}&key=${API_KEY}&lazy=1&iframe=1&omit_script=1&omit_css=true`}
+              frameBorder="0"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+            />
+          </div>
+        </div>
       </div>
     </NodeViewWrapper>
   );
@@ -143,8 +151,9 @@ const renderImage = (src, alt) => {
       <div
         contentEditable={false}
         data-drag-handle
-        className="flex justify-center object-none group border-blue-500 focus:border-8"
+        className="flex justify-center object-none"
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           contentEditable={false}
           src={src}

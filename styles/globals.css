@@ -20,10 +20,6 @@ h4.is-empty::before
   height: 0;
 }
 
-.ProseMirror hr.has-focus, img.has-focus {
-   @apply outline;
-}
-
 .ProseMirror kbd {
    background-color: #eee;
    border-radius: 3px;
@@ -65,10 +61,30 @@ code::after {
    @apply m-4;
 }
 
+.ProseMirror hr.has-focus {
+   @apply ring-4;
+}
+
 .ProseMirror .has-focus img {
-   @apply ring-4
+   @apply ring-4;
 }
 
 .ProseMirror .has-focus video {
-   @apply ring-4
+   @apply ring-4;
+}
+
+.ProseMirror .has-focus div > iframe {
+   @apply ring-4;
+}
+
+.ProseMirror .has-focus iframe {
+   @apply ring-4;
+}
+
+iframe:focus {
+   @apply ring-4;
+}
+
+.iframely-responsive>* {
+    top: 0; left: 0; width: 100%; height: 100%; position: absolute; border: 0;
 }

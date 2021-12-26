@@ -4,7 +4,6 @@ import Tiptap from '../../../components/TipTap';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { createPost, updatePost } from '../../../graphql/mutations';
-import Iframely from '../../../components/Media/Iframely';
 
 type Props = {} & typeof defaultProps;
 
@@ -46,6 +45,8 @@ export default function EditPost() {
 
   async function updateCurrentPost() {
     if (!post.content) return;
+    console.log('Updating post');
+    console.log(post.content);
 
     if (isNew) {
       await API.graphql({

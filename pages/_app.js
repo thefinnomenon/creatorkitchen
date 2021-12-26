@@ -10,7 +10,7 @@ React.useLayoutEffect = React.useEffect;
 function MyApp({ Component, pageProps }) {
   return (
     <>
-      {/* <Script src="//cdn.iframe.ly/embed.js" strategy="beforeInteractive" /> */}
+      <Script src="//cdn.iframe.ly/embed.js" strategy="beforeInteractive" />
       <Script
         src="//cdn.embedly.com/widgets/platform.js"
         strategy="beforeInteractive"
