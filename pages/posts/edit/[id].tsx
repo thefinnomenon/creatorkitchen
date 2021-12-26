@@ -4,6 +4,7 @@ import Tiptap from '../../../components/TipTap';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { createPost, updatePost } from '../../../graphql/mutations';
+import Iframely from '../../../components/Media/Iframely';
 
 type Props = {} & typeof defaultProps;
 

@@ -11,6 +11,8 @@ import ReactDOMServer from 'react-dom/server';
 import { RiLinkM } from 'react-icons/ri';
 import Link from './Link';
 import React from 'react';
+import Unsplash from './Unsplash';
+import Iframely from './Iframely';
 
 export default Node.create({
   name: 'media',
@@ -64,7 +66,7 @@ export default Node.create({
   },
 });
 
-type MediaType = 'image' | 'video';
+type MediaType = 'image' | 'video' | 'embed';
 export type MediaObject = {
   type: MediaType;
   src: string;
@@ -84,9 +86,9 @@ const SOURCES = [
   // @ts-ignore
   { label: 'Link', icon: <RiLinkM />, panel: <Link /> },
   { label: 'Upload', icon: <RiLinkM />, panel: <div /> },
-  { label: 'Unsplash', icon: <RiLinkM />, panel: <div /> },
+  // @ts-ignore
+  { label: 'Unsplash', icon: <RiLinkM />, panel: <Unsplash /> },
   { label: 'Giphy', icon: <RiLinkM />, panel: <div /> },
-  // { label: 'Memengine', icon: <RiLinkM />, panel: <div /> },
 ];
 
 function classNames(...classes) {
@@ -106,7 +108,7 @@ export function Media(props: Props): JSX.Element {
     });
   };
 
-  if (!type) {
+  if (!src) {
     return renderMediaInput(setMedia);
   }
 
@@ -116,19 +118,39 @@ export function Media(props: Props): JSX.Element {
     case 'video':
       return renderVideo(src);
     default:
-      console.log('Type not supported');
-      return <div>Type not supported</div>;
+      return renderEmbed(src);
   }
 }
+
+const renderEmbed = (src) => {
+  return (
+    <NodeViewWrapper contentEditable={false}>
+      <div
+        contentEditable={false}
+        data-drag-handle
+        className=" border-blue-500 focus:border-8"
+      >
+        {/* <Iframely url={src} /> */}
+        <a contentEditable={false} className="embedly-card" href={src} />
+      </div>
+    </NodeViewWrapper>
+  );
+};
 
 const renderImage = (src, alt) => {
   return (
     <NodeViewWrapper contentEditable={false}>
       <div
+        contentEditable={false}
         data-drag-handle
         className="flex justify-center object-none group border-blue-500 focus:border-8"
       >
-        <img src={src} alt={alt} className="rounded-md shadow-2xl" />
+        <img
+          contentEditable={false}
+          src={src}
+          alt={alt}
+          className="rounded-md shadow-2xl"
+        />
       </div>
     </NodeViewWrapper>
   );
