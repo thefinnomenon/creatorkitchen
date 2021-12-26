@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MediaObject } from '../Media';
 
 type Props = {
@@ -9,13 +9,19 @@ const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
 export default function Unsplash({ setMedia }: Props): JSX.Element {
-  const [search, setSearch] = useState('');
+  const [query, setQuery] = useState('');
   const [src, setSrc] = useState('');
   const [alt, setAlt] = useState('');
 
+  const handleSearch = async () => {
+    console.log(query);
+    const results = await (await fetch(`/api/unsplash?query=${query}`)).json();
+    console.log(results);
+  };
+
   const handleSet = () => {
     setMedia({ type: 'image', src, alt });
-    setSearch('');
+    setQuery('');
     setSrc('');
     setAlt('');
   };
@@ -28,13 +34,13 @@ export default function Unsplash({ setMedia }: Props): JSX.Element {
             className="appearance-none border rounded px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="search"
             type="text"
-            value={search}
+            value={query}
             // @ts-ignore
-            onInput={(e) => setSearch(e.target.value)}
+            onInput={(e) => setQuery(e.target.value)}
             placeholder={'Search'}
           />
           <button
-            onClick={() => handleSet()}
+            onClick={() => handleSearch()}
             className="flex-2 flex-shrink-0 text-sm font-bold bg-blue-500 hover:bg-blue-700 hover:border-blue-900  text-white  py-2 px-6 rounded"
             type="button"
           >
