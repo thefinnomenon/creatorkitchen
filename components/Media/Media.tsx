@@ -96,12 +96,13 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
+const API_KEY = process.env.NEXT_PUBLIC_IFRAMELY_API_KEY;
+
 export function Media(props: Props): JSX.Element {
+  const editing = props.editor && props.editor.isEditable;
   const { type, src, alt } = props.node.attrs;
-  //console.log('attrs: ', type, src);
 
   const setMedia = (media: MediaObject) => {
-    //console.log(media);
     props.updateAttributes({
       type: media.type,
       src: media.src,
@@ -109,30 +110,21 @@ export function Media(props: Props): JSX.Element {
     });
   };
 
-  if (!src) {
-    return renderMediaInput(setMedia);
-  }
+  if (!src) return renderMediaInput(setMedia);
 
+  let embed;
   switch (type) {
     case 'image':
-      return renderImage(src, alt);
+      embed = <img src={src} className="embed not-prose" alt={alt} />;
+      break;
     case 'video':
-      return renderVideo(src);
+      embed = <video src={src} className="embed not-prose" controls />;
+      break;
     default:
-      return renderEmbed(src);
-  }
-}
-
-const renderEmbed = (src) => {
-  const API_KEY = process.env.NEXT_PUBLIC_IFRAMELY_API_KEY;
-
-  return (
-    <NodeViewWrapper contentEditable={false}>
-      <div contentEditable={false} data-drag-handle className="">
-        <div className="iframely-embed " contentEditable={false}>
-          <div className="iframely-responsive" contentEditable={false}>
+      embed = (
+        <div className="flex-1 iframely-embed embed">
+          <div className="iframely-responsive">
             <iframe
-              contentEditable={false}
               src={`https://cdn.iframe.ly/api/iframe?app=1&url=${src}&key=${API_KEY}&lazy=1&iframe=1&omit_script=1&omit_css=true`}
               frameBorder="0"
               allow="autoplay; encrypted-media"
@@ -140,43 +132,18 @@ const renderEmbed = (src) => {
             />
           </div>
         </div>
-      </div>
-    </NodeViewWrapper>
-  );
-};
+      );
+  }
 
-const renderImage = (src, alt) => {
   return (
     <NodeViewWrapper contentEditable={false}>
-      <div
-        contentEditable={false}
-        data-drag-handle
-        className="flex justify-center object-none"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          contentEditable={false}
-          src={src}
-          alt={alt}
-          className="rounded-md shadow-2xl"
-        />
+      <div contentEditable={false} className="flex justify-center items-center">
+        {editing && <div data-drag-handle className="drag-handle"></div>}
+        {embed}
       </div>
     </NodeViewWrapper>
   );
-};
-
-const renderVideo = (src) => {
-  return (
-    <NodeViewWrapper contentEditable={false}>
-      <div
-        data-drag-handle
-        className="flex justify-center items-center object-none group"
-      >
-        <video src={src} className="rounded-md shadow-2xl" controls />
-      </div>
-    </NodeViewWrapper>
-  );
-};
+}
 
 const renderMediaInput = (setMedia) => (
   <NodeViewWrapper
