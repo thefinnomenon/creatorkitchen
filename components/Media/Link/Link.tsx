@@ -43,7 +43,7 @@ export default function Link({ setMedia }: Props): JSX.Element {
       <div className="flex w-full">
         <div className="flex w-full flex-col gap-2">
           <input
-            className="appearance-none border rounded px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="appearance-none border py-2 rounded px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="media_url"
             type="url"
             value={src}
@@ -67,7 +67,7 @@ export default function Link({ setMedia }: Props): JSX.Element {
             className="flex-2 flex-shrink-0 text-sm font-bold bg-blue-500 hover:bg-blue-700 hover:border-blue-900 text-white  py-2 px-6 rounded"
             type="button"
           >
-            Set
+            Embed
           </button>
         </div>
       </div>

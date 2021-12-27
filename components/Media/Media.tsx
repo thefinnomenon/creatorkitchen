@@ -13,6 +13,7 @@ import Link from './Link';
 import React, { useEffect, useState } from 'react';
 import Unsplash from './Unsplash';
 import Giphy from './Giphy';
+import Upload from './Upload';
 
 export default Node.create({
   name: 'media',
@@ -91,7 +92,8 @@ const initialState = Object.freeze({});
 const SOURCES = [
   // @ts-ignore
   { label: 'Link', icon: <RiLinkM />, panel: <Link /> },
-  { label: 'Upload', icon: <RiLinkM />, panel: <div /> },
+  // @ts-ignore
+  { label: 'Upload', icon: <RiLinkM />, panel: <Upload /> },
   // @ts-ignore
   { label: 'Unsplash', icon: <RiLinkM />, panel: <Unsplash /> },
   // @ts-ignore
@@ -185,7 +187,7 @@ const renderMediaInput = (setMedia) => (
           </Tab>
         ))}
       </Tab.List>
-      <Tab.Panels className="mt-2">
+      <Tab.Panels className="my-2 min-h-[8rem]">
         {SOURCES.map(({ panel }, index) => (
           <Tab.Panel key={index} className="p-3">
             {React.cloneElement(panel, { setMedia })}

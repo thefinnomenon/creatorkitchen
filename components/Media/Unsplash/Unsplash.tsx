@@ -48,7 +48,7 @@ export default function Unsplash({ setMedia }: Props): JSX.Element {
         <div className="flex w-full">
           <div className="flex w-full flex-col gap-2">
             <input
-              className="appearance-none border rounded px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="search"
               type="text"
               value={query}
