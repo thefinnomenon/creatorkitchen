@@ -11,6 +11,8 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@giphy/js-fetch-api": "^4.1.2",
+    "@giphy/react-components": "^5.4.0",
     "@headlessui/react": "^1.4.2",
     "@reach/tabs": "^0.16.4",
     "@reach/visually-hidden": "^0.16.0",

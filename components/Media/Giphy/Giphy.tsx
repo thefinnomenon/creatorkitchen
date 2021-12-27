@@ -1,26 +1,6 @@
 import { useState } from 'react';
 import { MediaObject } from '../Media';
 
-type Photo = {
-  id: number;
-  alt_description: string;
-  width: number;
-  height: number;
-  urls: { large: string; regular: string; raw: string; small: string };
-  color: string | null;
-  links: {
-    html: string;
-  };
-  user: {
-    links: {
-      self: string;
-      html: string;
-    };
-    username: string;
-    name: string;
-  };
-};
-
 type Props = {
   setMedia(media: MediaObject): void;
 } & typeof defaultProps;
@@ -30,16 +10,16 @@ const initialState = Object.freeze({});
 
 const NUM_OF_IMAGES = 24;
 
-export default function Unsplash({ setMedia }: Props): JSX.Element {
+export default function Giphy({ setMedia }: Props): JSX.Element {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<[Photo]>();
+  const [results, setResults] = useState();
 
   const handleSearch = async () => {
     const res = await (
-      await fetch(`/api/unsplash?per_page=${NUM_OF_IMAGES}&query=${query}`)
+      await fetch(`/api/giphy?limit=${NUM_OF_IMAGES}&query=${query}`)
     ).json();
 
-    setResults(res.results);
+    setResults(res.results.data);
   };
 
   return (
@@ -68,25 +48,26 @@ export default function Unsplash({ setMedia }: Props): JSX.Element {
       </div>
       <div className="masonry mt-5">
         {results &&
-          results.map((image, index) => {
+          // @ts-ignore
+          results.map((gif) => {
             return (
               <div
-                key={image.id}
+                key={gif.id}
                 className="brick not-prose"
                 onClick={() =>
                   setMedia({
                     type: 'image',
-                    src: image.urls.regular,
-                    alt: image.alt_description,
-                    caption: `Photo by <a href="${image.user.links.html}" target="_blank" rel="noopener noreferrer">${image.user.name}</a> on <a href="${image.links.html}" target="_blank" rel="noopener noreferrer">Unsplash</a>`,
+                    src: gif.images.original.url,
+                    alt: gif.title,
+                    caption: `${gif.title} from <a href="${gif.url}" target="_blank" rel="noopener noreferrer">Giphy</a>`,
                   })
                 }
               >
                 <div>
                   <img
-                    key={image.id}
-                    src={image.urls.small}
-                    alt={image.alt_description}
+                    key={gif.id}
+                    src={gif.images.fixed_width_downsampled.url}
+                    alt={gif.title}
                     className="not-prose"
                   />
                   {/* <a
@@ -104,4 +85,4 @@ export default function Unsplash({ setMedia }: Props): JSX.Element {
   );
 }
 
-Unsplash.defaultProps = defaultProps;
+Giphy.defaultProps = defaultProps;

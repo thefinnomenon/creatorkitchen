@@ -14,8 +14,8 @@ export default function Link({ setMedia }: Props): JSX.Element {
   const [showAlt, setShowAlt] = useState(false);
 
   const determineTypeFromSrc = (source: string) => {
-    const imgRegex = new RegExp('.?(jpe?g|png|gif|bmp)$', 'i');
-    const videoRegex = new RegExp('.?(mov|avi|wmv|flv|3gp|mp4|mpg)$', 'i');
+    const imgRegex = new RegExp('.?(jpe?g|png|gif|bmp)', 'ig');
+    const videoRegex = new RegExp('.?(mov|avi|wmv|flv|3gp|mp4|mpg)', 'ig');
 
     if (imgRegex.test(source)) return 'image';
     if (videoRegex.test(source)) return 'video';
@@ -26,7 +26,7 @@ export default function Link({ setMedia }: Props): JSX.Element {
     const type = determineTypeFromSrc(src);
     console.log(src, type);
 
-    setMedia({ type, src, alt });
+    setMedia({ type, src, alt, caption: alt });
     setSrc('');
     setShowAlt(false);
   };

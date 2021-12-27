@@ -109,3 +109,51 @@ code::after {
    background-size: contain;
    background-position: center;
 }
+
+/* The Masonry Container */
+/* Masonry grid */
+.masonry {
+  column-count: 2;
+  column-gap: 0;
+  column-fill: initial;
+}
+
+/* Masonry item */
+.masonry .brick {
+  width: 100%;
+  vertical-align: top; /* Keep the item on the very top */
+}
+
+/* Masonry image effects */
+.masonry .brick img {
+  transition: all .5s ease-in-out;
+  backface-visibility: hidden; /* Remove Image flickering on hover */
+  @apply ring-0;
+}
+
+.masonry .brick:hover img {
+  opacity: .5;
+}
+
+/* Masonry on tablets */
+@media only screen and (min-width: 480px) and (max-width: 749px) {
+  .masonry {
+    column-count: 3;
+  }
+}
+
+/* Masonry on big screens */
+@media only screen and (min-width: 750px) {
+  .desc {
+    font-size: 1.25em;
+  }
+
+  .intro {
+    letter-spacing: 1px;
+  }
+
+  .masonry {
+    column-count: 4;
+  }
+}
+/***********************/

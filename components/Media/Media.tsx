@@ -12,6 +12,7 @@ import { RiLinkM } from 'react-icons/ri';
 import Link from './Link';
 import React, { useEffect, useState } from 'react';
 import Unsplash from './Unsplash';
+import Giphy from './Giphy';
 
 export default Node.create({
   name: 'media',
@@ -28,6 +29,9 @@ export default Node.create({
         default: '',
       },
       alt: {
+        default: '',
+      },
+      caption: {
         default: '',
       },
     };
@@ -54,7 +58,7 @@ export default Node.create({
       dom.setAttribute(attribute, HTMLAttributes[attribute]);
     });
 
-    //console.log(dom);
+    const contentDOM = dom.querySelector('[data-node-view-content]');
 
     return {
       dom,
@@ -72,6 +76,7 @@ export type MediaObject = {
   type: MediaType;
   src: string;
   alt: string;
+  caption: string;
 };
 
 type Props = {
@@ -89,7 +94,8 @@ const SOURCES = [
   { label: 'Upload', icon: <RiLinkM />, panel: <div /> },
   // @ts-ignore
   { label: 'Unsplash', icon: <RiLinkM />, panel: <Unsplash /> },
-  { label: 'Giphy', icon: <RiLinkM />, panel: <div /> },
+  // @ts-ignore
+  { label: 'Giphy', icon: <RiLinkM />, panel: <Giphy /> },
 ];
 
 function classNames(...classes) {
@@ -107,6 +113,7 @@ export function Media(props: Props): JSX.Element {
       type: media.type,
       src: media.src,
       alt: media.alt,
+      caption: media.caption || '',
     });
   };
 
@@ -136,10 +143,19 @@ export function Media(props: Props): JSX.Element {
   }
 
   return (
-    <NodeViewWrapper contentEditable={false}>
-      <div contentEditable={false} className="flex justify-center items-center">
-        {editing && <div data-drag-handle className="drag-handle"></div>}
+    <NodeViewWrapper contentEditable={false} className="mb-8">
+      <div className="flex justify-center items-center">
+        {editing && <div data-drag-handle className="drag-handle" />}
         {embed}
+      </div>
+      <div
+        contentEditable={false}
+        className="w-full text-center text-sm text-gray-500"
+      >
+        <div
+          className="mt-[-1rem]"
+          dangerouslySetInnerHTML={{ __html: props.node.attrs.caption }}
+        />
       </div>
     </NodeViewWrapper>
   );
@@ -147,7 +163,7 @@ export function Media(props: Props): JSX.Element {
 
 const renderMediaInput = (setMedia) => (
   <NodeViewWrapper
-    className="bg-gray-100 border-2 border-gray-200 rounded-sm shadow-lg overflow-hidden"
+    className="bg-gray-100 border-2 border-gray-200 rounded-sm shadow-lg overflow-hidden mb-8"
     contentEditable={false}
   >
     <Tab.Group>
