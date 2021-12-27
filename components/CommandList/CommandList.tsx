@@ -34,21 +34,31 @@ export default forwardRef((props: Props, ref) => {
       (selectedIndex + props.items.length - 1) % props.items.length
     );
     if (listRef.current) {
-      // @ts-ignore
-      listRef.current.getElementsByClassName('bg-gray-300')[0].scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-      });
+      // Note: Even if there is no matches (e.g. nothing shown) the last one is still highlighted
+      //       but not in the dom
+      try {
+        listRef.current
+          // @ts-ignore
+          .getElementsByClassName('bg-gray-300')[0]
+          .scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+          });
+      } catch {}
     }
   };
 
   const downHandler = () => {
     setSelectedIndex((selectedIndex + 1) % props.items.length);
     if (listRef.current) {
-      listRef.current
-        // @ts-ignore
-        .getElementsByClassName('bg-gray-300')[0]
-        .scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // Note: Even if there is no matches (e.g. nothing shown) the last one is still highlighted
+      //       but not in the dom
+      try {
+        listRef.current
+          // @ts-ignore
+          .getElementsByClassName('bg-gray-300')[0]
+          .scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch {}
     }
   };
 
