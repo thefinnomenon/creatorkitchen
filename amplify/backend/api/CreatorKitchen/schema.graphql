@@ -1,11 +1,6 @@
-type Post @model @auth(rules: [{allow: public}]) {
+# Cognito User @owner can CRUD their own posts, Anyone can read any post
+type Post @model @auth(rules: [{ allow: owner}, { allow: public, operations: [read] }]) {
   id: ID!
-  content: String
-  blogID: ID @index(name: "byBlog")
-}
-
-type Blog @model @auth(rules: [{allow: public}]) {
-  id: ID!
-  name: String
-  posts: [Post] @hasMany(indexName: "byBlog", fields: ["id"])
+  content: String!
+  media: AWSJSON
 }

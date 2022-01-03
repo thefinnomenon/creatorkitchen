@@ -7,9 +7,10 @@ export const getPost = /* GraphQL */ `
     getPost(id: $id) {
       id
       content
-      blogID
+      media
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -23,39 +24,10 @@ export const listPosts = /* GraphQL */ `
       items {
         id
         content
-        blogID
+        media
         createdAt
         updatedAt
-      }
-      nextToken
-    }
-  }
-`;
-export const getBlog = /* GraphQL */ `
-  query GetBlog($id: ID!) {
-    getBlog(id: $id) {
-      id
-      name
-      posts {
-        nextToken
-      }
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const listBlogs = /* GraphQL */ `
-  query ListBlogs(
-    $filter: ModelBlogFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listBlogs(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        name
-        createdAt
-        updatedAt
+        owner
       }
       nextToken
     }

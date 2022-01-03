@@ -1,17 +1,19 @@
 {
   "version": 1,
   "serviceConfiguration": {
-    "apiName": "CreatorKitchen",
+    "apiName": "creatorkitchen",
     "serviceName": "AppSync",
-    "gqlSchemaPath": "/Users/finn/Projects/Dev/creatorkitchen/amplify/backend/api/CreatorKitchen/schema.graphql",
+    "gqlSchemaPath": "/Users/finn/Projects/Dev/creatorkitchen/amplify/backend/api/creatorkitchen/schema.graphql",
     "defaultAuthType": {
       "mode": "API_KEY",
-      "keyDescription": "api key description",
-      "expirationTime": 30
+      "expirationTime": 365,
+      "apiKeyExpirationDate": "2022-12-31T21:31:24.473Z",
+      "keyDescription": ""
     },
     "additionalAuthTypes": [
       {
-        "mode": "AWS_IAM"
+        "mode": "AMAZON_COGNITO_USER_POOLS",
+        "cognitoUserPoolId": "authcreatorkitchen40d51635"
       }
     ],
     "conflictResolution": {}

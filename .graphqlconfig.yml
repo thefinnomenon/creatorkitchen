@@ -1,6 +1,6 @@
 projects:
-  CreatorKitchen:
-    schemaPath: amplify/backend/api/CreatorKitchen/build/schema.graphql
+  creatorkitchen:
+    schemaPath: graphql/schema.json
     includes:
       - graphql/**/*.ts
     excludes:
@@ -8,11 +8,8 @@ projects:
     extensions:
       amplify:
         codeGenTarget: typescript
-        generatedFileName: api.ts
+        generatedFileName: graphql/API.ts
         docsFilePath: graphql
-        region: us-east-1
-        apiId: null
-        maxDepth: 2
 extensions:
   amplify:
     version: 3

@@ -1,0 +1,15 @@
+{
+  "resourceName": "CreatorKitchenS3",
+  "policyUUID": "40b493be",
+  "bucketName": "creatorkitchen",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "READ"
+  ],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "groupAccess": {}
+}

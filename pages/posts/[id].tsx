@@ -1,16 +1,31 @@
 import API from '@aws-amplify/api';
-import { route } from 'next/dist/server/router';
 import { useRouter } from 'next/router';
 import { getPost, listPosts } from '../../graphql/queries';
-import Tiptap from '../../components/TipTap';
+import Amplify from 'aws-amplify';
+import config from '../../aws-exports';
+Amplify.configure(config);
 
-export default function Post({ post }) {
+type PostType = {
+  id: string;
+  content: string;
+};
+
+type Props = {
+  post: PostType;
+} & typeof defaultProps;
+
+const defaultProps = Object.freeze({});
+const initialState = Object.freeze({});
+
+export default function Post({ post }: Props) {
   const router = useRouter();
   const { id } = router.query;
 
   function navigateToEdit() {
     router.push(`/posts/edit/${id}`);
   }
+
+  if (!post.content) return null;
 
   return (
     <>
@@ -26,49 +41,47 @@ export default function Post({ post }) {
             className="ProseMirror p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
-          {/* <Tiptap content={post.content} preview={true} onChange={() => {}} /> */}
         </div>
       </div>
     </>
   );
 }
 
-// This function gets called at build time
+// At build time, get post and pass as prop
 export async function getStaticProps({ params }) {
   const { id } = params;
+  console.log(id);
 
-  // Retrieve post from DynamoDB
-  const postData = await API.graphql({
-    query: getPost,
-    variables: { id },
-  });
-  // @ts-ignore
-  const post = postData.data.getPost;
-  console.log('Retrieved Post');
-  console.log(post.content);
+  try {
+    const postData = (await API.graphql({
+      query: getPost,
+      variables: { id },
+    })) as { data: { getPost: PostType } };
 
-  // By returning { props: { posts } }, the Blog component
-  // will receive `posts` as a prop at build time
-  return {
-    props: {
-      post,
-    },
-    revalidate: 60,
-  };
+    return {
+      props: {
+        post: postData.data.getPost,
+      },
+      revalidate: 1,
+    };
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-// This function gets called at build time
+// At build time, get posts list and generate paths
 export async function getStaticPaths() {
-  // Retrieve posts from DynamoDB
-  const postData = await API.graphql({
-    query: listPosts,
-  });
+  try {
+    const postData = (await API.graphql({
+      query: listPosts,
+    })) as { data: { listPosts: { items: [PostType] } } };
 
-  // Map post list to paths
-  // @ts-ignore
-  const paths = postData.data.listPosts.items.map((post) => ({
-    params: { id: post.id },
-  }));
+    const paths = postData.data.listPosts.items.map((post) => ({
+      params: { id: post.id },
+    }));
 
-  return { paths, fallback: 'blocking' };
+    return { paths, fallback: 'blocking' };
+  } catch (error) {
+    console.log(error);
+  }
 }

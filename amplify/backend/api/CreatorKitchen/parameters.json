@@ -1,5 +1,12 @@
 {
-  "AppSyncApiName": "CreatorKitchen",
+  "AppSyncApiName": "creatorkitchen",
   "DynamoDBBillingMode": "PAY_PER_REQUEST",
-  "DynamoDBEnableServerSideEncryption": false
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authcreatorkitchen40d51635",
+      "Outputs.UserPoolId"
+    ]
+  },
+  "AuthModeLastUpdated": "2021-12-31T21:31:29.761Z"
 }
