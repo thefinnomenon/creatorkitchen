@@ -123,14 +123,14 @@ export function Media(props: Props): JSX.Element {
   let embed;
   switch (type) {
     case 'image':
-      embed = <img src={src} className="embed not-prose" alt={alt} />;
+      embed = <img src={src} className="mx-auto embed not-prose" alt={alt} />;
       break;
     case 'video':
-      embed = <video src={src} className="embed not-prose" controls />;
+      embed = <video src={src} className="mx-auto embed not-prose" controls />;
       break;
     default:
       embed = (
-        <div className="flex-1 iframely-embed embed">
+        <div className="iframely-embed embed">
           <div className="iframely-responsive">
             <iframe
               src={`https://cdn.iframe.ly/api/iframe?app=1&url=${src}&key=${API_KEY}&lazy=1&iframe=1&omit_script=1&omit_css=true`}
@@ -147,7 +147,7 @@ export function Media(props: Props): JSX.Element {
     <NodeViewWrapper className="mb-8">
       <div contentEditable={false} className="flex justify-center items-center">
         {editing && <div data-drag-handle className="drag-handle" />}
-        {embed}
+        <div className="flex-1 max-w-2xl px-1">{embed}</div>
       </div>
 
       <div
@@ -155,7 +155,7 @@ export function Media(props: Props): JSX.Element {
         className="w-full text-center text-sm text-gray-500"
       >
         <div
-          className="mt-[-1rem]"
+          className="mt-[-1.4rem]"
           dangerouslySetInnerHTML={{ __html: props.node.attrs.caption }}
         />
       </div>
