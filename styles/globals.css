@@ -20,6 +20,15 @@ h4.is-empty::before
   height: 0;
 }
 
+figcaption.is-empty::before
+ {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
+
 .ProseMirror kbd {
    background-color: #eee;
    border-radius: 3px;
@@ -159,5 +168,10 @@ code::after {
 /***********************/
 
 amplify-authenticator {
-   @apply h-screen flex flex-col justify-center items-center bg-gradient-to-r from-rose-100 to-teal-100
+   @apply h-screen flex flex-col justify-center items-center bg-gradient-to-r from-rose-100 to-teal-100;
+}
+
+caption {
+   display: inline;
+   text-align: -webkit-center;
 }

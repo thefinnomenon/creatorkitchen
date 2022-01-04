@@ -24,7 +24,6 @@ export default function Link({ setMedia }: Props): JSX.Element {
 
   const handleSet = () => {
     const type = determineTypeFromSrc(src);
-    console.log(src, type);
 
     setMedia({ type, src, alt, caption: alt });
     setSrc('');

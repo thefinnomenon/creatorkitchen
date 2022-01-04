@@ -34,8 +34,17 @@ export default function TextFloatingToolbar({
 }: Props): JSX.Element {
   function shouldShow() {
     return ({ editor, view, state, oldState, from, to }) => {
+      // Force show
+      // if (textToolbar.current === 'show') return true;
+
       // Force hide
       if (textToolbar.current === 'hide') return false;
+
+      // If media -> Hide
+      if (state.selection.node) {
+        const type = state.selection.node.type.name;
+        if (type === 'media') return false;
+      }
 
       // Sometime check for `empty` is not enough
       const isEmptyTextBlock =

@@ -24,7 +24,6 @@ export default forwardRef((props: Props, ref) => {
     const item = props.items[index];
 
     if (item) {
-      console.log(item.key, item.title);
       props.command({ section: item.section, type: item.key });
     }
   };

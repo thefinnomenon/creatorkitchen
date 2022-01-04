@@ -10,7 +10,7 @@ import { Tab } from '@headlessui/react';
 import ReactDOMServer from 'react-dom/server';
 import { RiLinkM } from 'react-icons/ri';
 import Link from './Link';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Unsplash from './Unsplash';
 import Giphy from './Giphy';
 import Upload from './Upload';
@@ -48,7 +48,6 @@ export default Node.create({
 
   renderHTML({ HTMLAttributes }) {
     const dom = document.createElement('div');
-    const contentDom = document.createElement('div');
     dom.innerHTML = ReactDOMServer.renderToStaticMarkup(
       // @ts-ignore
       <Media editor={null} node={{ attrs: { ...HTMLAttributes } }} />
@@ -59,11 +58,11 @@ export default Node.create({
       dom.setAttribute(attribute, HTMLAttributes[attribute]);
     });
 
-    const contentDOM = dom.querySelector('[data-node-view-content]');
+    let contentDOM = dom.querySelector('[data-node-view-content]');
 
     return {
       dom,
-      contentDom,
+      contentDOM,
     };
   },
 
@@ -108,7 +107,7 @@ const API_KEY = process.env.NEXT_PUBLIC_IFRAMELY_API_KEY;
 
 export function Media(props: Props): JSX.Element {
   const editing = props.editor && props.editor.isEditable;
-  const { type, src, alt } = props.node.attrs;
+  const { type, src, alt, caption } = props.node.attrs;
 
   const setMedia = (media: MediaObject) => {
     props.updateAttributes({
@@ -145,11 +144,12 @@ export function Media(props: Props): JSX.Element {
   }
 
   return (
-    <NodeViewWrapper contentEditable={false} className="mb-8">
-      <div className="flex justify-center items-center">
+    <NodeViewWrapper className="mb-8">
+      <div contentEditable={false} className="flex justify-center items-center">
         {editing && <div data-drag-handle className="drag-handle" />}
         {embed}
       </div>
+
       <div
         contentEditable={false}
         className="w-full text-center text-sm text-gray-500"
@@ -159,6 +159,12 @@ export function Media(props: Props): JSX.Element {
           dangerouslySetInnerHTML={{ __html: props.node.attrs.caption }}
         />
       </div>
+
+      {/* <NodeViewContent
+        as="figcaption"
+        data-placeholder="Enter a caption"
+        className="w-full text-center text-sm text-gray-500"
+      /> */}
     </NodeViewWrapper>
   );
 }
