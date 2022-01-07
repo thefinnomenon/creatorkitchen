@@ -7,6 +7,10 @@ import TextAlign from '@tiptap/extension-text-align';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
 import Placeholder from '@tiptap/extension-placeholder';
+import Table from '@tiptap/extension-table';
+import TableRow from '@tiptap/extension-table-row';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
 import Focus from '@tiptap/extension-focus';
 import Link from '@tiptap/extension-link';
 import Keyboard from '../extensions/marks/keyboard';
@@ -18,6 +22,7 @@ import { applyDevTools } from 'prosemirror-dev-toolkit';
 import { useEffect, useRef, useState } from 'react';
 import TextFloatingToolbar from './TextFloatingToolbar';
 import LinkInput from './LinkInput';
+import TableFloatingToolbar from './TableFloatingToolbar';
 
 const DEBUG = process && process.env.NODE_ENV === 'development';
 
@@ -37,10 +42,11 @@ export type MenuState = 'show' | 'hide';
 export default function Tiptap({ content, preview, onChange }) {
   const [previewContent, setPreviewContent] = useState('');
   const linkToolbar = useRef<MenuState>('hide');
+  const tableToolbar = useRef<MenuState>('hide');
   const textToolbar = useRef<MenuState>('show');
 
   const editorClass =
-    'p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor';
+    'p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor whitespace-pre-wrap';
 
   const LinkWithShortcut = Link.extend({
     // @ts-ignore
@@ -79,6 +85,13 @@ export default function Tiptap({ content, preview, onChange }) {
       LinkWithShortcut.configure({
         openOnClick: false,
       }),
+      Table.configure({
+        resizable: true,
+        lastColumnResizable: false,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
       Focus,
       Keyboard,
       Callout,
@@ -90,6 +103,7 @@ export default function Tiptap({ content, preview, onChange }) {
         types: ['heading', 'paragraph'],
       }),
       Placeholder.configure({
+        includeChildren: true,
         placeholder: ({ node }) => {
           if (node.type.name === 'heading') {
             return `Heading ${node.attrs.level}`;
@@ -149,6 +163,9 @@ export default function Tiptap({ content, preview, onChange }) {
       )}
       {editor && !preview && (
         <LinkInput editor={editor} linkToolbar={linkToolbar} />
+      )}
+      {editor && !preview && (
+        <TableFloatingToolbar editor={editor} toolbar={tableToolbar} />
       )}
       <EditorContent editor={editor} id="editor" />
     </>

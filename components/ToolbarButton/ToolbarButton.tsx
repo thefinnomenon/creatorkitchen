@@ -7,13 +7,14 @@ type Props = {
   onClick(): void;
   altText: string;
   disabled?: boolean;
-  isActive: boolean;
+  isActive?: boolean;
   isGroupStart?: boolean;
 } & typeof defaultProps;
 
 const defaultProps = Object.freeze({
   disabled: false,
   isGroupStart: false,
+  isActive: false,
 });
 const initialState = Object.freeze({});
 

@@ -68,6 +68,11 @@ export const suggestion = {
         section: 'Basic',
       },
       {
+        key: 'table',
+        title: 'Table',
+        section: 'Basic',
+      },
+      {
         key: 'media',
         title: 'Media',
         section: 'Basic',

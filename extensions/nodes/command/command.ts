@@ -106,6 +106,15 @@ export const Command = Node.create<CommandOptions>({
             case 'callout':
               editor.chain().focus().deleteRange(range).wrapIn('callout').run();
               break;
+            case 'table':
+              console.log('Inserting table');
+              editor
+                .chain()
+                .focus()
+                .deleteRange(range)
+                .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+                .run();
+              break;
             case 'media':
               editor
                 .chain()
