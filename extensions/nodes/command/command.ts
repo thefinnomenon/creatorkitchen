@@ -92,9 +92,6 @@ export const Command = Node.create<CommandOptions>({
             case 'blockquote':
               editor.chain().focus().deleteRange(range).setBlockquote().run();
               break;
-            case 'codeblock':
-              editor.chain().focus().deleteRange(range).setCodeBlock().run();
-              break;
             case 'hr':
               editor
                 .chain()
@@ -105,6 +102,9 @@ export const Command = Node.create<CommandOptions>({
               break;
             case 'callout':
               editor.chain().focus().deleteRange(range).wrapIn('callout').run();
+              break;
+            case 'code':
+              editor.chain().focus().deleteRange(range).toggleCodeBlock().run();
               break;
             case 'table':
               console.log('Inserting table');

@@ -53,11 +53,6 @@ export const suggestion = {
         section: 'Basic',
       },
       {
-        key: 'codeblock',
-        title: 'Code Block',
-        section: 'Basic',
-      },
-      {
         key: 'hr',
         title: 'Divider',
         section: 'Basic',
@@ -65,6 +60,11 @@ export const suggestion = {
       {
         key: 'callout',
         title: 'Callout',
+        section: 'Basic',
+      },
+      {
+        key: 'code',
+        title: 'Code',
         section: 'Basic',
       },
       {

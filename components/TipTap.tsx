@@ -1,4 +1,9 @@
-import { EditorContent, isTextSelection, useEditor } from '@tiptap/react';
+import {
+  EditorContent,
+  isTextSelection,
+  ReactNodeViewRenderer,
+  useEditor,
+} from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
 import Underline from '@tiptap/extension-underline';
@@ -13,6 +18,10 @@ import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import Focus from '@tiptap/extension-focus';
 import Link from '@tiptap/extension-link';
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+// load all highlight.js languages
+// @ts-ignore
+import { lowlight } from 'lowlight';
 import Keyboard from '../extensions/marks/keyboard';
 import Command from '../extensions/nodes/command';
 import Callout from '../components/Callout';
@@ -23,6 +32,7 @@ import { useEffect, useRef, useState } from 'react';
 import TextFloatingToolbar from './TextFloatingToolbar';
 import LinkInput from './LinkInput';
 import TableFloatingToolbar from './TableFloatingToolbar';
+import CodeBlock from './CodeBlock';
 
 const DEBUG = process && process.env.NODE_ENV === 'development';
 
@@ -76,6 +86,7 @@ export default function Tiptap({ content, preview, onChange }) {
         heading: {
           levels: [1, 2, 3, 4],
         },
+        codeBlock: false,
       }),
       Highlight,
       Typography,
@@ -94,6 +105,16 @@ export default function Tiptap({ content, preview, onChange }) {
       TableCell,
       Focus,
       Keyboard,
+      CodeBlockLowlight.extend({
+        addNodeView() {
+          return ReactNodeViewRenderer(CodeBlock);
+        },
+      }).configure({
+        lowlight,
+        HTMLAttributes: {
+          class: 'not-prose',
+        },
+      }),
       Callout,
       Media,
       Command.configure({

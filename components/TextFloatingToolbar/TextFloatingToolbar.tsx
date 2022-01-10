@@ -40,6 +40,9 @@ export default function TextFloatingToolbar({
       // Force hide
       if (textToolbar.current === 'hide') return false;
 
+      // If codeblock -> Hide
+      if (editor.isActive('codeBlock')) return false;
+
       // If media -> Hide
       if (state.selection.node) {
         const type = state.selection.node.type.name;
