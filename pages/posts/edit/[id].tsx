@@ -139,9 +139,7 @@ export default function EditPost() {
     if (!content) return;
     const oldMediaList = post.media;
     const media = updateMediaList(content);
-    console.log(content);
     const newContent = highlightCodeblocks(content);
-    console.log(newContent);
 
     if (isNew) {
       await API.graphql({
