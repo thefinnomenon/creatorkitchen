@@ -5,6 +5,9 @@ import Tiptap from '../../../components/TipTap';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { createPost, updatePost } from '../../../graphql/mutations';
+// @ts-ignore
+import { lowlight } from 'lowlight';
+import hljs from 'highlight.js';
 import Auth from '@aws-amplify/auth';
 import config from '../../../aws-exports';
 
@@ -117,6 +120,17 @@ export default function EditPost() {
     fetchPost();
   }, [id]);
 
+  // Note: The v2 codeblock extension will output the styled
+  //       code block and we can remove this ugly extra step
+  const highlightCodeblocks = (content) => {
+    const doc = new DOMParser().parseFromString(content, 'text/html');
+    doc.querySelectorAll('pre code').forEach((el) => {
+      // @ts-ignore
+      hljs.highlightElement(el);
+    });
+    return new XMLSerializer().serializeToString(doc);
+  };
+
   function onChange(content) {
     setContent(content);
   }
@@ -125,24 +139,30 @@ export default function EditPost() {
     if (!content) return;
     const oldMediaList = post.media;
     const media = updateMediaList(content);
-    //console.log(content);
+    console.log(content);
+    const newContent = highlightCodeblocks(content);
+    console.log(newContent);
 
     if (isNew) {
       await API.graphql({
         query: createPost,
         variables: {
-          input: { ...post, content, media: formatMediaList(media) },
+          input: {
+            ...post,
+            content: newContent,
+            media: formatMediaList(media),
+          },
         },
         authMode: 'AMAZON_COGNITO_USER_POOLS',
       });
 
       await handleMediaChanges(oldMediaList, media);
-      setPost({ ...post, content, media });
+      setPost({ ...post, content: newContent, media });
       setIsNew(false);
     } else {
       const postUpdated = {
         id,
-        content: content,
+        content: newContent,
         media: formatMediaList(media),
       };
 
@@ -155,7 +175,7 @@ export default function EditPost() {
       });
 
       await handleMediaChanges(oldMediaList, media);
-      setPost({ ...post, content, media });
+      setPost({ ...post, content: newContent, media });
     }
   }
 

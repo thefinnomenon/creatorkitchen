@@ -23,7 +23,10 @@ export default function CodeBlock({
         ))}
       </select>
       <pre>
-        <NodeViewContent as="code" style={{ padding: 0 }} />
+        <NodeViewContent
+          as="code"
+          style={{ padding: 0, fontFamily: 'Menlo', fontSize: '14px' }}
+        />
       </pre>
     </NodeViewWrapper>
   );

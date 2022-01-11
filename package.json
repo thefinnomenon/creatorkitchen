@@ -40,6 +40,7 @@
     "@tiptap/suggestion": "^2.0.0-beta.85",
     "add": "^2.0.6",
     "aws-amplify": "^4.3.11",
+    "highlight": "^0.2.4",
     "lint": "next lint",
     "lowlight": "^2.5.0",
     "match-sorter": "^6.3.1",

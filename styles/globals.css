@@ -354,4 +354,8 @@ pre {
 
 code {
   border: 0;
+  font-family: 'Menlo';
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 25px;
 }
