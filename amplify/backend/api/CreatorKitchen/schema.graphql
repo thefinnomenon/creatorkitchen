@@ -1,6 +1,12 @@
-# Cognito User @owner can CRUD their own posts, Anyone can read any post
-type Post @model @auth(rules: [{ allow: owner}, { allow: public, operations: [read] }]) {
+type Post @model
+  @auth(rules: [
+    { allow: owner, ownerField: "username" },
+    { allow: public, operations: [read] }
+  ]) {
   id: ID!
+  title: String!
   content: String!
+  username: String @index(name: "postsByUsername", queryField: "postsByUsername")
   media: AWSJSON
+  coverImage: String
 }

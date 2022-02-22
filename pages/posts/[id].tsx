@@ -25,6 +25,7 @@ export default function Post({ post }: Props) {
     router.push(`/posts/edit/${id}`);
   }
 
+  console.log(post);
   if (!post.content) return null;
 
   return (
@@ -79,6 +80,7 @@ export async function getStaticPaths() {
     const paths = postData.data.listPosts.items.map((post) => ({
       params: { id: post.id },
     }));
+    console.log(paths);
 
     return { paths, fallback: 'blocking' };
   } catch (error) {

@@ -10,6 +10,8 @@ import { lowlight } from 'lowlight';
 import hljs from 'highlight.js';
 import Auth from '@aws-amplify/auth';
 import config from '../../../aws-exports';
+import ContentList from '../../../components/ContentList';
+import Editor from '../../../components/Editor';
 
 type Props = {} & typeof defaultProps;
 
@@ -20,66 +22,10 @@ const initialState = Object.freeze({
   preview: false,
 });
 
-const updateMediaList = (content: string) => {
-  const mediaRegex = new RegExp(
-    `https:\/\/(${config.aws_user_files_s3_bucket}).(.?[^\/]*)\/([^"]*)`,
-    'gm'
-  );
-
-  // @ts-ignore
-  const matches = [...content.matchAll(mediaRegex)];
-
-  const media = matches.map((match, index) => {
-    return { bucket: match[1], key: match[3] };
-  });
-
-  // Note: Skip every other to remove duplicates do to wrapping div references src
-  return media.filter((element, index) => {
-    return index % 2 === 0;
-  });
-};
-
-const handleMediaChanges = async (oldMedia, newMedia) => {
-  // Delete saved media that user removed
-  if (oldMedia) {
-    await oldMedia.map(async (media) => {
-      if (
-        !newMedia ||
-        !newMedia.some((elem) => {
-          return JSON.stringify(media) === JSON.stringify(elem);
-        })
-      ) {
-        await removeFile(media);
-      }
-    });
-  }
-
-  // Remove unsaved tag from new media
-  if (newMedia) {
-    await newMedia.map(async (media) => {
-      if (
-        !oldMedia ||
-        !oldMedia.some((elem) => {
-          return JSON.stringify(media) === JSON.stringify(elem);
-        })
-      ) {
-        await removeTags(media);
-      }
-    });
-  }
-};
-
-const formatMediaList = (media) => {
-  return media ? JSON.stringify(media) : null;
-};
-
 export default function EditPost() {
   const router = useRouter();
-  const { id } = router.query;
   const [user, setUser] = useState();
-  const [post, setPost] = useState(initialState.post);
-  const [isNew, setIsNew] = useState(initialState.isNew);
-  const [content, setContent] = useState('');
+  const [id, setId] = useState('');
 
   useEffect(() => {
     try {
@@ -91,136 +37,23 @@ export default function EditPost() {
     }
   }, []);
 
-  useEffect(() => {
-    async function fetchPost() {
-      if (!id) return;
-      try {
-        const postData = await API.graphql({
-          query: getPost,
-          variables: { id },
-        });
-        // console.log('postData: ', postData);
-        // If no previous postData -> this is a new post
-        // @ts-ignore
-        if (!postData.data.getPost) {
-          setIsNew(true);
-          setPost({ id, content: null, media: null });
-        } else {
-          setPost({
-            // @ts-ignore
-            ...postData.data.getPost,
-            // @ts-ignore
-            media: JSON.parse(postData.data.getPost.media),
-          });
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetchPost();
-  }, [id]);
-
-  // Note: The v2 codeblock extension will output the styled
-  //       code block and we can remove this ugly extra step
-  const highlightCodeblocks = (content) => {
-    const doc = new DOMParser().parseFromString(content, 'text/html');
-    doc.querySelectorAll('pre code').forEach((el) => {
-      // @ts-ignore
-      hljs.highlightElement(el);
-    });
-    return new XMLSerializer().serializeToString(doc);
-  };
-
-  function onChange(content) {
-    setContent(content);
-  }
-
-  async function updateCurrentPost() {
-    if (!content) return;
-    const oldMediaList = post.media;
-    const media = updateMediaList(content);
-    const newContent = highlightCodeblocks(content);
-
-    if (isNew) {
-      await API.graphql({
-        query: createPost,
-        variables: {
-          input: {
-            ...post,
-            content: newContent,
-            media: formatMediaList(media),
-          },
-        },
-        authMode: 'AMAZON_COGNITO_USER_POOLS',
-      });
-
-      await handleMediaChanges(oldMediaList, media);
-      setPost({ ...post, content: newContent, media });
-      setIsNew(false);
-    } else {
-      const postUpdated = {
-        id,
-        content: newContent,
-        media: formatMediaList(media),
-      };
-
-      await API.graphql({
-        query: updatePost,
-        variables: {
-          input: postUpdated,
-        },
-        authMode: 'AMAZON_COGNITO_USER_POOLS',
-      });
-
-      await handleMediaChanges(oldMediaList, media);
-      setPost({ ...post, content: newContent, media });
-    }
-  }
-
-  async function handleSignOut() {
-    try {
-      await signOut();
-      router.push('/');
-    } catch (error) {
-      console.log('Failed to signout');
-    }
-  }
-
-  function navigateToPost() {
-    router.push(`/posts/${id}`);
-  }
-
   return (
-    <>
-      {user && (
-        <div className="flex justify-start h-20 p-4 gap-4">
-          <button
-            className="bg-blue-600 text-white font-semibold px-8 rounded-lg"
-            onClick={updateCurrentPost}
-          >
-            Save Post
-          </button>
-          {post && !isNew && (
-            <button
-              className="bg-blue-600 text-white font-semibold px-8 rounded-lg"
-              onClick={navigateToPost}
-            >
-              View Post
-            </button>
-          )}
-          <button
-            className="ml-auto mr-0 bg-blue-600 text-white font-semibold px-8 rounded-lg"
-            onClick={handleSignOut}
-          >
-            Sign Out
-          </button>
-        </div>
-      )}
-      <div className="w-full min-h-screen bg-gray-200 flex justify-center items-stretch">
-        <div className="md:mt-4 flex-1 max-w-4xl min-w-0 bg-white shadow-xl">
-          {post && <Tiptap content={post.content} onChange={onChange} />}
-        </div>
+    <div className="w-full min-h-screen bg-white flex items-stretch justify-between">
+      <div className="flex-1">
+        <ContentList onSelect={(id) => setId(id)} />
       </div>
-    </>
+      <div className="md:mt-4 flex-4 max-w-4xl min-w-0">
+        {id && (
+          <button
+            className="text-blue-600 font-semibold px-8 rounded-lg float-right"
+            onClick={() => router.push(`/posts/${id}`)}
+          >
+            Preview
+          </button>
+        )}
+        {id && <Editor id={id as string} />}
+      </div>
+      <div className="flex-1"></div>
+    </div>
   );
 }

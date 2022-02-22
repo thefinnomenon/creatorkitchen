@@ -3,38 +3,44 @@
 // this is an auto generated file. This will be overwritten
 
 export const onCreatePost = /* GraphQL */ `
-  subscription OnCreatePost($owner: String) {
-    onCreatePost(owner: $owner) {
+  subscription OnCreatePost($username: String) {
+    onCreatePost(username: $username) {
       id
+      title
       content
+      username
       media
+      coverImage
       createdAt
       updatedAt
-      owner
     }
   }
 `;
 export const onUpdatePost = /* GraphQL */ `
-  subscription OnUpdatePost($owner: String) {
-    onUpdatePost(owner: $owner) {
+  subscription OnUpdatePost($username: String) {
+    onUpdatePost(username: $username) {
       id
+      title
       content
+      username
       media
+      coverImage
       createdAt
       updatedAt
-      owner
     }
   }
 `;
 export const onDeletePost = /* GraphQL */ `
-  subscription OnDeletePost($owner: String) {
-    onDeletePost(owner: $owner) {
+  subscription OnDeletePost($username: String) {
+    onDeletePost(username: $username) {
       id
+      title
       content
+      username
       media
+      coverImage
       createdAt
       updatedAt
-      owner
     }
   }
 `;

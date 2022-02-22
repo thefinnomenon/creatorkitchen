@@ -4,13 +4,19 @@
 
 export type CreatePostInput = {
   id?: string | null,
+  title: string,
   content: string,
+  username?: string | null,
   media?: string | null,
+  coverImage?: string | null,
 };
 
 export type ModelPostConditionInput = {
+  title?: ModelStringInput | null,
   content?: ModelStringInput | null,
+  username?: ModelStringInput | null,
   media?: ModelStringInput | null,
+  coverImage?: ModelStringInput | null,
   and?: Array< ModelPostConditionInput | null > | null,
   or?: Array< ModelPostConditionInput | null > | null,
   not?: ModelPostConditionInput | null,
@@ -59,17 +65,22 @@ export type ModelSizeInput = {
 export type Post = {
   __typename: "Post",
   id: string,
+  title: string,
   content: string,
+  username?: string | null,
   media?: string | null,
+  coverImage?: string | null,
   createdAt: string,
   updatedAt: string,
-  owner?: string | null,
 };
 
 export type UpdatePostInput = {
   id: string,
+  title?: string | null,
   content?: string | null,
+  username?: string | null,
   media?: string | null,
+  coverImage?: string | null,
 };
 
 export type DeletePostInput = {
@@ -78,8 +89,11 @@ export type DeletePostInput = {
 
 export type ModelPostFilterInput = {
   id?: ModelIDInput | null,
+  title?: ModelStringInput | null,
   content?: ModelStringInput | null,
+  username?: ModelStringInput | null,
   media?: ModelStringInput | null,
+  coverImage?: ModelStringInput | null,
   and?: Array< ModelPostFilterInput | null > | null,
   or?: Array< ModelPostFilterInput | null > | null,
   not?: ModelPostFilterInput | null,
@@ -107,6 +121,12 @@ export type ModelPostConnection = {
   nextToken?: string | null,
 };
 
+export enum ModelSortDirection {
+  ASC = "ASC",
+  DESC = "DESC",
+}
+
+
 export type CreatePostMutationVariables = {
   input: CreatePostInput,
   condition?: ModelPostConditionInput | null,
@@ -116,11 +136,13 @@ export type CreatePostMutation = {
   createPost?:  {
     __typename: "Post",
     id: string,
+    title: string,
     content: string,
+    username?: string | null,
     media?: string | null,
+    coverImage?: string | null,
     createdAt: string,
     updatedAt: string,
-    owner?: string | null,
   } | null,
 };
 
@@ -133,11 +155,13 @@ export type UpdatePostMutation = {
   updatePost?:  {
     __typename: "Post",
     id: string,
+    title: string,
     content: string,
+    username?: string | null,
     media?: string | null,
+    coverImage?: string | null,
     createdAt: string,
     updatedAt: string,
-    owner?: string | null,
   } | null,
 };
 
@@ -150,11 +174,13 @@ export type DeletePostMutation = {
   deletePost?:  {
     __typename: "Post",
     id: string,
+    title: string,
     content: string,
+    username?: string | null,
     media?: string | null,
+    coverImage?: string | null,
     createdAt: string,
     updatedAt: string,
-    owner?: string | null,
   } | null,
 };
 
@@ -166,11 +192,13 @@ export type GetPostQuery = {
   getPost?:  {
     __typename: "Post",
     id: string,
+    title: string,
     content: string,
+    username?: string | null,
     media?: string | null,
+    coverImage?: string | null,
     createdAt: string,
     updatedAt: string,
-    owner?: string | null,
   } | null,
 };
 
@@ -186,60 +214,94 @@ export type ListPostsQuery = {
     items:  Array< {
       __typename: "Post",
       id: string,
+      title: string,
       content: string,
+      username?: string | null,
       media?: string | null,
+      coverImage?: string | null,
       createdAt: string,
       updatedAt: string,
-      owner?: string | null,
+    } | null >,
+    nextToken?: string | null,
+  } | null,
+};
+
+export type PostsByUsernameQueryVariables = {
+  username?: string | null,
+  sortDirection?: ModelSortDirection | null,
+  filter?: ModelPostFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type PostsByUsernameQuery = {
+  postsByUsername?:  {
+    __typename: "ModelPostConnection",
+    items:  Array< {
+      __typename: "Post",
+      id: string,
+      title: string,
+      content: string,
+      username?: string | null,
+      media?: string | null,
+      coverImage?: string | null,
+      createdAt: string,
+      updatedAt: string,
     } | null >,
     nextToken?: string | null,
   } | null,
 };
 
 export type OnCreatePostSubscriptionVariables = {
-  owner?: string | null,
+  username?: string | null,
 };
 
 export type OnCreatePostSubscription = {
   onCreatePost?:  {
     __typename: "Post",
     id: string,
+    title: string,
     content: string,
+    username?: string | null,
     media?: string | null,
+    coverImage?: string | null,
     createdAt: string,
     updatedAt: string,
-    owner?: string | null,
   } | null,
 };
 
 export type OnUpdatePostSubscriptionVariables = {
-  owner?: string | null,
+  username?: string | null,
 };
 
 export type OnUpdatePostSubscription = {
   onUpdatePost?:  {
     __typename: "Post",
     id: string,
+    title: string,
     content: string,
+    username?: string | null,
     media?: string | null,
+    coverImage?: string | null,
     createdAt: string,
     updatedAt: string,
-    owner?: string | null,
   } | null,
 };
 
 export type OnDeletePostSubscriptionVariables = {
-  owner?: string | null,
+  username?: string | null,
 };
 
 export type OnDeletePostSubscription = {
   onDeletePost?:  {
     __typename: "Post",
     id: string,
+    title: string,
     content: string,
+    username?: string | null,
     media?: string | null,
+    coverImage?: string | null,
     createdAt: string,
     updatedAt: string,
-    owner?: string | null,
   } | null,
 };

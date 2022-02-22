@@ -9,11 +9,13 @@ export const createPost = /* GraphQL */ `
   ) {
     createPost(input: $input, condition: $condition) {
       id
+      title
       content
+      username
       media
+      coverImage
       createdAt
       updatedAt
-      owner
     }
   }
 `;
@@ -24,11 +26,13 @@ export const updatePost = /* GraphQL */ `
   ) {
     updatePost(input: $input, condition: $condition) {
       id
+      title
       content
+      username
       media
+      coverImage
       createdAt
       updatedAt
-      owner
     }
   }
 `;
@@ -39,11 +43,13 @@ export const deletePost = /* GraphQL */ `
   ) {
     deletePost(input: $input, condition: $condition) {
       id
+      title
       content
+      username
       media
+      coverImage
       createdAt
       updatedAt
-      owner
     }
   }
 `;

@@ -1,4 +1,5 @@
 import '../styles/globals.css';
+import 'react-complex-tree/lib/style.css';
 import Script from 'next/script';
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
