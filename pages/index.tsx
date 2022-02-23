@@ -29,8 +29,8 @@ export default function Home() {
   return (
     <div className="h-screen flex justify-center items-center bg-gradient-to-r from-rose-100 to-teal-100">
       <Authenticator components={components}>
-        {({ signOut, user }) => {
-          router.push(`posts/edit/${uuidv4()}`);
+        {() => {
+          router.push(`dashboard`);
 
           return (
             <div className="flex flex-col">

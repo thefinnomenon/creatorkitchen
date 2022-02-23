@@ -21,30 +21,25 @@ export default function Post({ post }: Props) {
   const router = useRouter();
   const { id } = router.query;
 
-  function navigateToEdit() {
-    router.push(`/posts/edit/${id}`);
-  }
-
-  console.log(post);
   if (!post.content) return null;
 
   return (
-    <>
-      <button
-        className="m-4 bg-blue-600 text-white font-semibold px-8 py-2 rounded-lg"
-        onClick={navigateToEdit}
-      >
-        Edit Post
-      </button>
-      <div className="w-full min-h-screen bg-gray-200 flex justify-center items-stretch">
-        <div className="md:mt-4 flex-1 max-w-4xl min-w-0 bg-white shadow-xl">
-          <div
-            className="ProseMirror p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
-        </div>
+    <div className="w-full min-h-screen bg-white flex justify-center items-stretch">
+      <div className="md:mt-4 flex-1 max-w-4xl min-w-0 bg-white">
+        {id && (
+          <button
+            className="text-blue-600 font-semibold px-8 rounded-lg float-right"
+            onClick={() => router.push(`/dashboard?content_id=${id}`)}
+          >
+            Edit
+          </button>
+        )}
+        <div
+          className="ProseMirror p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor"
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
       </div>
-    </>
+    </div>
   );
 }
 
