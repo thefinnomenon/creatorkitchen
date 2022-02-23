@@ -54,7 +54,7 @@ export default function ContentList({ onSelect }: Props): JSX.Element {
   };
 
   return (
-    <div className="h-full max-w-md bg-gray-100 shadow-md">
+    <div className="h-full max-w-md bg-gray-100">
       <h1 className="text-3xl font-semibold tracking-wide mb-4 pt-4 pl-4">
         Posts
       </h1>
