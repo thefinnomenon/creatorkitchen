@@ -173,12 +173,6 @@ export default function Tiptap({ content, preview, onChange }) {
     }
   }, [editor, preview]);
 
-  useEffect(() => {
-    if (editor) {
-      editor.commands.setContent(content);
-    }
-  }, [editor, content]);
-
   return (
     <>
       {editor && !preview && (

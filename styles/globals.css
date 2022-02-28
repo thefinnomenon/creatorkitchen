@@ -6,6 +6,11 @@
    margin: 0 auto;
 }
 
+.ProseMirror * {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
 .ProseMirror
 p.is-empty::before,
 h1.is-empty::before,
