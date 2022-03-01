@@ -1,10 +1,11 @@
 import VisuallyHidden from '@reach/visually-hidden';
 import API from '@aws-amplify/api';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import ContentList from '../components/ContentList';
 import Editor from '../components/Editor';
+import debounce from 'debounce';
 import { createPost, deletePost, updatePost } from '../graphql/mutations';
 import { v4 as uuidv4 } from 'uuid';
 import Link from 'next/link';
@@ -12,6 +13,8 @@ import { Auth } from 'aws-amplify';
 import { getPost, postsByUsername } from '../graphql/queries';
 import { signOut } from '../lib/amplify';
 import Tiptap from '../components/TipTap';
+
+const UPDATE_DEBOUNCE = 5000;
 
 type Props = {} & typeof defaultProps;
 
@@ -51,11 +54,17 @@ export default function EditPost() {
     IdRef.current = newPost.id;
   }
 
+  const debouncedUpdate = useCallback(
+    debounce((values) => onUpdate(values), UPDATE_DEBOUNCE),
+    []
+  );
+
   // UPDATE
   async function onUpdate(values) {
     if (!IdRef.current) return;
     const id = IdRef.current;
-    console.log('Updating post ', id);
+
+    // console.log('Updating post ', id);
 
     await API.graphql({
       query: updatePost,
@@ -81,6 +90,7 @@ export default function EditPost() {
       return post.id !== id;
     });
 
+    debouncedUpdate.clear();
     setPosts(newPosts);
     setPost(newPosts[0]);
     IdRef.current = newPosts[0].id;
@@ -113,6 +123,7 @@ export default function EditPost() {
       // @ts-ignore
       const newPost = postData.data.getPost;
 
+      debouncedUpdate.clear();
       setPost(newPost);
       IdRef.current = newPost.id;
     } catch (error) {
@@ -129,15 +140,6 @@ export default function EditPost() {
       console.log('Failed to signout');
     }
   }
-
-  console.log(post);
-  console.log(IdRef.current);
-
-  const onChange = (content) => {
-    console.log(post);
-    console.log(IdRef.current);
-    console.log(content);
-  };
 
   return (
     <div className="w-full min-h-screen bg-white flex items-stretch justify-between">
@@ -174,7 +176,7 @@ export default function EditPost() {
         {post && (
           <Tiptap
             content={post.content}
-            onChange={(content) => onUpdate({ content })}
+            onChange={(content) => debouncedUpdate({ content })}
           />
         )}
       </div>
