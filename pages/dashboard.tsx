@@ -33,6 +33,7 @@ export default function EditPost() {
   //const [id, setId] = useState(content_id);
   const [posts, setPosts] = useState<Post[]>([]);
   const [post, setPost] = useState<Post>();
+  const [isSaved, setIsSaved] = useState(true);
   const IdRef = useRef('');
 
   // CREATE
@@ -77,6 +78,8 @@ export default function EditPost() {
       },
       authMode: 'AMAZON_COGNITO_USER_POOLS',
     });
+
+    setIsSaved(true);
   }
 
   // DELETE
@@ -155,29 +158,35 @@ export default function EditPost() {
       </div>
       <div className="md:mt-4 flex-1 max-w-4xl">
         {post && (
-          <div className="flex float-right pb-4">
-            <Link href={`/posts/${post.id}`} passHref>
-              <a
-                className="text-blue-600 font-semibold px-8 rounded-lg p-2 hover:bg-gray-200"
-                target="_blank"
-                rel="noopener noreferrer"
+          <div className="flex items-center justify-between px-4">
+            {isSaved ? <p className="text-gray-400">Saved</p> : <div />}
+            <div className="flex items-center">
+              <Link href={`/posts/${post.id}`} passHref>
+                <a
+                  className="text-blue-600 font-semibold px-8 rounded-lg p-2 hover:bg-gray-200"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Preview
+                </a>
+              </Link>
+              <button
+                onClick={() => onDelete(post.id)}
+                className="rounded-lg p-2 hover:bg-gray-200"
               >
-                Preview
-              </a>
-            </Link>
-            <button
-              onClick={() => onDelete(post.id)}
-              className="rounded-lg p-2 hover:bg-gray-200"
-            >
-              <VisuallyHidden>Delete content</VisuallyHidden>
-              <RiDeleteBinLine className="text-xl text-red-500" />
-            </button>
+                <VisuallyHidden>Delete content</VisuallyHidden>
+                <RiDeleteBinLine className="text-xl text-red-500" />
+              </button>
+            </div>
           </div>
         )}
         {post && (
           <Tiptap
             content={post.content}
-            onChange={(content) => debouncedUpdate({ content })}
+            onChange={(content) => {
+              setIsSaved(false);
+              debouncedUpdate({ content });
+            }}
           />
         )}
       </div>
