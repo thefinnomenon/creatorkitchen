@@ -6,6 +6,10 @@
    margin: 0 auto;
 }
 
+.ProseMirror {
+  height: 100vh;
+}
+
 .ProseMirror * {
   white-space: pre-wrap;
   word-wrap: break-word;

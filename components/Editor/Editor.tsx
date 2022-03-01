@@ -37,9 +37,11 @@ export default function EditPost({ post, onChange }: Props) {
 
   const handleOnChange = (newContent) => {
     console.log('Content changed, ', post.id);
-    post.content = content;
+    post.content = newContent;
     onChange({ ...post });
   };
 
-  return <>{post && <Tiptap content={content} onChange={handleOnChange} />}</>;
+  return (
+    <>{post && <Tiptap content={post.content} onChange={handleOnChange} />}</>
+  );
 }

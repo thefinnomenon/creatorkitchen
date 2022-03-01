@@ -73,6 +73,7 @@ export default function EditPost() {
 
     setPosts(newPosts);
     setPost(newPosts[0]);
+    setId(newPosts[0].id);
   }
 
   useEffect(() => {
@@ -123,7 +124,7 @@ export default function EditPost() {
 
   return (
     <div className="w-full min-h-screen bg-white flex items-stretch justify-between">
-      <div className="flex-1">
+      <div className="w-52">
         <ContentList
           content={posts}
           selectedId={id as string}
@@ -132,7 +133,7 @@ export default function EditPost() {
           onSignOut={onSignOut}
         />
       </div>
-      <div className="md:mt-4 flex-4 max-w-4xl min-w-0">
+      <div className="md:mt-4 flex-1 max-w-4xl">
         {id && (
           <div className="float-right">
             <Link href={`/posts/${id}`} passHref>
@@ -155,7 +156,7 @@ export default function EditPost() {
         )}
         {post && <Editor post={post} onChange={setPost} />}
       </div>
-      <div className="flex-1"></div>
+      <div className="w-28"></div>
     </div>
   );
 }

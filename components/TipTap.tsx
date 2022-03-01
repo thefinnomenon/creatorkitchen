@@ -56,7 +56,7 @@ export default function Tiptap({ content, preview, onChange }) {
   const textToolbar = useRef<MenuState>('show');
 
   const editorClass =
-    'p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor whitespace-pre-wrap';
+    'p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor';
 
   const LinkWithShortcut = Link.extend({
     // @ts-ignore
@@ -139,6 +139,9 @@ export default function Tiptap({ content, preview, onChange }) {
         class: editorClass,
       },
     },
+    parseOptions: {
+      preserveWhitespace: 'full',
+    },
     content: content
       ? content
       : `
@@ -172,6 +175,12 @@ export default function Tiptap({ content, preview, onChange }) {
       editor.setEditable(!preview);
     }
   }, [editor, preview]);
+
+  useEffect(() => {
+    if (editor) {
+      editor.commands.setContent(content);
+    }
+  }, [editor, content]);
 
   return (
     <>
