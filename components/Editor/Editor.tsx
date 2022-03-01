@@ -9,39 +9,28 @@ import hljs from 'highlight.js';
 const SAVE_DEBOUNCE = 5000;
 
 type Props = {
+  initialContent: string;
   post: any;
-  onChange(post: any): void;
+  onChange(): void;
 } & typeof defaultProps;
 
 const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
-export default function EditPost({ post, onChange }: Props) {
-  const [content, setContent] = useState(post.content);
-
-  // Note: The v2 codeblock extension will output the styled
-  //       code block and we can remove this ugly extra step
-  const highlightCodeblocks = (content) => {
-    const doc = new DOMParser().parseFromString(content, 'text/html');
-    doc.querySelectorAll('pre code').forEach((el) => {
-      // @ts-ignore
-      hljs.highlightElement(el);
-    });
-    return new XMLSerializer().serializeToString(doc);
-  };
-
-  useEffect(() => {
-    console.log('Post changed, ', post.id);
-    setContent(post.content);
-  }, [post]);
-
-  const handleOnChange = (newContent) => {
-    console.log('Content changed, ', post.id);
-    post.content = newContent;
-    onChange({ ...post });
-  };
+export default function EditPost({ post, onChange, initialContent }: Props) {
+  function handleChange(content) {
+    // @ts-ignore
+    onChange({ ...post, content });
+  }
 
   return (
-    <>{post && <Tiptap content={post.content} onChange={handleOnChange} />}</>
+    <>
+      {post && (
+        <Tiptap
+          content={initialContent}
+          onChange={(content) => handleChange(content)}
+        />
+      )}
+    </>
   );
 }

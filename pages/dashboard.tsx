@@ -1,7 +1,7 @@
 import VisuallyHidden from '@reach/visually-hidden';
 import API from '@aws-amplify/api';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import ContentList from '../components/ContentList';
 import Editor from '../components/Editor';
@@ -11,18 +11,26 @@ import Link from 'next/link';
 import { Auth } from 'aws-amplify';
 import { getPost, postsByUsername } from '../graphql/queries';
 import { signOut } from '../lib/amplify';
+import Tiptap from '../components/TipTap';
 
 type Props = {} & typeof defaultProps;
 
 const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
+type Post = {
+  id: string;
+  title: string;
+  content: string;
+};
+
 export default function EditPost() {
   const router = useRouter();
-  const { content_id } = router.query;
-  const [id, setId] = useState(content_id);
-  const [posts, setPosts] = useState([]);
-  const [post, setPost] = useState();
+  //const { content_id } = router.query;
+  //const [id, setId] = useState(content_id);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [post, setPost] = useState<Post>();
+  const IdRef = useRef('');
 
   // CREATE
   async function onCreate() {
@@ -36,22 +44,26 @@ export default function EditPost() {
     });
 
     // @ts-ignore
-    setPosts([...posts, res.data.createPost]);
-    setId(id);
-    // @ts-ignore
-    setPost(res.data.createPost);
+    const newPost = res.data.createPost;
+
+    setPosts([...posts, newPost]);
+    setPost(newPost);
+    IdRef.current = newPost.id;
   }
 
   // UPDATE
-  async function updateCurrentPost(p) {
-    console.log('Updating post ', p.id);
-    delete p.createdAt;
-    delete p.updatedAt;
+  async function onUpdate(values) {
+    if (!IdRef.current) return;
+    const id = IdRef.current;
+    console.log('Updating post ', id);
 
     await API.graphql({
       query: updatePost,
       variables: {
-        input: p,
+        input: {
+          id,
+          ...values,
+        },
       },
       authMode: 'AMAZON_COGNITO_USER_POOLS',
     });
@@ -64,25 +76,20 @@ export default function EditPost() {
       variables: { input: { id } },
       authMode: 'AMAZON_COGNITO_USER_POOLS',
     });
-    //setId('');
-    console.log(id);
+
     const newPosts = posts.filter((post) => {
       return post.id !== id;
     });
-    console.log(newPosts);
 
     setPosts(newPosts);
     setPost(newPosts[0]);
-    setId(newPosts[0].id);
+    IdRef.current = newPosts[0].id;
   }
 
+  // LOAD USER POST LIST ON MOUNT
   useEffect(() => {
     fetchPosts();
   }, []);
-
-  useEffect(() => {
-    if (post) updateCurrentPost(post);
-  }, [post]);
 
   // GET USER POSTS
   async function fetchPosts() {
@@ -102,11 +109,12 @@ export default function EditPost() {
         query: getPost,
         variables: { id },
       });
-      setPost({
-        // @ts-ignore
-        ...postData.data.getPost,
-      });
-      setId(id);
+
+      // @ts-ignore
+      const newPost = postData.data.getPost;
+
+      setPost(newPost);
+      IdRef.current = newPost.id;
     } catch (error) {
       console.log(error);
     }
@@ -122,23 +130,32 @@ export default function EditPost() {
     }
   }
 
+  console.log(post);
+  console.log(IdRef.current);
+
+  const onChange = (content) => {
+    console.log(post);
+    console.log(IdRef.current);
+    console.log(content);
+  };
+
   return (
     <div className="w-full min-h-screen bg-white flex items-stretch justify-between">
       <div className="w-52">
         <ContentList
           content={posts}
-          selectedId={id as string}
+          selectedId={post ? post.id : ''}
           onCreate={onCreate}
           onSelect={onSelect}
           onSignOut={onSignOut}
         />
       </div>
       <div className="md:mt-4 flex-1 max-w-4xl">
-        {id && (
-          <div className="float-right">
-            <Link href={`/posts/${id}`} passHref>
+        {post && (
+          <div className="flex float-right pb-4">
+            <Link href={`/posts/${post.id}`} passHref>
               <a
-                className="text-blue-600 font-semibold px-8 rounded-lg"
+                className="text-blue-600 font-semibold px-8 rounded-lg p-2 hover:bg-gray-200"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -146,15 +163,20 @@ export default function EditPost() {
               </a>
             </Link>
             <button
-              onClick={() => onDelete(id)}
-              className="align-bottom pb-[0.15rem]"
+              onClick={() => onDelete(post.id)}
+              className="rounded-lg p-2 hover:bg-gray-200"
             >
               <VisuallyHidden>Delete content</VisuallyHidden>
               <RiDeleteBinLine className="text-xl text-red-500" />
             </button>
           </div>
         )}
-        {post && <Editor post={post} onChange={setPost} />}
+        {post && (
+          <Tiptap
+            content={post.content}
+            onChange={(content) => onUpdate({ content })}
+          />
+        )}
       </div>
       <div className="w-28"></div>
     </div>

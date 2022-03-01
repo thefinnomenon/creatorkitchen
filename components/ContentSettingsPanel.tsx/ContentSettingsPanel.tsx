@@ -21,15 +21,9 @@ export default function ContentList({
 }: Props): JSX.Element {
   return (
     <div className="h-full max-w-md bg-gray-100">
-      <div className="flex justify-between">
-        <h1 className="text-3xl font-semibold tracking-wide mb-4 pt-4 pl-4">
-          Posts
-        </h1>
-        <button onClick={() => onCreate()} className="p-2 pt-3">
-          <VisuallyHidden>Create new content</VisuallyHidden>
-          <VscDiffAdded className="text-4xl text-gray-500 hover:text-blue-500" />
-        </button>
-      </div>
+      <h1 className="text-3xl font-semibold tracking-wide mb-4 pt-4 pl-4">
+        Properties
+      </h1>
       {content.map((post, index) => (
         <div
           key={index}

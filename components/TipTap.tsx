@@ -49,6 +49,17 @@ const initialState = Object.freeze({});
 
 export type MenuState = 'show' | 'hide';
 
+// Note: The v2 codeblock extension will output the styled
+//       code block and we can remove this ugly extra step
+const highlightCodeblocks = (content) => {
+  const doc = new DOMParser().parseFromString(content, 'text/html');
+  doc.querySelectorAll('pre code').forEach((el) => {
+    // @ts-ignore
+    hljs.highlightElement(el);
+  });
+  return new XMLSerializer().serializeToString(doc);
+};
+
 export default function Tiptap({ content, preview, onChange }) {
   const [previewContent, setPreviewContent] = useState('');
   const linkToolbar = useRef<MenuState>('hide');
@@ -56,7 +67,7 @@ export default function Tiptap({ content, preview, onChange }) {
   const textToolbar = useRef<MenuState>('show');
 
   const editorClass =
-    'p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor';
+    'p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor whitespace-pre-wrap break-words';
 
   const LinkWithShortcut = Link.extend({
     // @ts-ignore
