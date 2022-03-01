@@ -49,6 +49,7 @@ export default function EditPost() {
     // @ts-ignore
     const newPost = res.data.createPost;
 
+    debouncedUpdate.clear();
     setPosts([...posts, newPost]);
     setPost(newPost);
     IdRef.current = newPost.id;
