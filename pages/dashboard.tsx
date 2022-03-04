@@ -165,24 +165,16 @@ export default function EditPost() {
         {post && (
           <div className="flex items-center justify-between px-4">
             {isSaved ? <p className="text-gray-400">Saved</p> : <div />}
-            <div className="flex items-center">
-              <Link href={`/posts/${post.id}`} passHref>
-                <a
-                  className="text-blue-600 font-semibold px-8 rounded-lg p-2 hover:bg-gray-200"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Preview
-                </a>
-              </Link>
-              <button
-                onClick={() => onDelete(post.id)}
-                className="rounded-lg p-2 hover:bg-gray-200"
+
+            <Link href={`/posts/${post.id}`} passHref>
+              <a
+                className="text-blue-600 font-semibold rounded-lg p-2 hover:bg-gray-200"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <VisuallyHidden>Delete content</VisuallyHidden>
-                <RiDeleteBinLine className="text-xl text-red-500" />
-              </button>
-            </div>
+                Preview
+              </a>
+            </Link>
           </div>
         )}
         {post && (
@@ -201,6 +193,7 @@ export default function EditPost() {
             post={post}
             onUpdate={(values) => onUpdate(values)}
             setIsSaved={setIsSaved}
+            onDelete={onDelete}
           />
         </div>
       )}

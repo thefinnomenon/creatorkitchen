@@ -1,9 +1,12 @@
+import VisuallyHidden from '@reach/visually-hidden';
 import { useEffect, useState } from 'react';
+import { RiDeleteBinLine } from 'react-icons/ri';
 
 type Props = {
   post: any;
   onUpdate(values: any): void;
   setIsSaved(value: boolean): void;
+  onDelete(id: string): void;
 } & typeof defaultProps;
 
 const defaultProps = Object.freeze({});
@@ -13,6 +16,7 @@ export default function ContentList({
   post,
   onUpdate,
   setIsSaved,
+  onDelete,
 }: Props): JSX.Element {
   const [title, setTitle] = useState(post.title);
   const [description, setDescription] = useState(post.description || '');
@@ -65,6 +69,15 @@ export default function ContentList({
             cols={40}
           ></textarea>
         </div>
+        <button
+          onClick={() => onDelete(post.id)}
+          className="fixed bottom-1 right-2 rounded-lg p-2 hover:bg-gray-200"
+        >
+          <div className=" flex items-center text-2xl text-red-500">
+            <VisuallyHidden>Delete content</VisuallyHidden>
+            <RiDeleteBinLine />
+          </div>
+        </button>
       </div>
     </div>
   );

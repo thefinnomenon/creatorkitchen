@@ -50,7 +50,7 @@ export default function ContentList({
       ))}
       <div className="fixed bottom-2 left-2">
         <button
-          className="ml-auto mr-0 bg-blue-600 text-white font-semibold px-8 rounded-lg w-40 h-8"
+          className="bg-blue-600 text-white font-semibold px-8 rounded-lg h-8"
           onClick={() => onSignOut()}
         >
           Sign Out
