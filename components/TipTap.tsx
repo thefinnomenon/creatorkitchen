@@ -33,6 +33,7 @@ import TextFloatingToolbar from './TextFloatingToolbar';
 import LinkInput from './LinkInput';
 import TableFloatingToolbar from './TableFloatingToolbar';
 import CodeBlock from './CodeBlock';
+import TrailingNode from '../extensions/nodes/trailingNode';
 
 const DEBUG = process && process.env.NODE_ENV === 'development';
 
@@ -99,6 +100,7 @@ export default function Tiptap({ content, preview, onChange }) {
         },
         codeBlock: false,
       }),
+      TrailingNode,
       Highlight,
       Typography,
       Underline,
