@@ -155,17 +155,7 @@ export default function Tiptap({ content, preview, onChange }) {
     parseOptions: {
       preserveWhitespace: 'full',
     },
-    content: content
-      ? content
-      : `
-      <h1>
-        Welcome to Creator Kitchen
-      </h1>
-      <p>
-        Type <code>/</code> to add different blocks or elect some text to access the toolbar to set (<strong>bold</strong>, <em>italics</em>, etc). The editor also supports markdown syntax -- try typing <code>#</code> followed by a space in an empty block.
-      </p>
-      <div [data-type="callout"]></div>
-    `,
+    content,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },

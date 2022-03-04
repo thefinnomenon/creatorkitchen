@@ -39,6 +39,15 @@ export default function EditPost() {
 
   // CREATE
   async function onCreate() {
+    if (!isSaved) {
+      const cont = confirm(
+        "Current draft isn't saved. Want to continue and lose changes?"
+      );
+      if (!cont) return;
+      debouncedUpdate.clear();
+      setIsSaved(true);
+    }
+
     const id = uuidv4();
     const res = await API.graphql({
       query: createPost,
@@ -51,10 +60,9 @@ export default function EditPost() {
     // @ts-ignore
     const newPost = res.data.createPost;
 
-    debouncedUpdate.clear();
+    IdRef.current = newPost.id;
     setPosts([...posts, newPost]);
     setPost(newPost);
-    IdRef.current = newPost.id;
   }
 
   const debouncedUpdate = useCallback(
@@ -89,6 +97,9 @@ export default function EditPost() {
 
   // DELETE
   async function onDelete(id) {
+    debouncedUpdate.clear();
+    setIsSaved(true);
+
     await API.graphql({
       query: deletePost,
       variables: { input: { id } },
@@ -99,10 +110,9 @@ export default function EditPost() {
       return post.id !== id;
     });
 
-    debouncedUpdate.clear();
+    IdRef.current = null;
     setPosts(newPosts);
-    setPost(newPosts[0]);
-    IdRef.current = newPosts[0].id;
+    setPost(null);
   }
 
   // LOAD USER POST LIST ON MOUNT
@@ -124,6 +134,15 @@ export default function EditPost() {
   // GET SELECTED POST
   async function onSelect(id) {
     try {
+      if (!isSaved) {
+        const cont = confirm(
+          "Current draft isn't saved. Want to continue and lose changes?"
+        );
+        if (!cont) return;
+        debouncedUpdate.clear();
+        setIsSaved(true);
+      }
+
       const postData = await API.graphql({
         query: getPost,
         variables: { id },
@@ -132,9 +151,8 @@ export default function EditPost() {
       // @ts-ignore
       const newPost = postData.data.getPost;
 
-      debouncedUpdate.clear();
-      setPost(newPost);
       IdRef.current = newPost.id;
+      setPost(newPost);
     } catch (error) {
       console.log(error);
     }
@@ -178,13 +196,15 @@ export default function EditPost() {
           </div>
         )}
         {post && (
-          <Tiptap
-            content={post.content}
-            onChange={(content) => {
-              setIsSaved(false);
-              debouncedUpdate({ content });
-            }}
-          />
+          <div>
+            <Tiptap
+              content={post.content}
+              onChange={(content) => {
+                setIsSaved(false);
+                debouncedUpdate({ content });
+              }}
+            />
+          </div>
         )}
       </div>
       {post && (
