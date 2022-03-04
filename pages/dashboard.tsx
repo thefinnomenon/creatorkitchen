@@ -13,6 +13,7 @@ import { Auth } from 'aws-amplify';
 import { getPost, postsByUsername } from '../graphql/queries';
 import { signOut } from '../lib/amplify';
 import Tiptap from '../components/TipTap';
+import ContentSettingsPanel from '../components/ContentSettingsPanel';
 
 const UPDATE_DEBOUNCE = 5000;
 
@@ -42,7 +43,7 @@ export default function EditPost() {
     const res = await API.graphql({
       query: createPost,
       variables: {
-        input: { title: 'Untitled', content: '', id },
+        input: { id, title: '', description: '', content: '' },
       },
       authMode: 'AMAZON_COGNITO_USER_POOLS',
     });
@@ -66,7 +67,11 @@ export default function EditPost() {
     if (!IdRef.current) return;
     const id = IdRef.current;
 
-    // console.log('Updating post ', id);
+    // If title updated, optimistically update it in the content list
+    if ('title' in values) {
+      const postIndex = posts.findIndex((post) => post.id === IdRef.current);
+      if (postIndex !== -1) posts[postIndex].title = values.title;
+    }
 
     await API.graphql({
       query: updatePost,
@@ -190,7 +195,15 @@ export default function EditPost() {
           />
         )}
       </div>
-      <div className="w-28"></div>
+      {post && (
+        <div className="w-52">
+          <ContentSettingsPanel
+            post={post}
+            onUpdate={(values) => onUpdate(values)}
+            setIsSaved={setIsSaved}
+          />
+        </div>
+      )}
     </div>
   );
 }

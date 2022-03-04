@@ -7,6 +7,7 @@ export const getPost = /* GraphQL */ `
     getPost(id: $id) {
       id
       title
+      description
       content
       username
       media
@@ -26,6 +27,7 @@ export const listPosts = /* GraphQL */ `
       items {
         id
         title
+        description
         content
         username
         media
@@ -55,6 +57,7 @@ export const postsByUsername = /* GraphQL */ `
       items {
         id
         title
+        description
         content
         username
         media

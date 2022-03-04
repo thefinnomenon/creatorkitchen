@@ -23,7 +23,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "components/ContentSettingsPanel"  ],
   "exclude": [
     "node_modules"
   ]

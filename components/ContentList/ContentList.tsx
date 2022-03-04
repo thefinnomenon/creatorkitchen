@@ -43,7 +43,7 @@ export default function ContentList({
               post.id === selectedId ? 'font-bold' : 'font-medium'
             }`}
           >
-            {post.title}
+            {post.title === '' ? 'Untitled' : post.title}
           </h2>
           {/* <p className="text-gray-500 mt-2 mb-2">Author: {post.username}</p> */}
         </div>

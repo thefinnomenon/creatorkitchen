@@ -4,8 +4,9 @@ type Post @model
     { allow: public, operations: [read] }
   ]) {
   id: ID!
-  title: String!
-  content: String!
+  title: String
+  description: String
+  content: String
   username: String @index(name: "postsByUsername", queryField: "postsByUsername")
   media: AWSJSON
   coverImage: String
