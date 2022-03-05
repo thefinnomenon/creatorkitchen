@@ -189,6 +189,15 @@ export default function EditPost() {
                 className="text-blue-600 font-semibold rounded-lg p-2 hover:bg-gray-200"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!isSaved) {
+                    const cont = alert(
+                      "Current draft isn't saved. Please wait a few seconds."
+                    );
+                    e.preventDefault();
+                    return false;
+                  }
+                }}
               >
                 Preview
               </a>
