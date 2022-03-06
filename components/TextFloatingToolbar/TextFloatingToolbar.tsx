@@ -14,6 +14,7 @@ import {
   MdSubscript,
   MdSuperscript,
 } from 'react-icons/md';
+import { AiOutlineAudio } from 'react-icons/ai';
 import { RiLinkM } from 'react-icons/ri';
 import ToolbarButton from '../ToolbarButton';
 import { MutableRefObject } from 'react';
@@ -22,6 +23,7 @@ type Props = {
   editor: Editor;
   textToolbar: MutableRefObject<string>;
   linkToolbar: MutableRefObject<string>;
+  audioLinkToolbar: MutableRefObject<string>;
 } & typeof defaultProps;
 
 const defaultProps = Object.freeze({});
@@ -31,6 +33,7 @@ export default function TextFloatingToolbar({
   editor,
   textToolbar,
   linkToolbar,
+  audioLinkToolbar,
 }: Props): JSX.Element {
   function shouldShow() {
     return ({ editor, view, state, oldState, from, to }) => {
@@ -125,6 +128,21 @@ export default function TextFloatingToolbar({
           }, 200);
         }}
         isActive={editor.getAttributes('link').href}
+      />
+      <ToolbarButton
+        icon={<AiOutlineAudio />}
+        altText="Audio"
+        onClick={() => {
+          textToolbar.current = 'hide';
+          audioLinkToolbar.current = 'show';
+          editor.chain().focus().run();
+          // HACK: I don't love this, but it works for now...
+          setTimeout(() => {
+            textToolbar.current = 'show';
+            audioLinkToolbar.current = 'hide';
+          }, 200);
+        }}
+        isActive={editor.getAttributes('audiolink').src}
       />
       <ToolbarButton
         icon={<MdSubscript />}

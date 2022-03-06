@@ -58,7 +58,9 @@ export default function LinkInput({ editor, linkToolbar }: Props): JSX.Element {
             .chain()
             .focus()
             .extendMarkRange('link')
+            .unsetAudioLink()
             .setLink({ href: `http://${href}` })
+            .setTextSelection(editor.state.selection.$head.pos)
             .run();
     }
   };
@@ -80,6 +82,7 @@ export default function LinkInput({ editor, linkToolbar }: Props): JSX.Element {
           className="appearance-none border rounded ml-2 mr-1 w-52  px-3 py-[2px] text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           id="link"
           type="text"
+          autoComplete="off"
           onKeyPress={onKeyPressHandler}
           value={href || editor.getAttributes('link').href || ''}
           // @ts-ignore

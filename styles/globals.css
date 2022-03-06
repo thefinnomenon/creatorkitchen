@@ -122,6 +122,19 @@ code::after {
    @apply my-8 shadow-2xl shadow-black/70;
 }
 
+span[data-type="audiolink"] {
+  cursor: pointer;
+  text-decoration-line: underline;
+  text-decoration-style: wavy;
+  @apply decoration-blue-500 underline-offset-1;
+
+}
+
+/* Unset the pointer in the editor since it should be treated as text */
+.ProseMirror span[data-type="audiolink"] {
+  cursor: auto;
+}
+
 .drag-handle {
    flex: 0 0 auto;
    position: relative;

@@ -34,6 +34,8 @@ import LinkInput from './LinkInput';
 import TableFloatingToolbar from './TableFloatingToolbar';
 import CodeBlock from './CodeBlock';
 import TrailingNode from '../extensions/nodes/trailingNode';
+import AudioLink from '../extensions/marks/audio';
+import AudioLinkInput from './AudioLinkInput';
 
 const DEBUG = process && process.env.NODE_ENV === 'development';
 
@@ -64,6 +66,7 @@ const highlightCodeblocks = (content) => {
 export default function Tiptap({ content, preview, onChange }) {
   const [previewContent, setPreviewContent] = useState('');
   const linkToolbar = useRef<MenuState>('hide');
+  const audioLinkToolbar = useRef<MenuState>('hide');
   const tableToolbar = useRef<MenuState>('hide');
   const textToolbar = useRef<MenuState>('show');
 
@@ -92,6 +95,28 @@ export default function Tiptap({ content, preview, onChange }) {
     },
   });
 
+  const AudioLinkWithShortcut = AudioLink.extend({
+    // @ts-ignore
+    addKeyboardShortcuts() {
+      return {
+        'Mod-"': () => {
+          // Unset active link
+          if (this.editor.isActive('audiolink')) {
+            this.editor.commands.unsetAudioLink();
+          } else {
+            audioLinkToolbar.current = 'show';
+            textToolbar.current = 'hide';
+            // This will cancel out, but will trigger the toolbar
+            this.editor.commands.toggleAudioLink({ src: '', title: '' });
+            this.editor.commands.toggleAudioLink({ src: '', title: '' });
+            audioLinkToolbar.current = 'hide';
+            textToolbar.current = 'show';
+          }
+        },
+      };
+    },
+  });
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -109,6 +134,7 @@ export default function Tiptap({ content, preview, onChange }) {
       LinkWithShortcut.configure({
         openOnClick: false,
       }),
+      AudioLinkWithShortcut,
       Table.configure({
         resizable: true,
         lastColumnResizable: false,
@@ -192,10 +218,14 @@ export default function Tiptap({ content, preview, onChange }) {
           editor={editor}
           textToolbar={textToolbar}
           linkToolbar={linkToolbar}
+          audioLinkToolbar={audioLinkToolbar}
         />
       )}
       {editor && !preview && (
         <LinkInput editor={editor} linkToolbar={linkToolbar} />
+      )}
+      {editor && !preview && (
+        <AudioLinkInput editor={editor} audioLinkToolbar={audioLinkToolbar} />
       )}
       {editor && !preview && (
         <TableFloatingToolbar editor={editor} toolbar={tableToolbar} />

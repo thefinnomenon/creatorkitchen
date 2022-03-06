@@ -26,7 +26,7 @@ export type StorageProgress = {
 };
 
 // Upload @file to S3 bucket with unique Id and update @setUploadProgress with current progress
-export const uploadFile = async (file, setUploadProgress) => {
+export const uploadFile = async (file, setUploadProgress = (p) => {}) => {
   console.log(file, setUploadProgress);
   try {
     const user = await Auth.currentAuthenticatedUser();
@@ -35,7 +35,6 @@ export const uploadFile = async (file, setUploadProgress) => {
     const fileName = `${uuidv4()}${ext}`;
 
     const res = await Storage.put(fileName, file, {
-      tagging: 'unsaved=1',
       progressCallback(progress: StorageProgress) {
         setUploadProgress(progress);
       },
