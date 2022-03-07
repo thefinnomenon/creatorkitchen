@@ -27,7 +27,6 @@ export type StorageProgress = {
 
 // Upload @file to S3 bucket with unique Id and update @setUploadProgress with current progress
 export const uploadFile = async (file, setUploadProgress = (p) => {}) => {
-  console.log(file, setUploadProgress);
   try {
     const user = await Auth.currentAuthenticatedUser();
     const ext = file.name.match(/\.[0-9a-z]+$/i)[0];
@@ -50,7 +49,6 @@ export const uploadFile = async (file, setUploadProgress = (p) => {}) => {
 
 export const removeFile = async (file) => {
   const name = file.key.substring(file.key.lastIndexOf('/') + 1);
-  console.log(name);
   try {
     await Storage.remove(name, { level: 'protected' });
   } catch (error) {
