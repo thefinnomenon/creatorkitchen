@@ -69,7 +69,7 @@ export default function TextFloatingToolbar({
       editor={editor}
       pluginKey="textToolbar"
       shouldShow={shouldShow()}
-      tippyOptions={{ maxWidth: '500px' }}
+      tippyOptions={{ maxWidth: '600px' }}
       className="bg-gray-100 text-lg rounded-sm shadow-lg"
     >
       <ToolbarButton

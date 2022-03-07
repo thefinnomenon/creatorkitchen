@@ -170,9 +170,6 @@ export default function AudioLinkInput({
         <ToolbarButton
           icon={<RiLinkUnlinkM />}
           onClick={() => {
-            console.log('Deleting file ', file);
-            file['key'] = src;
-            removeFile(file);
             editor
               .chain()
               .focus()
