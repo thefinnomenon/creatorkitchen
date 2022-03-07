@@ -29,26 +29,14 @@ export default function AudioLinkInput({
   audioLinkToolbar,
 }: Props): JSX.Element {
   const { src, title } = editor.getAttributes('audiolink');
-  const audioRef = useRef(new Audio(src));
-  const [file, setFile] = useState<File>();
   const [isPlaying, setIsPlaying] = useState(false);
-  const [filename, setFilename] = useState(title);
+  const [file, setFile] = useState<File>();
+  const audioRef = useRef(new Audio(src));
 
   useEffect(() => {
-    if (src) {
-      audioRef.current = new Audio(src);
-    }
-
-    return function cleanup() {
-      stopAudio();
-    };
+    audioRef.current = new Audio(src);
+    return () => stopAudio();
   }, [src]);
-
-  useEffect(() => {
-    if (title) {
-      setFilename(title);
-    }
-  }, [title]);
 
   useEffect(() => {
     async function upload() {
@@ -144,7 +132,7 @@ export default function AudioLinkInput({
             input.click();
           }}
         >
-          {filename || 'Choose an audio file...'}
+          {title || 'Choose an audio file...'}
         </p>
         <ToolbarButton
           icon={isPlaying ? <RiPauseLine /> : <RiPlayLine />}
@@ -176,7 +164,6 @@ export default function AudioLinkInput({
               .extendMarkRange('audiolink')
               .unsetAudioLink()
               .run();
-            setFilename('');
           }}
           altText="Remove"
           disabled={!src}
