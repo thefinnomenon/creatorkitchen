@@ -4,6 +4,7 @@ import { getPost, listPosts } from '../../graphql/queries';
 import Amplify from 'aws-amplify';
 import config from '../../aws-exports';
 Amplify.configure(config);
+import Script from 'next/script';
 
 type PostType = {
   id: string;
@@ -24,9 +25,21 @@ export default function Post({ post }: Props) {
   if (!post.content) return null;
 
   return (
-    <div className="w-full min-h-screen bg-white flex justify-center items-stretch">
-      <div className="md:mt-4 flex-1 max-w-4xl min-w-0 bg-white">
-        {/* {id && (
+    <>
+      <Script
+        src="https://unpkg.com/@popperjs/core@2"
+        strategy="beforeInteractive"
+      />
+      <Script src="https://unpkg.com/tippy.js@6" strategy="beforeInteractive" />
+      <Script id="initialize-tooltips" strategy="afterInteractive">
+        {`tippy('[data-tooltip-content]', { interactive: true, allowHTML: true, onShow(instance) {
+        instance.popper.hidden = instance.reference.dataset.tooltipContent ? false : true;
+      	instance.setContent(instance.reference.dataset.tooltipContent);
+      } })`}
+      </Script>
+      <div className="w-full min-h-screen bg-white flex justify-center items-stretch">
+        <div className="md:mt-4 flex-1 max-w-4xl min-w-0 bg-white">
+          {/* {id && (
           <button
             className="text-blue-600 font-semibold px-8 rounded-lg float-right"
             onClick={() => router.push(`/dashboard?content_id=${id}`)}
@@ -34,12 +47,13 @@ export default function Post({ post }: Props) {
             Edit
           </button>
         )} */}
-        <div
-          className="ProseMirror p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor"
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
+          <div
+            className="ProseMirror p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
