@@ -153,6 +153,9 @@ export default function EditPost() {
 
       IdRef.current = newPost.id;
       setPost(newPost);
+
+      // Initialize any tooltips in the newly loaded content
+      // setTimeout(() => tippy('[data-tippy-content]'), 500);
     } catch (error) {
       console.log(error);
     }

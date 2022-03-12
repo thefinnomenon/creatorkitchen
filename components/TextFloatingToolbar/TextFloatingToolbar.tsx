@@ -18,11 +18,14 @@ import { AiOutlineAudio } from 'react-icons/ai';
 import { RiLinkM } from 'react-icons/ri';
 import ToolbarButton from '../ToolbarButton';
 import { MutableRefObject } from 'react';
+import { BsChatSquareText } from 'react-icons/bs';
+import { tippy } from '@tippyjs/react';
 
 type Props = {
   editor: Editor;
   textToolbar: MutableRefObject<string>;
   linkToolbar: MutableRefObject<string>;
+  tooltip: MutableRefObject<string>;
   audioLinkToolbar: MutableRefObject<string>;
 } & typeof defaultProps;
 
@@ -33,6 +36,7 @@ export default function TextFloatingToolbar({
   editor,
   textToolbar,
   linkToolbar,
+  tooltip,
   audioLinkToolbar,
 }: Props): JSX.Element {
   function shouldShow() {
@@ -143,6 +147,22 @@ export default function TextFloatingToolbar({
           }, 200);
         }}
         isActive={editor.getAttributes('audiolink').src}
+      />
+      <ToolbarButton
+        icon={<BsChatSquareText />}
+        altText="Tooltip"
+        onClick={() => {
+          textToolbar.current = 'hide';
+          tooltip.current = 'show';
+          editor.chain().focus().run();
+          //editor.chain().focus().toggleTooltip({ content: '' }).run();
+          // HACK: I don't love this, but it works for now...
+          setTimeout(() => {
+            textToolbar.current = 'show';
+            tooltip.current = 'hide';
+          }, 200);
+        }}
+        isActive={editor.isActive('tooltip')}
       />
       <ToolbarButton
         icon={<MdSubscript />}

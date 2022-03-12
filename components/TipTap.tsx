@@ -36,6 +36,9 @@ import CodeBlock from './CodeBlock';
 import TrailingNode from '../extensions/nodes/trailingNode';
 import AudioLink from '../extensions/marks/audio';
 import AudioLinkInput from './AudioLinkInput';
+import Tooltip from '../extensions/marks/tooltip';
+import TooltipUI from './TooltipUI';
+import tippy from 'tippy.js';
 
 const DEBUG = process && process.env.NODE_ENV === 'development';
 
@@ -68,6 +71,7 @@ export default function Tiptap({ content, preview, onChange }) {
   const linkToolbar = useRef<MenuState>('hide');
   const audioLinkToolbar = useRef<MenuState>('hide');
   const tableToolbar = useRef<MenuState>('hide');
+  const tooltip = useRef<MenuState>('hide');
   const textToolbar = useRef<MenuState>('show');
 
   const editorClass =
@@ -117,6 +121,26 @@ export default function Tiptap({ content, preview, onChange }) {
     },
   });
 
+  const TooltipWithShortcut = Tooltip.extend({
+    // @ts-ignore
+    addKeyboardShortcuts() {
+      return {
+        'Mod-/': () => {
+          // Unset active tooltip
+          if (this.editor.isActive('tooltip')) {
+            this.editor.commands.unsetTooltip();
+          } else {
+            tooltip.current = 'show';
+            textToolbar.current = 'hide';
+            this.editor.commands.toggleTooltip({ 'data-tooltip-content': '' });
+            tooltip.current = 'hide';
+            textToolbar.current = 'show';
+          }
+        },
+      };
+    },
+  });
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -144,6 +168,7 @@ export default function Tiptap({ content, preview, onChange }) {
       TableCell,
       Focus,
       Keyboard,
+      TooltipWithShortcut,
       CodeBlockLowlight.extend({
         addNodeView() {
           return ReactNodeViewRenderer(CodeBlock);
@@ -214,21 +239,19 @@ export default function Tiptap({ content, preview, onChange }) {
   return (
     <>
       {editor && !preview && (
-        <TextFloatingToolbar
-          editor={editor}
-          textToolbar={textToolbar}
-          linkToolbar={linkToolbar}
-          audioLinkToolbar={audioLinkToolbar}
-        />
-      )}
-      {editor && !preview && (
-        <LinkInput editor={editor} linkToolbar={linkToolbar} />
-      )}
-      {editor && !preview && (
-        <AudioLinkInput editor={editor} audioLinkToolbar={audioLinkToolbar} />
-      )}
-      {editor && !preview && (
-        <TableFloatingToolbar editor={editor} toolbar={tableToolbar} />
+        <>
+          <TextFloatingToolbar
+            editor={editor}
+            textToolbar={textToolbar}
+            linkToolbar={linkToolbar}
+            tooltip={tooltip}
+            audioLinkToolbar={audioLinkToolbar}
+          />
+          <TableFloatingToolbar editor={editor} toolbar={tableToolbar} />
+          <AudioLinkInput editor={editor} audioLinkToolbar={audioLinkToolbar} />
+          <LinkInput editor={editor} linkToolbar={linkToolbar} />
+          <TooltipUI editor={editor} tooltip={tooltip} />
+        </>
       )}
       <EditorContent editor={editor} id="editor" />
     </>
