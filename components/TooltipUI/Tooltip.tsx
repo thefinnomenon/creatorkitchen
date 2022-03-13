@@ -66,7 +66,11 @@ export default function Tooltip({ editor, tooltip }: Props): JSX.Element {
               .chain()
               .focus()
               .extendMarkRange('tooltip')
-              .setTooltip({ 'data-tooltip-content': event.target.innerHTML })
+              .setTooltip({
+                'data-tooltip-content': event.target.innerHTML,
+                activeLink:
+                  editor.isActive('link') || editor.isActive('audiolink'),
+              })
               .setTextSelection(editor.state.selection.$head.pos)
               .run();
           } else {

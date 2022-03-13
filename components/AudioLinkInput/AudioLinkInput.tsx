@@ -43,17 +43,36 @@ export default function AudioLinkInput({
       try {
         if (file) {
           const source = await uploadFile(file);
-          editor
-            .chain()
-            .focus()
-            .extendMarkRange('audiolink')
-            .unsetLink()
-            .setAudioLink({
-              src: source,
-              title: file.name,
-            })
-            .setTextSelection(editor.state.selection.$head.pos)
-            .run();
+          if (editor.isActive('tooltip')) {
+            editor
+              .chain()
+              .focus()
+              .extendMarkRange('audiolink')
+              .unsetLink()
+              .setAudioLink({
+                src: source,
+                title: file.name,
+              })
+              .setTooltip({
+                'data-tooltip-content':
+                  editor.getAttributes('tooltip')['data-tooltip-content'],
+                activeLink: true,
+              })
+              .setTextSelection(editor.state.selection.$head.pos)
+              .run();
+          } else {
+            editor
+              .chain()
+              .focus()
+              .extendMarkRange('audiolink')
+              .unsetLink()
+              .setAudioLink({
+                src: source,
+                title: file.name,
+              })
+              .setTextSelection(editor.state.selection.$head.pos)
+              .run();
+          }
         }
       } catch (error) {
         console.log(error);
