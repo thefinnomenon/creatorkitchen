@@ -3,6 +3,7 @@ import { BubbleMenu } from '@tiptap/react';
 import { useEffect, useRef, useState } from 'react';
 import { roundArrow } from 'tippy.js';
 import 'tippy.js/dist/svg-arrow.css';
+import { hideOnEsc } from '../../lib/tippy/hideOnEsc';
 
 type Props = {
   editor: Editor;
@@ -54,6 +55,7 @@ export default function Tooltip({ editor, tooltip }: Props): JSX.Element {
         arrow: roundArrow,
         theme: 'my-tippy',
         animation: 'fade',
+        plugins: [hideOnEsc],
       }}
       shouldShow={shouldShow()}
       // className="focus-within:ring-4"

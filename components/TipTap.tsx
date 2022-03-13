@@ -38,7 +38,6 @@ import AudioLink from '../extensions/marks/audio';
 import AudioLinkInput from './AudioLinkInput';
 import Tooltip from '../extensions/marks/tooltip';
 import TooltipUI from './TooltipUI';
-import tippy from 'tippy.js';
 
 const DEBUG = process && process.env.NODE_ENV === 'development';
 

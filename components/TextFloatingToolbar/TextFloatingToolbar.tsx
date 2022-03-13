@@ -19,7 +19,7 @@ import { RiLinkM } from 'react-icons/ri';
 import ToolbarButton from '../ToolbarButton';
 import { MutableRefObject } from 'react';
 import { BsChatSquareText } from 'react-icons/bs';
-import { tippy } from '@tippyjs/react';
+import { hideOnEsc } from '../../lib/tippy/hideOnEsc';
 
 type Props = {
   editor: Editor;
@@ -73,7 +73,7 @@ export default function TextFloatingToolbar({
       editor={editor}
       pluginKey="textToolbar"
       shouldShow={shouldShow()}
-      tippyOptions={{ maxWidth: '600px' }}
+      tippyOptions={{ maxWidth: '600px', plugins: [hideOnEsc] }}
       className="bg-gray-100 text-lg rounded-sm shadow-lg"
     >
       <ToolbarButton

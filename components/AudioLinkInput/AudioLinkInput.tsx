@@ -1,15 +1,11 @@
 import { Editor, isTextSelection } from '@tiptap/react';
 import { BubbleMenu } from '@tiptap/react';
 import { useEffect, useRef, useState } from 'react';
-import { uploadFile, removeFile } from '../../lib/amplify';
-import {
-  RiLinkUnlinkM,
-  RiPauseLine,
-  RiPlayCircleLine,
-  RiPlayLine,
-} from 'react-icons/ri';
+import { uploadFile } from '../../lib/amplify';
+import { RiLinkUnlinkM, RiPauseLine, RiPlayLine } from 'react-icons/ri';
 import { VscLinkExternal } from 'react-icons/vsc';
 import ToolbarButton from '../ToolbarButton';
+import { hideOnEsc } from '../../lib/tippy/hideOnEsc';
 
 type File = {
   path: string;
@@ -128,6 +124,7 @@ export default function AudioLinkInput({
         maxWidth: '320px',
         placement: 'bottom',
         interactive: true,
+        plugins: [hideOnEsc],
       }}
       shouldShow={shouldShow()}
       className="bg-gray-100 text-lg rounded-sm shadow-lg"

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { RiLinkUnlinkM } from 'react-icons/ri';
 import { VscLinkExternal } from 'react-icons/vsc';
 import ToolbarButton from '../ToolbarButton';
+import { hideOnEsc } from '../../lib/tippy/hideOnEsc';
 
 type Props = {
   editor: Editor;
@@ -90,6 +91,7 @@ export default function LinkInput({ editor, linkToolbar }: Props): JSX.Element {
         maxWidth: '320px',
         placement: 'bottom',
         interactive: true,
+        plugins: [hideOnEsc],
       }}
       shouldShow={shouldShow()}
       className="bg-gray-100 text-lg rounded-sm shadow-lg"
