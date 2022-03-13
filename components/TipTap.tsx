@@ -132,7 +132,15 @@ export default function Tiptap({ content, preview, onChange }) {
           } else {
             tooltip.current = 'show';
             textToolbar.current = 'hide';
-            this.editor.commands.toggleTooltip({ 'data-tooltip-content': '' });
+            // This will cancel out, but will trigger the toolbar
+            this.editor.commands.toggleTooltip({
+              'data-tooltip-content': '',
+              activeLink: false,
+            });
+            this.editor.commands.toggleTooltip({
+              'data-tooltip-content': '',
+              activeLink: false,
+            });
             tooltip.current = 'hide';
             textToolbar.current = 'show';
           }

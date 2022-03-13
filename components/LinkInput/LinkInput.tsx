@@ -51,17 +51,34 @@ export default function LinkInput({ editor, linkToolbar }: Props): JSX.Element {
       }
 
       // eslint-disable-next-line
-      const re = new RegExp('^http(s)?:\/\/.*');
-      re.test(href)
-        ? editor.chain().focus().extendMarkRange('link').setLink({ href }).run()
-        : editor
-            .chain()
-            .focus()
-            .extendMarkRange('link')
-            .unsetAudioLink()
-            .setLink({ href: `http://${href}` })
-            .setTextSelection(editor.state.selection.$head.pos)
-            .run();
+      let src = ''
+      const re = new RegExp('^http(s)?://.*');
+      src = re.test(href) ? href : `http://${href}`;
+
+      if (editor.isActive('tooltip')) {
+        editor
+          .chain()
+          .focus()
+          .extendMarkRange('link')
+          .unsetAudioLink()
+          .setLink({ href })
+          .setTooltip({
+            'data-tooltip-content':
+              editor.getAttributes('tooltip')['data-tooltip-content'],
+            activeLink: true,
+          })
+          .setTextSelection(editor.state.selection.$head.pos)
+          .run();
+      } else {
+        editor
+          .chain()
+          .focus()
+          .extendMarkRange('link')
+          .unsetAudioLink()
+          .setLink({ href })
+          .setTextSelection(editor.state.selection.$head.pos)
+          .run();
+      }
     }
   };
 

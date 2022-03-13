@@ -5,6 +5,7 @@ import Amplify from 'aws-amplify';
 import config from '../../aws-exports';
 Amplify.configure(config);
 import Script from 'next/script';
+import 'tippy.js/dist/svg-arrow.css';
 
 type PostType = {
   id: string;
@@ -32,7 +33,7 @@ export default function Post({ post }: Props) {
       />
       <Script src="https://unpkg.com/tippy.js@6" strategy="beforeInteractive" />
       <Script id="initialize-tooltips" strategy="afterInteractive">
-        {`tippy('[data-tooltip-content]', { interactive: true, allowHTML: true, onShow(instance) {
+        {`tippy('[data-tooltip-content]', { interactive: true, allowHTML: true, arrow: tippy.roundArrow, theme: 'my-tippy', onShow(instance) {
         instance.popper.hidden = instance.reference.dataset.tooltipContent ? false : true;
       	instance.setContent(instance.reference.dataset.tooltipContent);
       } })`}

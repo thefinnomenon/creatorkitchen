@@ -9,9 +9,11 @@ declare module '@tiptap/core' {
     tooltip: {
       setTooltip: (attributes: {
         'data-tooltip-content': string;
+        activeLink: boolean;
       }) => ReturnType;
       toggleTooltip: (attributes: {
         'data-tooltip-content': string;
+        activeLink: boolean;
       }) => ReturnType;
       unsetTooltip: () => ReturnType;
     };
@@ -33,6 +35,9 @@ export const Tooltip = Mark.create<TooltipOptions>({
       'data-tooltip-content': {
         default: null,
       },
+      activeLink: {
+        default: null,
+      },
     };
   },
 
@@ -49,6 +54,7 @@ export const Tooltip = Mark.create<TooltipOptions>({
       'span',
       mergeAttributes(HTMLAttributes, {
         'data-type': 'tooltip',
+        class: HTMLAttributes.activeLink ? '' : 'tooltip-underline',
       }),
       0,
     ];

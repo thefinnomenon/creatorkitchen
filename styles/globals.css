@@ -135,14 +135,18 @@ span[data-type="audiolink"] {
   cursor: auto;
 }
 
-span[data-type="tooltip"] {
+.tooltip-underline {
   text-decoration-line: underline;
   text-decoration-style: dotted;
   @apply decoration-gray-500;
 }
 
-.tippy-content {
-  @apply text-sm md:text-base lg:text-lg;
+.tippy-box[data-theme~='my-tippy'] {
+  @apply bg-gray-900 text-white text-sm md:text-base lg:text-lg rounded-lg p-2;
+}
+
+.tippy-box[data-theme~='my-tippy'] > .tippy-svg-arrow {
+  @apply fill-gray-900;
 }
 
 .drag-handle {

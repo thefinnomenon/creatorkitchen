@@ -1,6 +1,8 @@
 import { Editor, isTextSelection } from '@tiptap/react';
 import { BubbleMenu } from '@tiptap/react';
 import { useEffect, useRef, useState } from 'react';
+import { roundArrow } from 'tippy.js';
+import 'tippy.js/dist/svg-arrow.css';
 
 type Props = {
   editor: Editor;
@@ -49,11 +51,12 @@ export default function Tooltip({ editor, tooltip }: Props): JSX.Element {
         maxWidth: '500px',
         placement: 'top',
         interactive: true,
-        arrow: true,
+        arrow: roundArrow,
+        theme: 'my-tippy',
         animation: 'fade',
       }}
       shouldShow={shouldShow()}
-      className="bg-gray-900 text-white text-lg rounded-lg shadow-lg p-4 focus-within:ring-4"
+      // className="focus-within:ring-4"
     >
       <div
         ref={contentEditableRef}
@@ -66,7 +69,11 @@ export default function Tooltip({ editor, tooltip }: Props): JSX.Element {
               .chain()
               .focus()
               .extendMarkRange('tooltip')
-              .setTooltip({ 'data-tooltip-content': event.target.innerHTML })
+              .setTooltip({
+                'data-tooltip-content': event.target.innerHTML,
+                activeLink:
+                  editor.isActive('link') || editor.isActive('audiolink'),
+              })
               .setTextSelection(editor.state.selection.$head.pos)
               .run();
           } else {
