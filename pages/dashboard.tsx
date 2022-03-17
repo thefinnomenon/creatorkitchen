@@ -172,7 +172,7 @@ export default function EditPost() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white flex items-stretch justify-between">
+    <div className="w-full overflow-hidden h-screen bg-white flex justify-between">
       <div className="w-52">
         <ContentList
           content={posts}
@@ -182,7 +182,7 @@ export default function EditPost() {
           onSignOut={onSignOut}
         />
       </div>
-      <div className="md:mt-4 flex-1 max-w-4xl">
+      <div className="md:mt-4 flex-1 items-stretch max-w-4xl">
         {post && (
           <div className="flex items-center justify-between px-4">
             {isSaved ? <p className="text-gray-400">Saved</p> : <div />}
@@ -208,7 +208,7 @@ export default function EditPost() {
           </div>
         )}
         {post && (
-          <div>
+          <div className="overflow-auto">
             <Tiptap
               content={post.content}
               onChange={(content) => {
