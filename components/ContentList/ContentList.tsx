@@ -54,7 +54,7 @@ export default function ContentList({
           ))}
         </div>
         <button
-          className="bg-blue-600 text-white font-semibold px-8 rounded-lg h-8 m-2"
+          className="bg-blue-600 text-white font-semibold px-8 rounded-lg h-8 m-2 hover:bg-blue-500"
           onClick={() => onSignOut()}
         >
           Sign Out

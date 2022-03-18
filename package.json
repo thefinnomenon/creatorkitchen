@@ -16,6 +16,7 @@
     "@giphy/js-fetch-api": "^4.1.2",
     "@giphy/react-components": "^5.4.0",
     "@headlessui/react": "^1.4.2",
+    "@reach/menu-button": "^0.16.2",
     "@reach/tabs": "^0.16.4",
     "@reach/visually-hidden": "^0.16.0",
     "@tippyjs/react": "^4.2.6",

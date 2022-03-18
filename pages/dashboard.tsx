@@ -13,6 +13,7 @@ import { Auth } from 'aws-amplify';
 import { getPost, postsByUsername } from '../graphql/queries';
 import { signOut } from '../lib/amplify';
 import Tiptap from '../components/TipTap';
+import { FiExternalLink } from 'react-icons/fi';
 import ContentSettingsPanel from '../components/ContentSettingsPanel';
 
 const UPDATE_DEBOUNCE = 5000;
@@ -35,6 +36,7 @@ export default function EditPost() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [post, setPost] = useState<Post>();
   const [isSaved, setIsSaved] = useState(true);
+  const [currentDraft, setCurrentDraft] = useState<Post>();
   const IdRef = useRef('');
 
   // CREATE
@@ -93,6 +95,7 @@ export default function EditPost() {
     });
 
     setIsSaved(true);
+    setCurrentDraft({ ...currentDraft, ...values });
   }
 
   // DELETE
@@ -184,27 +187,49 @@ export default function EditPost() {
       </div>
       <div className="md:mt-4 flex-1 items-stretch max-w-4xl">
         {post && (
-          <div className="flex items-center justify-between px-4">
+          <div className="flex items-center justify-between px-4 pb-2">
             {isSaved ? <p className="text-gray-400">Saved</p> : <div />}
+            <div className="flex items-stretch">
+              <Link href={`/preview/${post.id}`} passHref>
+                <a
+                  className="text-blue-600 font-semibold rounded-lg p-2 hover:bg-gray-200"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => {
+                    if (!isSaved) {
+                      const cont = alert(
+                        "Current draft isn't saved. Please wait a few seconds."
+                      );
+                      e.preventDefault();
+                      return false;
+                    }
+                  }}
+                >
+                  Preview
+                </a>
+              </Link>
 
-            <Link href={`/posts/${post.id}`} passHref>
-              <a
-                className="text-blue-600 font-semibold rounded-lg p-2 hover:bg-gray-200"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                className="bg-blue-600 font-semibold text-white rounded-lg p-2 hover:bg-blue-500 mx-2"
                 onClick={(e) => {
-                  if (!isSaved) {
-                    const cont = alert(
-                      "Current draft isn't saved. Please wait a few seconds."
-                    );
-                    e.preventDefault();
-                    return false;
-                  }
+                  console.log('Publish changes');
+                  // TODO: Create new published post from currentDraft values, with contentId and status published
+                  // Need to keep createdAt (first draft created) publishedAt (first published), updatedAt (latest published)
                 }}
               >
-                Preview
-              </a>
-            </Link>
+                Publish
+              </button>
+              <Link href={`/posts/${post.id}`} passHref>
+                <a target="_blank" rel="noopener noreferrer">
+                  <button
+                  //disabled={disabled}
+                  >
+                    <VisuallyHidden>View published content</VisuallyHidden>
+                    <FiExternalLink className="font-semibold text-4xl text-blue-600 rounded-lg p-2 hover:bg-gray-200" />
+                  </button>
+                </a>
+              </Link>
+            </div>
           </div>
         )}
         {post && (

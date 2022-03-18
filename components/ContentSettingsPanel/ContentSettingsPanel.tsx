@@ -75,7 +75,7 @@ export default function ContentList({
         </div>
         <button
           onClick={() => onDelete(post.id)}
-          className="flex self-end rounded-lg p-2 hover:bg-gray-200"
+          className="flex self-end rounded-lg p-2 hover:bg-gray-200 m-1"
         >
           <div className="text-2xl text-red-500">
             <VisuallyHidden>Delete content</VisuallyHidden>
