@@ -1,6 +1,6 @@
 import API from '@aws-amplify/api';
 import { useRouter } from 'next/router';
-import { getPost, listPosts } from '../../graphql/queries';
+import { getPost } from '../../graphql/queries';
 import Amplify from 'aws-amplify';
 import config from '../../aws-exports';
 Amplify.configure(config);
@@ -50,10 +50,8 @@ export default function Post({ post }: Props) {
   );
 }
 
-// At build time, get post and pass as prop
-export async function getStaticProps({ params }) {
+export async function getServerSideProps({ params }) {
   const { id } = params;
-  console.log(id);
 
   try {
     const postData = (await API.graphql({
@@ -65,26 +63,7 @@ export async function getStaticProps({ params }) {
       props: {
         post: postData.data.getPost,
       },
-      revalidate: 1,
     };
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-// At build time, get posts list and generate paths
-export async function getStaticPaths() {
-  try {
-    const postData = (await API.graphql({
-      query: listPosts,
-    })) as { data: { listPosts: { items: [PostType] } } };
-
-    const paths = postData.data.listPosts.items.map((post) => ({
-      params: { id: post.id },
-    }));
-    console.log(paths);
-
-    return { paths, fallback: 'blocking' };
   } catch (error) {
     console.log(error);
   }

@@ -15,6 +15,7 @@ import { signOut } from '../lib/amplify';
 import Tiptap from '../components/TipTap';
 import { FiExternalLink } from 'react-icons/fi';
 import ContentSettingsPanel from '../components/ContentSettingsPanel';
+import { ClipLoader } from 'react-spinners';
 
 const UPDATE_DEBOUNCE = 5000;
 
@@ -36,6 +37,7 @@ export default function EditPost() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [post, setPost] = useState<Post>();
   const [isSaved, setIsSaved] = useState(true);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [currentDraft, setCurrentDraft] = useState<Post>();
   const IdRef = useRef('');
 
@@ -211,13 +213,25 @@ export default function EditPost() {
 
               <button
                 className="bg-blue-600 font-semibold text-white rounded-lg p-2 hover:bg-blue-500 mx-2"
-                onClick={(e) => {
-                  console.log('Publish changes');
-                  // TODO: Create new published post from currentDraft values, with contentId and status published
-                  // Need to keep createdAt (first draft created) publishedAt (first published), updatedAt (latest published)
+                onClick={async (e) => {
+                  if (!isSaved) {
+                    const cont = alert(
+                      "Current draft isn't saved. Please wait a few seconds."
+                    );
+                    return false;
+                  }
+                  setIsPublishing(true);
+                  const response = await fetch(
+                    `api/publish?id=${post.id}&secret=${process.env.NEXT_PUBLIC_MY_SECRET_TOKEN}`
+                  );
+                  setIsPublishing(false);
                 }}
               >
-                Publish
+                {isPublishing ? (
+                  <ClipLoader color="white" size={24} />
+                ) : (
+                  'Publish'
+                )}
               </button>
               <Link href={`/posts/${post.id}`} passHref>
                 <a target="_blank" rel="noopener noreferrer">

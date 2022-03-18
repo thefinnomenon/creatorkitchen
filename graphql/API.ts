@@ -7,7 +7,6 @@ export type CreatePostInput = {
   title?: string | null,
   description?: string | null,
   content?: string | null,
-  status?: string | null,
   username?: string | null,
   media?: string | null,
   coverImage?: string | null,
@@ -17,7 +16,6 @@ export type ModelPostConditionInput = {
   title?: ModelStringInput | null,
   description?: ModelStringInput | null,
   content?: ModelStringInput | null,
-  status?: ModelStringInput | null,
   username?: ModelStringInput | null,
   media?: ModelStringInput | null,
   coverImage?: ModelStringInput | null,
@@ -72,7 +70,6 @@ export type Post = {
   title?: string | null,
   description?: string | null,
   content?: string | null,
-  status?: string | null,
   username?: string | null,
   media?: string | null,
   coverImage?: string | null,
@@ -85,7 +82,6 @@ export type UpdatePostInput = {
   title?: string | null,
   description?: string | null,
   content?: string | null,
-  status?: string | null,
   username?: string | null,
   media?: string | null,
   coverImage?: string | null,
@@ -95,34 +91,17 @@ export type DeletePostInput = {
   id: string,
 };
 
-export type CreateContentInput = {
-  id?: string | null,
-  contentID: string,
-  status?: string | null,
-  title?: string | null,
-  description?: string | null,
-  content?: string | null,
-  username?: string | null,
-  media?: string | null,
-  coverImage?: string | null,
-  createdAt?: string | null,
-  updatedAt?: string | null,
-};
-
-export type ModelContentConditionInput = {
-  contentID?: ModelIDInput | null,
-  status?: ModelStringInput | null,
+export type ModelPostFilterInput = {
+  id?: ModelIDInput | null,
   title?: ModelStringInput | null,
   description?: ModelStringInput | null,
   content?: ModelStringInput | null,
   username?: ModelStringInput | null,
   media?: ModelStringInput | null,
   coverImage?: ModelStringInput | null,
-  createdAt?: ModelStringInput | null,
-  updatedAt?: ModelStringInput | null,
-  and?: Array< ModelContentConditionInput | null > | null,
-  or?: Array< ModelContentConditionInput | null > | null,
-  not?: ModelContentConditionInput | null,
+  and?: Array< ModelPostFilterInput | null > | null,
+  or?: Array< ModelPostFilterInput | null > | null,
+  not?: ModelPostFilterInput | null,
 };
 
 export type ModelIDInput = {
@@ -141,53 +120,6 @@ export type ModelIDInput = {
   size?: ModelSizeInput | null,
 };
 
-export type Content = {
-  __typename: "Content",
-  id: string,
-  contentID: string,
-  status?: string | null,
-  title?: string | null,
-  description?: string | null,
-  content?: string | null,
-  username?: string | null,
-  media?: string | null,
-  coverImage?: string | null,
-  createdAt: string,
-  updatedAt?: string | null,
-};
-
-export type UpdateContentInput = {
-  id: string,
-  contentID?: string | null,
-  status?: string | null,
-  title?: string | null,
-  description?: string | null,
-  content?: string | null,
-  username?: string | null,
-  media?: string | null,
-  coverImage?: string | null,
-  createdAt?: string | null,
-  updatedAt?: string | null,
-};
-
-export type DeleteContentInput = {
-  id: string,
-};
-
-export type ModelPostFilterInput = {
-  id?: ModelIDInput | null,
-  title?: ModelStringInput | null,
-  description?: ModelStringInput | null,
-  content?: ModelStringInput | null,
-  status?: ModelStringInput | null,
-  username?: ModelStringInput | null,
-  media?: ModelStringInput | null,
-  coverImage?: ModelStringInput | null,
-  and?: Array< ModelPostFilterInput | null > | null,
-  or?: Array< ModelPostFilterInput | null > | null,
-  not?: ModelPostFilterInput | null,
-};
-
 export type ModelPostConnection = {
   __typename: "ModelPostConnection",
   items:  Array<Post | null >,
@@ -199,29 +131,6 @@ export enum ModelSortDirection {
   DESC = "DESC",
 }
 
-
-export type ModelContentFilterInput = {
-  id?: ModelIDInput | null,
-  contentID?: ModelIDInput | null,
-  status?: ModelStringInput | null,
-  title?: ModelStringInput | null,
-  description?: ModelStringInput | null,
-  content?: ModelStringInput | null,
-  username?: ModelStringInput | null,
-  media?: ModelStringInput | null,
-  coverImage?: ModelStringInput | null,
-  createdAt?: ModelStringInput | null,
-  updatedAt?: ModelStringInput | null,
-  and?: Array< ModelContentFilterInput | null > | null,
-  or?: Array< ModelContentFilterInput | null > | null,
-  not?: ModelContentFilterInput | null,
-};
-
-export type ModelContentConnection = {
-  __typename: "ModelContentConnection",
-  items:  Array<Content | null >,
-  nextToken?: string | null,
-};
 
 export type CreatePostMutationVariables = {
   input: CreatePostInput,
@@ -235,7 +144,6 @@ export type CreatePostMutation = {
     title?: string | null,
     description?: string | null,
     content?: string | null,
-    status?: string | null,
     username?: string | null,
     media?: string | null,
     coverImage?: string | null,
@@ -256,7 +164,6 @@ export type UpdatePostMutation = {
     title?: string | null,
     description?: string | null,
     content?: string | null,
-    status?: string | null,
     username?: string | null,
     media?: string | null,
     coverImage?: string | null,
@@ -277,78 +184,11 @@ export type DeletePostMutation = {
     title?: string | null,
     description?: string | null,
     content?: string | null,
-    status?: string | null,
     username?: string | null,
     media?: string | null,
     coverImage?: string | null,
     createdAt: string,
     updatedAt: string,
-  } | null,
-};
-
-export type CreateContentMutationVariables = {
-  input: CreateContentInput,
-  condition?: ModelContentConditionInput | null,
-};
-
-export type CreateContentMutation = {
-  createContent?:  {
-    __typename: "Content",
-    id: string,
-    contentID: string,
-    status?: string | null,
-    title?: string | null,
-    description?: string | null,
-    content?: string | null,
-    username?: string | null,
-    media?: string | null,
-    coverImage?: string | null,
-    createdAt: string,
-    updatedAt?: string | null,
-  } | null,
-};
-
-export type UpdateContentMutationVariables = {
-  input: UpdateContentInput,
-  condition?: ModelContentConditionInput | null,
-};
-
-export type UpdateContentMutation = {
-  updateContent?:  {
-    __typename: "Content",
-    id: string,
-    contentID: string,
-    status?: string | null,
-    title?: string | null,
-    description?: string | null,
-    content?: string | null,
-    username?: string | null,
-    media?: string | null,
-    coverImage?: string | null,
-    createdAt: string,
-    updatedAt?: string | null,
-  } | null,
-};
-
-export type DeleteContentMutationVariables = {
-  input: DeleteContentInput,
-  condition?: ModelContentConditionInput | null,
-};
-
-export type DeleteContentMutation = {
-  deleteContent?:  {
-    __typename: "Content",
-    id: string,
-    contentID: string,
-    status?: string | null,
-    title?: string | null,
-    description?: string | null,
-    content?: string | null,
-    username?: string | null,
-    media?: string | null,
-    coverImage?: string | null,
-    createdAt: string,
-    updatedAt?: string | null,
   } | null,
 };
 
@@ -363,7 +203,6 @@ export type GetPostQuery = {
     title?: string | null,
     description?: string | null,
     content?: string | null,
-    status?: string | null,
     username?: string | null,
     media?: string | null,
     coverImage?: string | null,
@@ -387,7 +226,6 @@ export type ListPostsQuery = {
       title?: string | null,
       description?: string | null,
       content?: string | null,
-      status?: string | null,
       username?: string | null,
       media?: string | null,
       coverImage?: string | null,
@@ -415,89 +253,11 @@ export type PostsByUsernameQuery = {
       title?: string | null,
       description?: string | null,
       content?: string | null,
-      status?: string | null,
       username?: string | null,
       media?: string | null,
       coverImage?: string | null,
       createdAt: string,
       updatedAt: string,
-    } | null >,
-    nextToken?: string | null,
-  } | null,
-};
-
-export type GetContentQueryVariables = {
-  id: string,
-};
-
-export type GetContentQuery = {
-  getContent?:  {
-    __typename: "Content",
-    id: string,
-    contentID: string,
-    status?: string | null,
-    title?: string | null,
-    description?: string | null,
-    content?: string | null,
-    username?: string | null,
-    media?: string | null,
-    coverImage?: string | null,
-    createdAt: string,
-    updatedAt?: string | null,
-  } | null,
-};
-
-export type ListContentsQueryVariables = {
-  filter?: ModelContentFilterInput | null,
-  limit?: number | null,
-  nextToken?: string | null,
-};
-
-export type ListContentsQuery = {
-  listContents?:  {
-    __typename: "ModelContentConnection",
-    items:  Array< {
-      __typename: "Content",
-      id: string,
-      contentID: string,
-      status?: string | null,
-      title?: string | null,
-      description?: string | null,
-      content?: string | null,
-      username?: string | null,
-      media?: string | null,
-      coverImage?: string | null,
-      createdAt: string,
-      updatedAt?: string | null,
-    } | null >,
-    nextToken?: string | null,
-  } | null,
-};
-
-export type ContentByUsernameQueryVariables = {
-  username?: string | null,
-  sortDirection?: ModelSortDirection | null,
-  filter?: ModelContentFilterInput | null,
-  limit?: number | null,
-  nextToken?: string | null,
-};
-
-export type ContentByUsernameQuery = {
-  contentByUsername?:  {
-    __typename: "ModelContentConnection",
-    items:  Array< {
-      __typename: "Content",
-      id: string,
-      contentID: string,
-      status?: string | null,
-      title?: string | null,
-      description?: string | null,
-      content?: string | null,
-      username?: string | null,
-      media?: string | null,
-      coverImage?: string | null,
-      createdAt: string,
-      updatedAt?: string | null,
     } | null >,
     nextToken?: string | null,
   } | null,
@@ -514,7 +274,6 @@ export type OnCreatePostSubscription = {
     title?: string | null,
     description?: string | null,
     content?: string | null,
-    status?: string | null,
     username?: string | null,
     media?: string | null,
     coverImage?: string | null,
@@ -534,7 +293,6 @@ export type OnUpdatePostSubscription = {
     title?: string | null,
     description?: string | null,
     content?: string | null,
-    status?: string | null,
     username?: string | null,
     media?: string | null,
     coverImage?: string | null,
@@ -554,74 +312,10 @@ export type OnDeletePostSubscription = {
     title?: string | null,
     description?: string | null,
     content?: string | null,
-    status?: string | null,
     username?: string | null,
     media?: string | null,
     coverImage?: string | null,
     createdAt: string,
     updatedAt: string,
-  } | null,
-};
-
-export type OnCreateContentSubscriptionVariables = {
-  username?: string | null,
-};
-
-export type OnCreateContentSubscription = {
-  onCreateContent?:  {
-    __typename: "Content",
-    id: string,
-    contentID: string,
-    status?: string | null,
-    title?: string | null,
-    description?: string | null,
-    content?: string | null,
-    username?: string | null,
-    media?: string | null,
-    coverImage?: string | null,
-    createdAt: string,
-    updatedAt?: string | null,
-  } | null,
-};
-
-export type OnUpdateContentSubscriptionVariables = {
-  username?: string | null,
-};
-
-export type OnUpdateContentSubscription = {
-  onUpdateContent?:  {
-    __typename: "Content",
-    id: string,
-    contentID: string,
-    status?: string | null,
-    title?: string | null,
-    description?: string | null,
-    content?: string | null,
-    username?: string | null,
-    media?: string | null,
-    coverImage?: string | null,
-    createdAt: string,
-    updatedAt?: string | null,
-  } | null,
-};
-
-export type OnDeleteContentSubscriptionVariables = {
-  username?: string | null,
-};
-
-export type OnDeleteContentSubscription = {
-  onDeleteContent?:  {
-    __typename: "Content",
-    id: string,
-    contentID: string,
-    status?: string | null,
-    title?: string | null,
-    description?: string | null,
-    content?: string | null,
-    username?: string | null,
-    media?: string | null,
-    coverImage?: string | null,
-    createdAt: string,
-    updatedAt?: string | null,
   } | null,
 };

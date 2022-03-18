@@ -65,7 +65,6 @@ export async function getStaticProps({ params }) {
       props: {
         post: postData.data.getPost,
       },
-      revalidate: 1,
     };
   } catch (error) {
     console.log(error);

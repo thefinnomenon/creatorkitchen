@@ -7,35 +7,7 @@ type Post @model
   title: String
   description: String
   content: String
-  status: String
   username: String @index(name: "postsByUsername", queryField: "postsByUsername")
   media: AWSJSON
   coverImage: String
-}
-
-# Draft         ->      Publish1        ->    Publish2
-# ID: 128               ID: 8273              ID: 3332
-# ContentID: 128        ContentID: 128        ContentID: 128
-# CreatedAt: 1-2        CreatedAt: 1-4        CreatedAt: 1-6
-# UpdatedAt: 1-4        publishedAt: 1-4      publishedAt: 1-4
-#                       updatedAt: 1-4        updatedAt: 1-6
-
-# 
-
-type Content @model
-  @auth(rules: [
-    { allow: owner, ownerField: "username" },
-    { allow: public, operations: [read] }
-  ]) {
-  id: ID!
-  contentID: ID!
-  status: String
-  title: String
-  description: String
-  content: String
-  username: String @index(name: "contentByUsername", queryField: "contentByUsername")
-  media: AWSJSON
-  coverImage: String
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime
 }
