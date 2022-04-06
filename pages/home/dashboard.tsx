@@ -23,8 +23,10 @@ import { siteByUsernameWithContents } from '../../graphql/customStatements';
 
 const UPDATE_DEBOUNCE = 5000;
 
+let PROTOCOL = 'http://';
 let ROOT_DOMAIN = 'localhost:3000';
 if (process && process.env.NODE_ENV !== 'development') {
+  PROTOCOL = 'https://';
   ROOT_DOMAIN = 'creatorkitchen.net';
 }
 
@@ -197,7 +199,7 @@ export default function EditPost() {
   }
 
   const isCustomDomain = domain && domain.includes('.');
-  const urlRoot = `http://${
+  const urlRoot = `${PROTOCOL}${
     isCustomDomain ? domain : `${domain}.${ROOT_DOMAIN}`
   }`;
 
