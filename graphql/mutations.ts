@@ -2,55 +2,139 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const createPost = /* GraphQL */ `
-  mutation CreatePost(
-    $input: CreatePostInput!
-    $condition: ModelPostConditionInput
+export const createContent = /* GraphQL */ `
+  mutation CreateContent(
+    $input: CreateContentInput!
+    $condition: ModelContentConditionInput
   ) {
-    createPost(input: $input, condition: $condition) {
+    createContent(input: $input, condition: $condition) {
       id
+      siteID
+      author
       title
       description
       content
-      username
       media
-      coverImage
       createdAt
       updatedAt
     }
   }
 `;
-export const updatePost = /* GraphQL */ `
-  mutation UpdatePost(
-    $input: UpdatePostInput!
-    $condition: ModelPostConditionInput
+export const updateContent = /* GraphQL */ `
+  mutation UpdateContent(
+    $input: UpdateContentInput!
+    $condition: ModelContentConditionInput
   ) {
-    updatePost(input: $input, condition: $condition) {
+    updateContent(input: $input, condition: $condition) {
       id
+      siteID
+      author
       title
       description
       content
-      username
       media
-      coverImage
       createdAt
       updatedAt
     }
   }
 `;
-export const deletePost = /* GraphQL */ `
-  mutation DeletePost(
-    $input: DeletePostInput!
-    $condition: ModelPostConditionInput
+export const deleteContent = /* GraphQL */ `
+  mutation DeleteContent(
+    $input: DeleteContentInput!
+    $condition: ModelContentConditionInput
   ) {
-    deletePost(input: $input, condition: $condition) {
+    deleteContent(input: $input, condition: $condition) {
       id
+      siteID
+      author
       title
       description
       content
-      username
       media
-      coverImage
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createSite = /* GraphQL */ `
+  mutation CreateSite(
+    $input: CreateSiteInput!
+    $condition: ModelSiteConditionInput
+  ) {
+    createSite(input: $input, condition: $condition) {
+      id
+      domain
+      username
+      contents {
+        items {
+          id
+          siteID
+          author
+          title
+          description
+          content
+          media
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const updateSite = /* GraphQL */ `
+  mutation UpdateSite(
+    $input: UpdateSiteInput!
+    $condition: ModelSiteConditionInput
+  ) {
+    updateSite(input: $input, condition: $condition) {
+      id
+      domain
+      username
+      contents {
+        items {
+          id
+          siteID
+          author
+          title
+          description
+          content
+          media
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const deleteSite = /* GraphQL */ `
+  mutation DeleteSite(
+    $input: DeleteSiteInput!
+    $condition: ModelSiteConditionInput
+  ) {
+    deleteSite(input: $input, condition: $condition) {
+      id
+      domain
+      username
+      contents {
+        items {
+          id
+          siteID
+          author
+          title
+          description
+          content
+          media
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       createdAt
       updatedAt
     }

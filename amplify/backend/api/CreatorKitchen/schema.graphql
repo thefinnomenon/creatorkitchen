@@ -1,13 +1,27 @@
-type Post @model
+type Content 
+  @model
+  @auth(rules: [
+    { allow: owner, ownerField: "author" },
+    { allow: public, operations: [read] }
+  ]) {
+  id: ID! @primaryKey(sortKeyFields: ["siteID"])
+  siteID: ID! @index(name: "bySite")
+  author: String
+  title: String
+  description: String
+  content: String
+  media: AWSJSON
+}
+
+# TODO: Ensure subdomain and domain are unique
+type Site
+  @model
   @auth(rules: [
     { allow: owner, ownerField: "username" },
     { allow: public, operations: [read] }
   ]) {
   id: ID!
-  title: String
-  description: String
-  content: String
-  username: String @index(name: "postsByUsername", queryField: "postsByUsername")
-  media: AWSJSON
-  coverImage: String
+  domain: String @index(name: "siteByDomain", queryField: "siteByDomain")
+  username: String @index(name: "siteByUsername", queryField: "siteByUsername")
+  contents: [Content] @hasMany(indexName: "bySite", fields: ["id"])
 }

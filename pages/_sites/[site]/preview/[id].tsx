@@ -1,11 +1,12 @@
 import API from '@aws-amplify/api';
 import { useRouter } from 'next/router';
-import { getPost, listPosts } from '../../graphql/queries';
+import { getContent, siteByDomain } from '../../../../graphql/queries';
 import Amplify from 'aws-amplify';
-import config from '../../aws-exports';
+import config from '../../../../aws-exports';
 Amplify.configure(config);
 import Script from 'next/script';
 import 'tippy.js/dist/svg-arrow.css';
+import { GetContentQuery, SiteByDomainQuery } from '../../../../graphql/API';
 
 type PostType = {
   id: string;
@@ -50,40 +51,30 @@ export default function Post({ post }: Props) {
   );
 }
 
-// At build time, get post and pass as prop
-export async function getStaticProps({ params }) {
-  const { id } = params;
-  console.log(id);
-
+export async function getServerSideProps({ params: { id, site } }) {
   try {
-    const postData = (await API.graphql({
-      query: getPost,
-      variables: { id },
-    })) as { data: { getPost: PostType } };
+    const siteRes = (await API.graphql({
+      query: siteByDomain,
+      variables: {
+        domain: site,
+      },
+    })) as { data: SiteByDomainQuery; errors: any[] };
+    if (!siteRes.data.siteByDomain.items[0]) return { notFound: true };
+
+    const contentRes = (await API.graphql({
+      query: getContent,
+      variables: {
+        id,
+        siteID: siteRes.data.siteByDomain.items[0].id,
+      },
+    })) as { data: GetContentQuery; errors: any[] };
+    if (!contentRes.data.getContent) return { notFound: true };
 
     return {
       props: {
-        post: postData.data.getPost,
+        post: contentRes.data.getContent,
       },
     };
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-// At build time, get posts list and generate paths
-export async function getStaticPaths() {
-  try {
-    const postData = (await API.graphql({
-      query: listPosts,
-    })) as { data: { listPosts: { items: [PostType] } } };
-
-    const paths = postData.data.listPosts.items.map((post) => ({
-      params: { id: post.id },
-    }));
-    console.log(paths);
-
-    return { paths, fallback: 'blocking' };
   } catch (error) {
     console.log(error);
   }

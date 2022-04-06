@@ -1,8 +1,9 @@
 import { VscDiffAdded } from 'react-icons/vsc';
 import VisuallyHidden from '@reach/visually-hidden';
+import { Content } from '../../graphql/API';
 
 type Props = {
-  content: any;
+  contents: Content[];
   selectedId: string;
   onSelect(id: string): void;
   onCreate(): void;
@@ -13,7 +14,7 @@ const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
 export default function ContentList({
-  content,
+  contents,
   selectedId,
   onSelect,
   onCreate,
@@ -25,29 +26,29 @@ export default function ContentList({
         <div>
           <div className="flex justify-between">
             <h1 className="text-3xl font-semibold tracking-wide mb-4 pt-4 pl-4">
-              Posts
+              Content
             </h1>
             <button onClick={() => onCreate()} className="p-2 pt-3">
               <VisuallyHidden>Create new content</VisuallyHidden>
               <VscDiffAdded className="text-4xl text-gray-500 hover:text-blue-500" />
             </button>
           </div>
-          {content.map((post, index) => (
+          {contents.map((content, index) => (
             <div
               key={index}
-              onClick={() => onSelect(post.id)}
+              onClick={() => onSelect(content.id)}
               className={`overflow-y-auto cursor-pointer p-4 hover:bg-gray-300 ${
-                post.id === selectedId
+                content.id === selectedId
                   ? 'font-bold text-blue-600 bg-gray-300'
                   : ''
               }`}
             >
               <h2
                 className={`text-xl ${
-                  post.id === selectedId ? 'font-bold' : 'font-medium'
+                  content.id === selectedId ? 'font-bold' : 'font-medium'
                 }`}
               >
-                {post.title === '' ? 'Untitled' : post.title}
+                {content.title === '' ? 'Untitled' : content.title}
               </h2>
               {/* <p className="text-gray-500 mt-2 mb-2">Author: {post.username}</p> */}
             </div>
