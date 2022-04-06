@@ -328,12 +328,14 @@ export default function EditPost() {
                       );
                       setTimeout(() => setIsPublishing(false), 2000);
                     } else {
-                      console.log(
-                        `${urlRoot}/api/publish?slug=${content.id}&secret=${process.env.NEXT_PUBLIC_MY_SECRET_TOKEN}`
-                      );
-                      const response = await fetch(
-                        `${urlRoot}/api/publish?slug=${content.id}&secret=${process.env.NEXT_PUBLIC_MY_SECRET_TOKEN}`
-                      );
+                      try {
+                        const response = await fetch(
+                          `${urlRoot}/api/publish?slug=${content.id}`,
+                          { mode: 'no-cors' }
+                        );
+                      } catch (e) {
+                        console.error(e);
+                      }
                       setIsPublishing(false);
                     }
                   }}

@@ -104,6 +104,8 @@ export async function getStaticPaths() {
       return arr;
     }, []);
 
+    console.log(paths);
+
     return { paths, fallback: 'blocking' };
   } catch (error) {
     console.log(error);
