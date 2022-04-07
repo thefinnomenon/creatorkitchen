@@ -23,5 +23,7 @@ type Site
   id: ID!
   domain: String @index(name: "siteByDomain", queryField: "siteByDomain")
   username: String @index(name: "siteByUsername", queryField: "siteByUsername")
+  title: String!
+  description: String!
   contents: [Content] @hasMany(indexName: "bySite", fields: ["id"])
 }

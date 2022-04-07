@@ -55,6 +55,8 @@ export const getSite = /* GraphQL */ `
       id
       domain
       username
+      title
+      description
       contents {
         items {
           id
@@ -85,6 +87,8 @@ export const listSites = /* GraphQL */ `
         id
         domain
         username
+        title
+        description
         contents {
           nextToken
         }
@@ -114,6 +118,8 @@ export const siteByDomain = /* GraphQL */ `
         id
         domain
         username
+        title
+        description
         contents {
           nextToken
         }
@@ -143,18 +149,10 @@ export const siteByUsername = /* GraphQL */ `
         id
         domain
         username
+        title
+        description
         contents {
           nextToken
-          items {
-            author
-            id
-            content
-            title
-            siteID
-            updatedAt
-            createdAt
-            description
-          }
         }
         createdAt
         updatedAt

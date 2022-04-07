@@ -65,6 +65,8 @@ export const createSite = /* GraphQL */ `
       id
       domain
       username
+      title
+      description
       contents {
         items {
           id
@@ -93,6 +95,8 @@ export const updateSite = /* GraphQL */ `
       id
       domain
       username
+      title
+      description
       contents {
         items {
           id
@@ -121,6 +125,8 @@ export const deleteSite = /* GraphQL */ `
       id
       domain
       username
+      title
+      description
       contents {
         items {
           id
