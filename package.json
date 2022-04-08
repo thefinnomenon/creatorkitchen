@@ -41,6 +41,7 @@
     "@tiptap/suggestion": "^2.0.0-beta.85",
     "add": "^2.0.6",
     "aws-amplify": "^4.3.11",
+    "cors": "^2.8.5",
     "debounce": "^1.2.1",
     "debounce-async": "^0.0.2",
     "highlight": "^0.2.4",

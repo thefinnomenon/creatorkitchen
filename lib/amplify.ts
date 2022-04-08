@@ -1,4 +1,4 @@
-import Amplify, { Auth, Storage } from 'aws-amplify';
+import { Amplify, Auth, Storage } from 'aws-amplify';
 import config from '../aws-exports';
 import { v4 as uuidv4 } from 'uuid';
 import { S3Client, DeleteObjectTaggingCommand } from '@aws-sdk/client-s3';
@@ -7,8 +7,12 @@ export const configureAmplify = async () => {
   // Configure Amplify with the Amplify CLI generated config file
   await Amplify.configure({
     ...config,
-    mandatorySignIn: false,
+    ssr: true,
   });
+
+  if (process && process.env.NODE_ENV === 'development') {
+    Amplify.Logger.LOG_LEVEL = 'DEBUG';
+  }
 
   // We want our users' files to be protected by default (i.e. readable by everyone, but only writable by the creating owner)
   // https://docs.amplify.aws/lib/storage/configureaccess/q/platform/js/

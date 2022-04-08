@@ -248,22 +248,20 @@ export default function EditPost() {
                       return false;
                     }
                     setIsPublishing(true);
-                    if (process.env.NODE_ENV === 'development') {
-                      console.log(
-                        "Revalidation doesn't work in dev mode so just simulating a publish"
+                    try {
+                      const cookies = document.cookie;
+                      const response = await fetch(
+                        `${urlRootWithProtocol}/api/publish?slug=${content.slug}`,
+                        {
+                          method: 'POST',
+                          mode: 'no-cors',
+                          body: JSON.stringify(cookies),
+                        }
                       );
-                      setTimeout(() => setIsPublishing(false), 2000);
-                    } else {
-                      try {
-                        const response = await fetch(
-                          `${urlRootWithProtocol}/api/publish?slug=${content.slug}`,
-                          { mode: 'no-cors' }
-                        );
-                      } catch (e) {
-                        console.error(e);
-                      }
-                      setIsPublishing(false);
+                    } catch (e) {
+                      console.error(e);
                     }
+                    setIsPublishing(false);
                   }}
                 >
                   {isPublishing ? (
