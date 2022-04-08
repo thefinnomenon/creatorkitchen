@@ -7,6 +7,7 @@ export const getContent = /* GraphQL */ `
     getContent(id: $id, siteID: $siteID) {
       id
       siteID
+      slug
       author
       title
       description
@@ -37,6 +38,40 @@ export const listContents = /* GraphQL */ `
       items {
         id
         siteID
+        slug
+        author
+        title
+        description
+        content
+        media
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const contentBySiteAndSlug = /* GraphQL */ `
+  query ContentBySiteAndSlug(
+    $slug: String!
+    $siteID: ModelIDKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelContentFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    contentBySiteAndSlug(
+      slug: $slug
+      siteID: $siteID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        siteID
+        slug
         author
         title
         description
@@ -61,6 +96,7 @@ export const getSite = /* GraphQL */ `
         items {
           id
           siteID
+          slug
           author
           title
           description

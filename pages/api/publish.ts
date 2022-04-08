@@ -21,12 +21,12 @@ export default async function handler(req, res) {
   if (!req.query.slug) {
     return res.status(400).json({ message: 'Missing slug parameter' });
   }
-
-  const { domain, slug } = req.query;
+  const { slug } = req.query;
 
   try {
     // Rebuild the page to publish the new updates
-    // ${domain}
+    // This API is called with the current domain (e.g. chris.creatorkitchen.net/publish?...),
+    // so the proper routing will happen automatically
     console.log(`[Next.js] Revalidating /posts/${slug}`);
     await res.unstable_revalidate(`/posts/${slug}`);
     return res.json({ revalidated: true });

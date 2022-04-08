@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ContentList from '../../components/ContentList';
 import debounce from 'debounce';
+import { v4 as uuidv4 } from 'uuid';
 import {
   createContent,
   createSite,
@@ -17,18 +18,13 @@ import Tiptap from '../../components/TipTap';
 import { FiExternalLink } from 'react-icons/fi';
 import ContentSettingsPanel from '../../components/ContentSettingsPanel';
 import { ClipLoader } from 'react-spinners';
-import { Dialog } from '@headlessui/react';
 import { Content, Site } from '../../graphql/API';
 import { siteByUsernameWithContents } from '../../graphql/customStatements';
 
 const UPDATE_DEBOUNCE = 5000;
 
-let PROTOCOL = 'http://';
-let ROOT_DOMAIN = 'localhost:3000';
-if (process && process.env.NODE_ENV !== 'development') {
-  PROTOCOL = 'https://';
-  ROOT_DOMAIN = 'creatorkitchen.net';
-}
+let PROTOCOL = process.env.NEXT_PUBLIC_PROTOCOL;
+let ROOT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
 type Props = {} & typeof defaultProps;
 
@@ -43,7 +39,6 @@ export default function EditPost() {
   const [content, setContent] = useState<Content>();
   const [isSaved, setIsSaved] = useState(true);
   const [isPublishing, setIsPublishing] = useState(false);
-  const [showSubdomainModal, setShowSubdomainModal] = useState(false);
   const SiteIdRef = useRef('');
   const IdRef = useRef('');
 
@@ -65,6 +60,7 @@ export default function EditPost() {
           title: '',
           description: '',
           content: '',
+          slug: uuidv4(),
           siteID: site.id,
         },
       },
@@ -94,6 +90,10 @@ export default function EditPost() {
     if ('title' in values) {
       const contentIndex = contents.findIndex((c) => c.id === IdRef.current);
       if (contentIndex !== -1) contents[contentIndex].title = values.title;
+    }
+
+    if ('slug' in values) {
+      setContent({ ...content, slug: values.slug });
     }
 
     await API.graphql({
@@ -146,7 +146,7 @@ export default function EditPost() {
 
     // @ts-ignore
     if (siteData.data.siteByUsername.items.length === 0) {
-      setShowSubdomainModal(true);
+      router.push('/');
     } else {
       // @ts-ignore
       console.log(siteData.data.siteByUsername.items[0]);
@@ -180,7 +180,6 @@ export default function EditPost() {
 
       // @ts-ignore
       const newContent = contentData.data.getContent;
-
       IdRef.current = newContent.id;
       setContent(newContent);
     } catch (error) {
@@ -199,95 +198,22 @@ export default function EditPost() {
   }
 
   const isCustomDomain = domain && domain.includes('.');
-  const urlRoot = `${PROTOCOL}${
-    isCustomDomain ? domain : `${domain}.${ROOT_DOMAIN}`
-  }`;
+  const urlRoot = `${isCustomDomain ? domain : `${domain}.${ROOT_DOMAIN}`}`;
+  const urlRootWithProtocol = `${PROTOCOL}${urlRoot}`;
 
   return (
     <>
-      <Dialog
-        open={showSubdomainModal}
-        onClose={() => {}}
-        className="fixed z-10 inset-0 overflow-y-auto"
-      >
-        <div className="flex items-center justify-center min-h-screen">
-          <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
-          <div className="relative bg-white rounded max-w-sm mx-auto">
-            <Dialog.Title className="text-center text-2xl">
-              Set Subdomain
-            </Dialog.Title>
-            <Dialog.Description>
-              <div className="pb-6 md:pb-0 flex flex-col">
-                <div>
-                  <label className="input-field inline-flex items-baseline border-none bg-white p-4">
-                    <input
-                      id="subdomainInput"
-                      type="text"
-                      className="placeholder-blue w-full p-1 no-outline text-dusty-blue-darker"
-                      name="subdomain"
-                      placeholder="mscott"
-                    />
-                    <span className="flex-none text-dusty-blue-darker select-none leading-none">
-                      .creatorkitchen.net
-                    </span>
-                  </label>
-                </div>
-              </div>
-            </Dialog.Description>
-            <div className="flex justify-around">
-              <button
-                className="bg-blue-600 text-white font-semibold px-8 w-1/2 rounded-lg h-8 my-2 hover:bg-blue-500"
-                onClick={async () => {
-                  // @ts-ignore
-                  const sd = document.querySelector('#subdomainInput').value;
-                  if (sd === '') {
-                    // @ts-ignore
-                    document.querySelector('#subdomainInput').value = '';
-                    return;
-                  }
-                  try {
-                    console.log('Creating site for user, ', sd);
-                    const createSiteResult = await API.graphql({
-                      query: createSite,
-                      variables: {
-                        input: {
-                          domain: sd,
-                        },
-                      },
-                      authMode: 'AMAZON_COGNITO_USER_POOLS',
-                    });
-                    console.log(createSiteResult);
-                    // @ts-ignore
-                    setSite(createSiteResult.data.createSite);
-                    setDomain(sd);
-                    setShowSubdomainModal(false);
-                  } catch (e) {
-                    console.log(e);
-                  }
-                }}
-              >
-                Set
-              </button>
-              <button
-                disabled={!domain}
-                className="disabled:text-gray-400 w-1/4 font-semibold rounded-lg h-8 my-2"
-                onClick={() => setShowSubdomainModal(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      </Dialog>
       <div className="w-full overflow-hidden h-screen bg-white flex justify-between">
         <div className="w-52">
-          <ContentList
-            contents={contents}
-            selectedId={content ? content.id : ''}
-            onCreate={onCreate}
-            onSelect={onSelect}
-            onSignOut={onSignOut}
-          />
+          {domain && (
+            <ContentList
+              contents={contents}
+              selectedId={content ? content.id : ''}
+              onCreate={onCreate}
+              onSelect={onSelect}
+              onSignOut={onSignOut}
+            />
+          )}
         </div>
         <div className="md:mt-4 flex-1 items-stretch max-w-4xl">
           {content && (
@@ -298,7 +224,7 @@ export default function EditPost() {
                   className="text-blue-600 font-semibold rounded-lg p-2 hover:bg-gray-200"
                   target="_blank"
                   rel="noopener noreferrer"
-                  href={`${urlRoot}/preview/${content.id}`}
+                  href={`${urlRootWithProtocol}/preview/${content.slug}`}
                   onClick={(e) => {
                     if (!isSaved) {
                       const cont = alert(
@@ -330,7 +256,7 @@ export default function EditPost() {
                     } else {
                       try {
                         const response = await fetch(
-                          `${urlRoot}/api/publish?slug=${content.id}`,
+                          `${urlRootWithProtocol}/api/publish?slug=${content.slug}`,
                           { mode: 'no-cors' }
                         );
                       } catch (e) {
@@ -349,11 +275,9 @@ export default function EditPost() {
                 <a
                   target="_blank"
                   rel="noopener noreferrer"
-                  href={`${urlRoot}/posts/${content.id}`}
+                  href={`${urlRootWithProtocol}/posts/${content.slug}`}
                 >
-                  <button
-                  //disabled={disabled}
-                  >
+                  <button>
                     <VisuallyHidden>View published content</VisuallyHidden>
                     <FiExternalLink className="font-semibold text-4xl text-blue-600 rounded-lg p-2 hover:bg-gray-200" />
                   </button>
@@ -376,6 +300,8 @@ export default function EditPost() {
         {content && (
           <div className="w-52">
             <ContentSettingsPanel
+              siteID={site.id}
+              url={urlRoot}
               post={content}
               onUpdate={(values) => onUpdate(values)}
               setIsSaved={setIsSaved}

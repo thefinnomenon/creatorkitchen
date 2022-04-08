@@ -7,6 +7,7 @@ export const onCreateContent = /* GraphQL */ `
     onCreateContent(author: $author) {
       id
       siteID
+      slug
       author
       title
       description
@@ -22,6 +23,7 @@ export const onUpdateContent = /* GraphQL */ `
     onUpdateContent(author: $author) {
       id
       siteID
+      slug
       author
       title
       description
@@ -37,6 +39,7 @@ export const onDeleteContent = /* GraphQL */ `
     onDeleteContent(author: $author) {
       id
       siteID
+      slug
       author
       title
       description
@@ -59,6 +62,7 @@ export const onCreateSite = /* GraphQL */ `
         items {
           id
           siteID
+          slug
           author
           title
           description
@@ -86,6 +90,7 @@ export const onUpdateSite = /* GraphQL */ `
         items {
           id
           siteID
+          slug
           author
           title
           description
@@ -113,6 +118,7 @@ export const onDeleteSite = /* GraphQL */ `
         items {
           id
           siteID
+          slug
           author
           title
           description

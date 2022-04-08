@@ -1,15 +1,28 @@
 import API from '@aws-amplify/api';
 import { useRouter } from 'next/router';
-import { getContent, siteByDomain } from '../../../../graphql/queries';
+import {
+  contentBySiteAndSlug,
+  getContent,
+  siteByDomain,
+} from '../../../../graphql/queries';
+import {
+  ListSitesWithContentQuery,
+  ListSitesWithContents,
+} from '../../../../graphql/customStatements';
 import Amplify from 'aws-amplify';
 import config from '../../../../aws-exports';
 Amplify.configure(config);
 import Script from 'next/script';
 import 'tippy.js/dist/svg-arrow.css';
-import { GetContentQuery, SiteByDomainQuery } from '../../../../graphql/API';
+import {
+  ContentBySiteAndSlugQuery,
+  GetContentQuery,
+  SiteByDomainQuery,
+} from '../../../../graphql/API';
 
 type PostType = {
   id: string;
+  subdomain: string;
   content: string;
 };
 
@@ -51,7 +64,10 @@ export default function Post({ post }: Props) {
   );
 }
 
-export async function getServerSideProps({ params: { id, site } }) {
+// At build time, resolve domain to site and get content for siteID, slug combo
+export async function getStaticProps({ params }) {
+  const { site, slug } = params;
+
   try {
     const siteRes = (await API.graphql({
       query: siteByDomain,
@@ -61,20 +77,42 @@ export async function getServerSideProps({ params: { id, site } }) {
     })) as { data: SiteByDomainQuery; errors: any[] };
     if (!siteRes.data.siteByDomain.items[0]) return { notFound: true };
 
-    const contentRes = (await API.graphql({
-      query: getContent,
+    const { data } = (await API.graphql({
+      query: contentBySiteAndSlug,
       variables: {
-        id,
-        siteID: siteRes.data.siteByDomain.items[0].id,
+        siteID: { eq: siteRes.data.siteByDomain.items[0].id },
+        slug,
       },
-    })) as { data: GetContentQuery; errors: any[] };
-    if (!contentRes.data.getContent) return { notFound: true };
+    })) as { data: ContentBySiteAndSlugQuery; errors: any[] };
+    if (!data.contentBySiteAndSlug.items[0]) return { notFound: true };
 
     return {
       props: {
-        post: contentRes.data.getContent,
+        post: data.contentBySiteAndSlug.items[0],
       },
     };
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// At build time, get all sites and their content and get content and return them as site, slug combos
+export async function getStaticPaths() {
+  try {
+    const sitesRes = (await API.graphql({
+      query: ListSitesWithContents,
+    })) as { data: ListSitesWithContentQuery; errors: any[] };
+
+    const paths = sitesRes.data.listSites.items.reduce((arr, site) => {
+      site.contents.items.forEach((content) => {
+        arr.push({
+          params: { site: site.domain, slug: content.slug },
+        });
+      });
+      return arr;
+    }, []);
+
+    return { paths, fallback: 'blocking' };
   } catch (error) {
     console.log(error);
   }

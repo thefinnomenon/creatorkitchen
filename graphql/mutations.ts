@@ -10,6 +10,7 @@ export const createContent = /* GraphQL */ `
     createContent(input: $input, condition: $condition) {
       id
       siteID
+      slug
       author
       title
       description
@@ -28,6 +29,7 @@ export const updateContent = /* GraphQL */ `
     updateContent(input: $input, condition: $condition) {
       id
       siteID
+      slug
       author
       title
       description
@@ -46,6 +48,7 @@ export const deleteContent = /* GraphQL */ `
     deleteContent(input: $input, condition: $condition) {
       id
       siteID
+      slug
       author
       title
       description
@@ -71,6 +74,7 @@ export const createSite = /* GraphQL */ `
         items {
           id
           siteID
+          slug
           author
           title
           description
@@ -101,6 +105,7 @@ export const updateSite = /* GraphQL */ `
         items {
           id
           siteID
+          slug
           author
           title
           description
@@ -131,6 +136,7 @@ export const deleteSite = /* GraphQL */ `
         items {
           id
           siteID
+          slug
           author
           title
           description

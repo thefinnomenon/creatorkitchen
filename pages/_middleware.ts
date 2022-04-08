@@ -16,15 +16,11 @@ export default function middleware(req: NextRequest) {
       statusText: 'No hostname found in request headers',
     });
 
-  // Get subdomain
-  let currentHost =
-    process.env.NODE_ENV === 'production' && process.env.VERCEL === '1'
-      ? hostname.replace(`creatorkitchen.net`, '')
-      : hostname.replace(`localhost:3000`, '');
+  // Get subdomain (e.g. <currentHost>.domain.com)
+  let currentHost = hostname.replace(process.env.DOMAIN, '');
 
-  if (currentHost) {
-    currentHost = currentHost.slice(0, -1);
-  }
+  // Remove trailing .
+  if (currentHost) currentHost = currentHost.slice(0, -1);
 
   // Don't allow direct targeting of /_sites
   if (pathname.startsWith(`/_sites`))
@@ -32,20 +28,15 @@ export default function middleware(req: NextRequest) {
       status: 404,
     });
 
+  //console.log(currentHost, hostname, pathname);
+
+  // If path is not an api route
   if (!pathname.includes('.') && !pathname.startsWith('/api')) {
     // Rewrite to app landing page
     if (currentHost === 'app') {
       url.pathname = `/app${pathname}`;
       return NextResponse.rewrite(url);
     }
-
-    // Rewrite to landing page
-    // if (hostname === 'localhost:3000' || hostname === 'creatorkitchen.net') {
-    //   url.pathname = `/home${pathname}`;
-    //   return NextResponse.rewrite(url);
-    // }
-
-    console.log(currentHost, pathname, hostname);
 
     // Rewrite to landing page
     if (currentHost === '' || pathname === '') {
@@ -55,7 +46,6 @@ export default function middleware(req: NextRequest) {
 
     // Rewrite to tenant path
     url.pathname = `/_sites/${currentHost}${pathname}`;
-    console.log(url.pathname);
     return NextResponse.rewrite(url);
   }
 }

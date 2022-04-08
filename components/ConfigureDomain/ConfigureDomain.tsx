@@ -99,7 +99,7 @@ export default function ConfigureDomain(props: Props): JSX.Element {
       >
         <h2 className="font-cal text-2xl mb-6">Create a New Site</h2>
         <div className="grid gap-y-5 w-5/6 mx-auto">
-          <div className="border border-gray-300 rounded-lg flex flex-start items-center focus-within:ring-blue-500 focus-within:ring-2">
+          <div className="border border-gray-300 rounded-lg flex flex-start items-center focus-within:border-transparent focus-within:ring-blue-500 focus-within:ring-2">
             <span className="pl-5 pr-1">📌</span>
             <input
               className="w-full px-5 py-3 text-gray-700 bg-white border-none focus:outline-none focus:ring-0 rounded-none rounded-r-lg placeholder-gray-400"
@@ -111,7 +111,7 @@ export default function ConfigureDomain(props: Props): JSX.Element {
             />
           </div>
           <div
-            className={`border border-gray-300 rounded-lg flex flex-start items-center focus-within:ring-blue-500 focus-within:ring-2 ${
+            className={`border border-gray-300 rounded-lg flex flex-start items-center focus-within:border-transparent focus-within:ring-blue-500 focus-within:ring-2 ${
               isValid && 'border-green-500 focus-within:ring-green-500'
             } ${error && 'border-red-500 focus-within:ring-red-500'}`}
           >
@@ -137,7 +137,7 @@ export default function ConfigureDomain(props: Props): JSX.Element {
               <b>{error}</b> is not available. Please choose another subdomain.
             </p>
           )}
-          <div className="border border-gray-300 rounded-lg flex flex-start items-top focus-within:ring-blue-500 focus-within:ring-2">
+          <div className="border border-gray-300 rounded-lg flex flex-start items-top focus-within:border-transparent focus-within:ring-blue-500 focus-within:ring-2">
             <span className="pl-5 pr-1 mt-3">✍️</span>
             <textarea
               className="w-full px-5 py-3 text-gray-700 bg-white border-none focus:outline-none focus:ring-0 rounded-none rounded-r-lg placeholder-gray-400"
@@ -157,7 +157,7 @@ export default function ConfigureDomain(props: Props): JSX.Element {
               creatingSite || error
                 ? 'cursor-not-allowed text-gray-400 bg-gray-50'
                 : 'bg-white text-gray-700 hover:text-blue-500'
-            } w-full px-5 py-5 text-sm font-semibold border-t border-gray-300 rounded-br focus:outline-none transition-all ease-in-out duration-500 focus:text-blue-500`}
+            } w-full px-5 py-5 text-sm font-semibold border-t border-gray-300 rounded-br focus:outline-none transition-all ease-in-out duration-500 focus:border-transparent focus:text-blue-500`}
           >
             {creatingSite ? <ClipLoader /> : 'CREATE SITE'}
           </button>

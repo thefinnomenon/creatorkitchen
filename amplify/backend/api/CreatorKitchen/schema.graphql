@@ -6,6 +6,7 @@ type Content
   ]) {
   id: ID! @primaryKey(sortKeyFields: ["siteID"])
   siteID: ID! @index(name: "bySite")
+  slug: String! @index(name: "contentBySiteAndSlug", queryField: "contentBySiteAndSlug", sortKeyFields: ["siteID"])
   author: String
   title: String
   description: String

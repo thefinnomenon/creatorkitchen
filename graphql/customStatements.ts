@@ -1,7 +1,7 @@
 import { Content, ListContentsQuery } from './API';
 
 export const siteByUsernameWithContents = /* GraphQL */ `
-  query SiteByUsername(
+  query SiteByUsernameWithContents(
     $username: String!
     $sortDirection: ModelSortDirection
     $filter: ModelSiteFilterInput
@@ -27,6 +27,7 @@ export const siteByUsernameWithContents = /* GraphQL */ `
             content
             title
             siteID
+            slug
             updatedAt
             createdAt
             description
@@ -53,6 +54,7 @@ export type ListSitesWithContentQuery = {
           __typename: 'Content';
           id: string;
           siteID: string;
+          slug: string;
           author?: string | null;
           title?: string | null;
           description?: string | null;
@@ -70,7 +72,7 @@ export type ListSitesWithContentQuery = {
 };
 
 export const ListSitesWithContents = /* GraphQL */ `
-  query ListSites(
+  query ListSitesWithContents(
     $filter: ModelSiteFilterInput
     $limit: Int
     $nextToken: String
@@ -88,6 +90,7 @@ export const ListSitesWithContents = /* GraphQL */ `
             content
             title
             siteID
+            slug
             updatedAt
             createdAt
             description
