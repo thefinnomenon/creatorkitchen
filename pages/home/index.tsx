@@ -35,20 +35,17 @@ export default function Home() {
     <div className="h-screen flex justify-center items-center bg-gradient-to-r from-rose-100 to-teal-100">
       <Authenticator components={components}>
         {() => {
-          // Check if user already has a site
-          // - YES: Redirect to dashboard
-          // - NO: Redirect to create site page
           async function getUserSites() {
             try {
               const { username } = await Auth.currentAuthenticatedUser();
-              const sitesRes = (await API.graphql({
+              const { data } = (await API.graphql({
                 query: siteByUsername,
                 variables: {
                   username,
                 },
               })) as { data: SiteByUsernameQuery; errors: any[] };
 
-              if (sitesRes.data.siteByUsername.items[0]) {
+              if (data.siteByUsername.items[0]) {
                 router.push('/dashboard');
               } else {
                 router.push('/createSite');

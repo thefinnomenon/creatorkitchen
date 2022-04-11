@@ -14,7 +14,7 @@ type Content
   media: AWSJSON
 }
 
-# TODO: Ensure subdomain and domain are unique
+# TODO: Ensure subdomain and domain are unique in update
 type Site
   @model
   @auth(rules: [
@@ -22,7 +22,8 @@ type Site
     { allow: public, operations: [read] }
   ]) {
   id: ID!
-  domain: String @index(name: "siteByDomain", queryField: "siteByDomain")
+  subdomain: String @index(name: "siteBySubdomain", queryField: "siteBySubdomain")
+  customDomain: String @index(name: "siteByCustomDomain", queryField: "siteByCustomDomain")
   username: String @index(name: "siteByUsername", queryField: "siteByUsername")
   title: String!
   description: String!

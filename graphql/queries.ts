@@ -88,7 +88,8 @@ export const getSite = /* GraphQL */ `
   query GetSite($id: ID!) {
     getSite(id: $id) {
       id
-      domain
+      subdomain
+      customDomain
       username
       title
       description
@@ -121,7 +122,8 @@ export const listSites = /* GraphQL */ `
     listSites(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
-        domain
+        subdomain
+        customDomain
         username
         title
         description
@@ -135,16 +137,16 @@ export const listSites = /* GraphQL */ `
     }
   }
 `;
-export const siteByDomain = /* GraphQL */ `
-  query SiteByDomain(
-    $domain: String!
+export const siteBySubdomain = /* GraphQL */ `
+  query SiteBySubdomain(
+    $subdomain: String!
     $sortDirection: ModelSortDirection
     $filter: ModelSiteFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    siteByDomain(
-      domain: $domain
+    siteBySubdomain(
+      subdomain: $subdomain
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
@@ -152,7 +154,40 @@ export const siteByDomain = /* GraphQL */ `
     ) {
       items {
         id
-        domain
+        subdomain
+        customDomain
+        username
+        title
+        description
+        contents {
+          nextToken
+        }
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const siteByCustomDomain = /* GraphQL */ `
+  query SiteByCustomDomain(
+    $customDomain: String!
+    $sortDirection: ModelSortDirection
+    $filter: ModelSiteFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    siteByCustomDomain(
+      customDomain: $customDomain
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        subdomain
+        customDomain
         username
         title
         description
@@ -183,7 +218,8 @@ export const siteByUsername = /* GraphQL */ `
     ) {
       items {
         id
-        domain
+        subdomain
+        customDomain
         username
         title
         description

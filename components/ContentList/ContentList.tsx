@@ -3,6 +3,7 @@ import VisuallyHidden from '@reach/visually-hidden';
 import { Content } from '../../graphql/API';
 
 type Props = {
+  url: string;
   contents: Content[];
   selectedId: string;
   onSelect(id: string): void;
@@ -14,6 +15,7 @@ const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
 export default function ContentList({
+  url,
   contents,
   selectedId,
   onSelect,
@@ -31,6 +33,16 @@ export default function ContentList({
             <button onClick={() => onCreate()} className="p-2 pt-3">
               <VisuallyHidden>Create new content</VisuallyHidden>
               <VscDiffAdded className="text-4xl text-gray-500 hover:text-blue-500" />
+            </button>
+          </div>
+          <div>
+            <button
+              className="text-gray-500 hover:text-blue-500"
+              onClick={() => onSelect('site')}
+            >
+              <h2 className="text-md font-semibold tracking-wide mb-4 pt-4 pl-4 ">
+                {url.split('//')[1]}
+              </h2>
             </button>
           </div>
           {contents.map((content, index) => (

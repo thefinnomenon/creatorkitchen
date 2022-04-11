@@ -17,8 +17,11 @@ export const siteByUsernameWithContents = /* GraphQL */ `
     ) {
       items {
         id
-        domain
+        subdomain
+        customDomain
         username
+        title
+        description
         contents {
           nextToken
           items {
@@ -47,7 +50,8 @@ export type ListSitesWithContentQuery = {
     items: Array<{
       __typename: 'Site';
       id: string;
-      domain?: string | null;
+      subdomain?: string | null;
+      customDomain?: string | null;
       username?: string | null;
       contents?: {
         items: Array<{
@@ -80,7 +84,8 @@ export const ListSitesWithContents = /* GraphQL */ `
     listSites(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
-        domain
+        subdomain
+        customDomain
         username
         contents {
           nextToken

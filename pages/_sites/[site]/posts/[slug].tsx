@@ -3,7 +3,9 @@ import { useRouter } from 'next/router';
 import {
   contentBySiteAndSlug,
   getContent,
-  siteByDomain,
+  siteBySubdomain,
+  siteByCustomDomain,
+  getSite,
 } from '../../../../graphql/queries';
 import {
   ListSitesWithContentQuery,
@@ -17,7 +19,9 @@ import 'tippy.js/dist/svg-arrow.css';
 import {
   ContentBySiteAndSlugQuery,
   GetContentQuery,
-  SiteByDomainQuery,
+  SiteBySubdomainQuery,
+  SiteByCustomDomainQuery,
+  GetSiteQuery,
 } from '../../../../graphql/API';
 
 type PostType = {
@@ -65,26 +69,40 @@ export default function Post({ post }: Props) {
 }
 
 // At build time, resolve domain to site and get content for siteID, slug combo
-export async function getStaticProps({ params }) {
-  const { site, slug } = params;
-
+export async function getStaticProps({ params: { site, slug } }) {
+  const isCustomDomain = site.includes('.');
+  console.log(site, slug, isCustomDomain);
   try {
-    const siteRes = (await API.graphql({
-      query: siteByDomain,
-      variables: {
-        domain: site,
-      },
-    })) as { data: SiteByDomainQuery; errors: any[] };
-    if (!siteRes.data.siteByDomain.items[0]) return { notFound: true };
-
+    let siteObj;
+    if (isCustomDomain) {
+      const siteRes = (await API.graphql({
+        query: siteByCustomDomain,
+        variables: {
+          domain: site,
+        },
+      })) as { data: SiteByCustomDomainQuery; errors: any[] };
+      if (!siteRes.data.siteByCustomDomain.items[0]) return { notFound: true };
+      siteObj = siteRes.data.siteByCustomDomain.items[0];
+    } else {
+      const siteRes = (await API.graphql({
+        query: siteBySubdomain,
+        variables: {
+          subdomain: site,
+        },
+      })) as { data: SiteBySubdomainQuery; errors: any[] };
+      if (!siteRes.data.siteBySubdomain.items[0]) return { notFound: true };
+      siteObj = siteRes.data.siteBySubdomain.items[0];
+    }
+    console.log(site);
     const { data } = (await API.graphql({
       query: contentBySiteAndSlug,
       variables: {
-        siteID: { eq: siteRes.data.siteByDomain.items[0].id },
+        siteID: { eq: siteObj.id },
         slug,
       },
     })) as { data: ContentBySiteAndSlugQuery; errors: any[] };
     if (!data.contentBySiteAndSlug.items[0]) return { notFound: true };
+    console.log(data.contentBySiteAndSlug.items[0]);
 
     return {
       props: {
@@ -106,7 +124,7 @@ export async function getStaticPaths() {
     const paths = sitesRes.data.listSites.items.reduce((arr, site) => {
       site.contents.items.forEach((content) => {
         arr.push({
-          params: { site: site.domain, slug: content.slug },
+          params: { site: site.subdomain, slug: content.slug },
         });
       });
       return arr;

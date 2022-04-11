@@ -1,8 +1,9 @@
 import API from '@aws-amplify/api';
 import { useRouter } from 'next/router';
 import {
-  siteByDomain,
+  siteByCustomDomain,
   contentBySiteAndSlug,
+  siteBySubdomain,
 } from '../../../../graphql/queries';
 import Amplify from 'aws-amplify';
 import config from '../../../../aws-exports';
@@ -10,8 +11,9 @@ Amplify.configure(config);
 import Script from 'next/script';
 import 'tippy.js/dist/svg-arrow.css';
 import {
-  SiteByDomainQuery,
+  SiteByCustomDomainQuery,
   ContentBySiteAndSlugQuery,
+  SiteBySubdomainQuery,
 } from '../../../../graphql/API';
 
 type PostType = {
@@ -62,23 +64,39 @@ export default function Post({ post }: Props) {
 // - Retrieves site record by querying siteByDomain index with @site
 // - Retrieves content by querying contentBySiteAndSlug with site ID and @slug
 export async function getServerSideProps({ params: { site, slug } }) {
+  const isCustomDomain = site.includes('.');
+  console.log(site, slug, isCustomDomain);
   try {
-    const siteRes = (await API.graphql({
-      query: siteByDomain,
-      variables: {
-        domain: site,
-      },
-    })) as { data: SiteByDomainQuery; errors: any[] };
-    if (!siteRes.data.siteByDomain.items[0]) return { notFound: true };
-
+    let siteObj;
+    if (isCustomDomain) {
+      const siteRes = (await API.graphql({
+        query: siteByCustomDomain,
+        variables: {
+          domain: site,
+        },
+      })) as { data: SiteByCustomDomainQuery; errors: any[] };
+      if (!siteRes.data.siteByCustomDomain.items[0]) return { notFound: true };
+      siteObj = siteRes.data.siteByCustomDomain.items[0];
+    } else {
+      const siteRes = (await API.graphql({
+        query: siteBySubdomain,
+        variables: {
+          subdomain: site,
+        },
+      })) as { data: SiteBySubdomainQuery; errors: any[] };
+      if (!siteRes.data.siteBySubdomain.items[0]) return { notFound: true };
+      siteObj = siteRes.data.siteBySubdomain.items[0];
+    }
+    console.log(site);
     const { data } = (await API.graphql({
       query: contentBySiteAndSlug,
       variables: {
-        siteID: { eq: siteRes.data.siteByDomain.items[0].id },
+        siteID: { eq: siteObj.id },
         slug,
       },
     })) as { data: ContentBySiteAndSlugQuery; errors: any[] };
     if (!data.contentBySiteAndSlug.items[0]) return { notFound: true };
+    console.log(data.contentBySiteAndSlug.items[0]);
 
     return {
       props: {

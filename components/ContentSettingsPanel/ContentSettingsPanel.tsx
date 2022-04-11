@@ -82,7 +82,12 @@ export default function ContentList({
                 Title
               </label>
               <input
-                onBlur={(e) => onUpdate({ title: e.target.value })}
+                onBlur={(e) => {
+                  onUpdate({
+                    title: e.target.value,
+                  });
+                  updateSlug(slug || slugify(title));
+                }}
                 onChange={(e) => {
                   setIsSaved(false);
                   setTitle(e.target.value);

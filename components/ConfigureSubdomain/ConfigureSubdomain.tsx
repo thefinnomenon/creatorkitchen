@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { API } from 'aws-amplify';
-import { siteByDomain } from '../../graphql/queries';
-import { CreateSiteMutation, SiteByDomainQuery } from '../../graphql/API';
+import { siteBySubdomain } from '../../graphql/queries';
+import { CreateSiteMutation, SiteBySubdomainQuery } from '../../graphql/API';
 import { useRouter } from 'next/router';
 import { ClipLoader } from 'react-spinners';
 import { createSite } from '../../graphql/mutations';
@@ -12,46 +12,37 @@ type Props = {} & typeof defaultProps;
 const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
-export default function ConfigureDomain(props: Props): JSX.Element {
+export default function ConfigureSubdomain(props: Props): JSX.Element {
+  const router = useRouter();
   const [creatingSite, setCreatingSite] = useState<boolean>(false);
   const [subdomain, setSubdomain] = useState<string>('');
-  const [debouncedSubdomain] = useDebounce(subdomain, 1500);
+  const [debouncedSubdomain] = useDebounce(subdomain, 1000);
   const [error, setError] = useState<string | null>(null);
-  const [isValid, setIsValid] = useState(false);
 
   const siteNameRef = useRef<HTMLInputElement | null>(null);
   const siteSubdomainRef = useRef<HTMLInputElement | null>(null);
   const siteDescriptionRef = useRef<HTMLTextAreaElement | null>(null);
 
-  // Check if subdomain is available
   useEffect(() => {
-    async function checkSubDomain() {
+    async function checkSubdomain() {
       if (debouncedSubdomain.length > 0) {
         try {
-          console.log(`Checking if ${debouncedSubdomain} is available`);
-          const siteRes = (await API.graphql({
-            query: siteByDomain,
+          const { data } = (await API.graphql({
+            query: siteBySubdomain,
             variables: {
-              domain: debouncedSubdomain,
+              subdomain: debouncedSubdomain,
             },
-          })) as { data: SiteByDomainQuery; errors: any[] };
+          })) as { data: SiteBySubdomainQuery; errors: any[] };
 
-          if (!siteRes.data.siteByDomain.items[0]) {
-            setIsValid(true);
-            setError(null);
-          } else {
-            setIsValid(false);
-            setError(`${debouncedSubdomain}.creatorkitchen.net`);
-          }
+          if (!data.siteBySubdomain.items[0]) setError(null);
+          else setError(`${debouncedSubdomain}.creatorkitchen.net`);
         } catch (e) {
           console.log(e);
         }
       }
     }
-    checkSubDomain();
+    checkSubdomain();
   }, [debouncedSubdomain]);
-
-  const router = useRouter();
 
   async function createNewSite(e: React.SyntheticEvent) {
     const target = e.target as typeof e.target & {
@@ -60,31 +51,25 @@ export default function ConfigureDomain(props: Props): JSX.Element {
       description: { value: string };
     };
     const { name, subdomain, description } = target;
-    console.log(`${name.value}, ${subdomain.value}, ${description.value}`);
 
     try {
-      const createSiteResult = (await API.graphql({
+      const { data } = (await API.graphql({
         query: createSite,
         variables: {
           input: {
             title: name.value,
             description: description.value,
-            domain: subdomain.value,
+            subdomain: subdomain.value,
           },
         },
         authMode: 'AMAZON_COGNITO_USER_POOLS',
       })) as { data: CreateSiteMutation; errors: any[] };
 
-      router.push(`/dashboard?site=${createSiteResult.data.createSite.id}`);
+      router.push(`/addCustomDomain?site=${data.createSite.id}`);
     } catch (e) {
       console.log(e);
     }
     setCreatingSite(false);
-  }
-
-  function resetValidation() {
-    setError('');
-    setIsValid(false);
   }
 
   return (
@@ -111,16 +96,16 @@ export default function ConfigureDomain(props: Props): JSX.Element {
             />
           </div>
           <div
-            className={`border border-gray-300 rounded-lg flex flex-start items-center focus-within:border-transparent focus-within:ring-blue-500 focus-within:ring-2 ${
-              isValid && 'border-green-500 focus-within:ring-green-500'
-            } ${error && 'border-red-500 focus-within:ring-red-500'}`}
+            className={`border border-gray-300 rounded-lg flex flex-start items-center focus-within:border-transparent focus-within:ring-blue-500 focus-within:ring-2  ${
+              error && 'border-red-500 focus-within:ring-red-500'
+            }`}
           >
             <span className="pl-5 pr-1">🪧</span>
             <input
               className="w-full px-5 py-3 text-gray-700 bg-white border-none focus:outline-none focus:ring-0 rounded-none rounded-l-lg placeholder-gray-400"
               name="subdomain"
               onInput={() => {
-                resetValidation();
+                setError(null);
                 setSubdomain(siteSubdomainRef.current!.value);
               }}
               required
@@ -156,8 +141,8 @@ export default function ConfigureDomain(props: Props): JSX.Element {
             className={`${
               creatingSite || error
                 ? 'cursor-not-allowed text-gray-400 bg-gray-50'
-                : 'bg-white text-gray-700 hover:text-blue-500'
-            } w-full px-5 py-5 text-sm font-semibold border-t border-gray-300 rounded-br focus:outline-none transition-all ease-in-out duration-500 focus:border-transparent focus:text-blue-500`}
+                : 'bg-white text-gray-700 hover:text-blue-500 cursor-pointer'
+            } w-full px-5 py-5 text-sm font-semibold border-t border-gray-300 rounded-br focus:outline-none transition-all ease-in-out duration-300 focus:border-transparent focus:text-blue-500`}
           >
             {creatingSite ? <ClipLoader /> : 'CREATE SITE'}
           </button>
@@ -167,4 +152,4 @@ export default function ConfigureDomain(props: Props): JSX.Element {
   );
 }
 
-ConfigureDomain.defaultProps = defaultProps;
+ConfigureSubdomain.defaultProps = defaultProps;

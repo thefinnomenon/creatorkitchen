@@ -28,7 +28,7 @@ export default function middleware(req: NextRequest) {
       status: 404,
     });
 
-  //console.log(currentHost, hostname, pathname);
+  // console.log(currentHost, hostname, pathname);
 
   // If path is not an api route
   if (!pathname.includes('.') && !pathname.startsWith('/api')) {

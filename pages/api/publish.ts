@@ -2,9 +2,14 @@ import { Amplify, withSSRContext } from 'aws-amplify';
 import config from '../../aws-exports.js';
 import {
   ContentBySiteAndSlugQuery,
-  SiteByDomainQuery,
+  SiteByCustomDomainQuery,
+  SiteBySubdomainQuery,
 } from '../../graphql/API';
-import { contentBySiteAndSlug, siteByDomain } from '../../graphql/queries';
+import {
+  contentBySiteAndSlug,
+  siteByCustomDomain,
+  siteBySubdomain,
+} from '../../graphql/queries';
 
 // Amplify SSR configuration needs to be done within each API route
 Amplify.configure({ ...config, ssr: true });
@@ -34,6 +39,9 @@ export default async function handler(req, res) {
 
   console.log(domain, subdomain);
 
+  let isCustomDomain = false;
+  if (!subdomain) isCustomDomain = true;
+
   let user;
   try {
     user = await Auth.currentAuthenticatedUser();
@@ -43,19 +51,33 @@ export default async function handler(req, res) {
       .json({ message: 'You must be authenticated to publish' });
   }
 
+  let siteObj;
   try {
-    const siteRes = (await API.graphql({
-      query: siteByDomain,
-      variables: {
-        domain: subdomain || domain,
-      },
-    })) as { data: SiteByDomainQuery; errors: any[] };
-    if (!siteRes.data.siteByDomain.items[0]) return { notFound: true };
+    if (isCustomDomain) {
+      const siteRes = (await API.graphql({
+        query: siteByCustomDomain,
+        variables: {
+          domain,
+        },
+      })) as { data: SiteByCustomDomainQuery; errors: any[] };
+      if (!siteRes.data.siteByCustomDomain.items[0]) return { notFound: true };
+      siteObj = siteRes.data.siteByCustomDomain.items[0];
+    } else {
+      const siteRes = (await API.graphql({
+        query: siteBySubdomain,
+        variables: {
+          subdomain,
+        },
+      })) as { data: SiteBySubdomainQuery; errors: any[] };
+      if (!siteRes.data.siteBySubdomain.items[0]) return { notFound: true };
+      siteObj = siteRes.data.siteBySubdomain.items[0];
+    }
+    console.log(siteObj);
 
     const { data } = (await API.graphql({
       query: contentBySiteAndSlug,
       variables: {
-        siteID: { eq: siteRes.data.siteByDomain.items[0].id },
+        siteID: { eq: siteObj.id },
         slug,
       },
     })) as { data: ContentBySiteAndSlugQuery; errors: any[] };

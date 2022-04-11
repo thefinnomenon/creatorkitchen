@@ -20,6 +20,7 @@ import ContentSettingsPanel from '../../components/ContentSettingsPanel';
 import { ClipLoader } from 'react-spinners';
 import { Content, Site } from '../../graphql/API';
 import { siteByUsernameWithContents } from '../../graphql/customStatements';
+import SiteConfigPage from '../../components/SiteConfigPage';
 
 const UPDATE_DEBOUNCE = 5000;
 
@@ -34,6 +35,8 @@ const initialState = Object.freeze({});
 export default function EditPost() {
   const router = useRouter();
   const [site, setSite] = useState<Site>();
+  const [subdomain, setSubdomain] = useState('');
+  const [url, setUrl] = useState('');
   const [domain, setDomain] = useState('');
   const [contents, setContents] = useState<Content[]>([]);
   const [content, setContent] = useState<Content>();
@@ -136,6 +139,11 @@ export default function EditPost() {
     fetchDomain();
   }, []);
 
+  // UPDATE URL
+  useEffect(() => {
+    setUrl(`${PROTOCOL}${domain ? domain : `${subdomain}.${ROOT_DOMAIN}`}`);
+  }, [domain, subdomain]);
+
   // GET USER DOMAIN
   async function fetchDomain() {
     const { username } = await Auth.currentAuthenticatedUser();
@@ -149,6 +157,13 @@ export default function EditPost() {
       router.push('/');
     } else {
       // @ts-ignore
+      const { customDomain } = siteData.data.siteByUsername.items[0];
+      // Note: '-1' is the same as no domain, since it is a index I can't set it to null
+      if (customDomain === '-1') {
+        // @ts-ignore
+        siteData.data.siteByUsername.items[0].customDomain = '';
+      }
+      // @ts-ignore
       console.log(siteData.data.siteByUsername.items[0]);
       // @ts-ignore
       setSite(siteData.data.siteByUsername.items[0]);
@@ -157,7 +172,9 @@ export default function EditPost() {
       // @ts-ignore
       setContents(siteData.data.siteByUsername.items[0].contents.items);
       // @ts-ignore
-      setDomain(siteData.data.siteByUsername.items[0].domain);
+      setDomain(siteData.data.siteByUsername.items[0].customDomain);
+      // @ts-ignore
+      setSubdomain(siteData.data.siteByUsername.items[0].subdomain);
     }
   }
 
@@ -171,6 +188,13 @@ export default function EditPost() {
         if (!cont) return;
         debouncedUpdate.clear();
         setIsSaved(true);
+      }
+
+      // Selected site
+      if (id === 'site') {
+        IdRef.current = 'site';
+        setContent(null);
+        return;
       }
 
       const contentData = await API.graphql({
@@ -197,117 +221,113 @@ export default function EditPost() {
     }
   }
 
-  const isCustomDomain = domain && domain.includes('.');
-  const urlRoot = `${isCustomDomain ? domain : `${domain}.${ROOT_DOMAIN}`}`;
-  const urlRootWithProtocol = `${PROTOCOL}${urlRoot}`;
-
   return (
-    <>
-      <div className="w-full overflow-hidden h-screen bg-white flex justify-between">
-        <div className="w-52">
-          {domain && (
-            <ContentList
-              contents={contents}
-              selectedId={content ? content.id : ''}
-              onCreate={onCreate}
-              onSelect={onSelect}
-              onSignOut={onSignOut}
-            />
-          )}
-        </div>
-        <div className="md:mt-4 flex-1 items-stretch max-w-4xl">
-          {content && (
-            <div className="flex items-center justify-between px-4 pb-2">
-              {isSaved ? <p className="text-gray-400">Saved</p> : <div />}
-              <div className="flex items-stretch">
-                <a
-                  className="text-blue-600 font-semibold rounded-lg p-2 hover:bg-gray-200"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={`${urlRootWithProtocol}/preview/${content.slug}`}
-                  onClick={(e) => {
-                    if (!isSaved) {
-                      const cont = alert(
-                        "Current draft isn't saved. Please wait a few seconds."
-                      );
-                      e.preventDefault();
-                      return false;
-                    }
-                  }}
-                >
-                  Preview
-                </a>
-
-                <button
-                  className="bg-blue-600 font-semibold text-white rounded-lg p-2 hover:bg-blue-500 mx-2"
-                  onClick={async (e) => {
-                    if (!isSaved) {
-                      const cont = alert(
-                        "Current draft isn't saved. Please wait a few seconds."
-                      );
-                      return false;
-                    }
-                    setIsPublishing(true);
-                    try {
-                      const cookies = document.cookie;
-                      const response = await fetch(
-                        `${urlRootWithProtocol}/api/publish?slug=${content.slug}`,
-                        {
-                          method: 'POST',
-                          mode: 'no-cors',
-                          body: JSON.stringify(cookies),
-                        }
-                      );
-                    } catch (e) {
-                      console.error(e);
-                    }
-                    setIsPublishing(false);
-                  }}
-                >
-                  {isPublishing ? (
-                    <ClipLoader color="white" size={24} />
-                  ) : (
-                    'Publish'
-                  )}
-                </button>
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={`${urlRootWithProtocol}/posts/${content.slug}`}
-                >
-                  <button>
-                    <VisuallyHidden>View published content</VisuallyHidden>
-                    <FiExternalLink className="font-semibold text-4xl text-blue-600 rounded-lg p-2 hover:bg-gray-200" />
-                  </button>
-                </a>
-              </div>
-            </div>
-          )}
-          {content && (
-            <div className="overflow-auto">
-              <Tiptap
-                content={content.content}
-                onChange={(content) => {
-                  setIsSaved(false);
-                  debouncedUpdate({ content });
-                }}
-              />
-            </div>
-          )}
-        </div>
+    <div className="w-full overflow-hidden h-screen bg-white flex justify-between">
+      <div className="w-52">
+        {subdomain && (
+          <ContentList
+            url={url}
+            contents={contents}
+            selectedId={content ? content.id : ''}
+            onCreate={onCreate}
+            onSelect={onSelect}
+            onSignOut={onSignOut}
+          />
+        )}
+      </div>
+      <div className="md:mt-4 flex-1 items-stretch max-w-4xl">
+        {IdRef.current === 'site' && <SiteConfigPage url={url} site={site} />}
         {content && (
-          <div className="w-52">
-            <ContentSettingsPanel
-              siteID={site.id}
-              url={urlRoot}
-              post={content}
-              onUpdate={(values) => onUpdate(values)}
-              setIsSaved={setIsSaved}
-              onDelete={onDelete}
+          <div className="flex items-center justify-between px-4 pb-2">
+            {isSaved ? <p className="text-gray-400">Saved</p> : <div />}
+            <div className="flex items-stretch">
+              <a
+                className="text-blue-600 font-semibold rounded-lg p-2 hover:bg-gray-200"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${url}/preview/${content.slug}`}
+                onClick={(e) => {
+                  if (!isSaved) {
+                    const cont = alert(
+                      "Current draft isn't saved. Please wait a few seconds."
+                    );
+                    e.preventDefault();
+                    return false;
+                  }
+                }}
+              >
+                Preview
+              </a>
+
+              <button
+                className="bg-blue-600 font-semibold text-white rounded-lg p-2 hover:bg-blue-500 mx-2"
+                onClick={async (e) => {
+                  if (!isSaved) {
+                    const cont = alert(
+                      "Current draft isn't saved. Please wait a few seconds."
+                    );
+                    return false;
+                  }
+                  setIsPublishing(true);
+                  try {
+                    const cookies = document.cookie;
+                    const response = await fetch(
+                      `${url}/api/publish?slug=${content.slug}`,
+                      {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify(cookies),
+                      }
+                    );
+                  } catch (e) {
+                    console.error(e);
+                  }
+                  setIsPublishing(false);
+                }}
+              >
+                {isPublishing ? (
+                  <ClipLoader color="white" size={24} />
+                ) : (
+                  'Publish'
+                )}
+              </button>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${url}/posts/${content.slug}`}
+              >
+                <button>
+                  <VisuallyHidden>View published content</VisuallyHidden>
+                  <FiExternalLink className="font-semibold text-4xl text-blue-600 rounded-lg p-2 hover:bg-gray-200" />
+                </button>
+              </a>
+            </div>
+          </div>
+        )}
+        {content && (
+          <div className="overflow-auto">
+            <Tiptap
+              content={content.content}
+              onChange={(content) => {
+                setIsSaved(false);
+                debouncedUpdate({ content });
+              }}
             />
           </div>
         )}
       </div>
-    </>
+      {content && (
+        <div className="w-52">
+          <ContentSettingsPanel
+            siteID={site.id}
+            url={url}
+            post={content}
+            onUpdate={(values) => onUpdate(values)}
+            setIsSaved={setIsSaved}
+            onDelete={onDelete}
+          />
+        </div>
+      )}
+    </div>
   );
 }

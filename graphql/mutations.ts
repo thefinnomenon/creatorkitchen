@@ -66,7 +66,8 @@ export const createSite = /* GraphQL */ `
   ) {
     createSite(input: $input, condition: $condition) {
       id
-      domain
+      subdomain
+      customDomain
       username
       title
       description
@@ -97,7 +98,8 @@ export const updateSite = /* GraphQL */ `
   ) {
     updateSite(input: $input, condition: $condition) {
       id
-      domain
+      subdomain
+      customDomain
       username
       title
       description
@@ -128,7 +130,8 @@ export const deleteSite = /* GraphQL */ `
   ) {
     deleteSite(input: $input, condition: $condition) {
       id
-      domain
+      subdomain
+      customDomain
       username
       title
       description

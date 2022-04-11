@@ -10,7 +10,8 @@ export enum ModelSortDirection {
 
 export type ModelSiteFilterInput = {
   id?: ModelIDInput | null,
-  domain?: ModelStringInput | null,
+  subdomain?: ModelStringInput | null,
+  customDomain?: ModelStringInput | null,
   username?: ModelStringInput | null,
   title?: ModelStringInput | null,
   description?: ModelStringInput | null,
@@ -84,7 +85,8 @@ export type ModelSiteConnection = {
 export type Site = {
   __typename: "Site",
   id: string,
-  domain?: string | null,
+  subdomain?: string | null,
+  customDomain?: string | null,
   username?: string | null,
   title: string,
   description: string,
@@ -103,7 +105,7 @@ export type Content = {
   __typename: "Content",
   id: string,
   siteID: string,
-  slug?: string | null,
+  slug: string,
   author?: string | null,
   title?: string | null,
   description?: string | null,
@@ -116,7 +118,7 @@ export type Content = {
 export type CreateContentInput = {
   id?: string | null,
   siteID: string,
-  slug?: string | null,
+  slug: string,
   author?: string | null,
   title?: string | null,
   description?: string | null,
@@ -154,14 +156,16 @@ export type DeleteContentInput = {
 
 export type CreateSiteInput = {
   id?: string | null,
-  domain?: string | null,
+  subdomain?: string | null,
+  customDomain?: string | null,
   username?: string | null,
   title: string,
   description: string,
 };
 
 export type ModelSiteConditionInput = {
-  domain?: ModelStringInput | null,
+  subdomain?: ModelStringInput | null,
+  customDomain?: ModelStringInput | null,
   username?: ModelStringInput | null,
   title?: ModelStringInput | null,
   description?: ModelStringInput | null,
@@ -172,7 +176,8 @@ export type ModelSiteConditionInput = {
 
 export type UpdateSiteInput = {
   id: string,
-  domain?: string | null,
+  subdomain?: string | null,
+  customDomain?: string | null,
   username?: string | null,
   title?: string | null,
   description?: string | null,
@@ -220,7 +225,8 @@ export type SiteByUsernameWithContentsQuery = {
     items:  Array< {
       __typename: "Site",
       id: string,
-      domain?: string | null,
+      subdomain?: string | null,
+      customDomain?: string | null,
       username?: string | null,
       contents?:  {
         __typename: "ModelContentConnection",
@@ -232,6 +238,7 @@ export type SiteByUsernameWithContentsQuery = {
           content?: string | null,
           title?: string | null,
           siteID: string,
+          slug: string,
           updatedAt: string,
           createdAt: string,
           description?: string | null,
@@ -256,7 +263,8 @@ export type ListSitesWithContentsQuery = {
     items:  Array< {
       __typename: "Site",
       id: string,
-      domain?: string | null,
+      subdomain?: string | null,
+      customDomain?: string | null,
       username?: string | null,
       contents?:  {
         __typename: "ModelContentConnection",
@@ -268,6 +276,7 @@ export type ListSitesWithContentsQuery = {
           content?: string | null,
           title?: string | null,
           siteID: string,
+          slug: string,
           updatedAt: string,
           createdAt: string,
           description?: string | null,
@@ -290,7 +299,7 @@ export type CreateContentMutation = {
     __typename: "Content",
     id: string,
     siteID: string,
-    slug?: string | null,
+    slug: string,
     author?: string | null,
     title?: string | null,
     description?: string | null,
@@ -311,7 +320,7 @@ export type UpdateContentMutation = {
     __typename: "Content",
     id: string,
     siteID: string,
-    slug?: string | null,
+    slug: string,
     author?: string | null,
     title?: string | null,
     description?: string | null,
@@ -332,7 +341,7 @@ export type DeleteContentMutation = {
     __typename: "Content",
     id: string,
     siteID: string,
-    slug?: string | null,
+    slug: string,
     author?: string | null,
     title?: string | null,
     description?: string | null,
@@ -352,7 +361,8 @@ export type CreateSiteMutation = {
   createSite?:  {
     __typename: "Site",
     id: string,
-    domain?: string | null,
+    subdomain?: string | null,
+    customDomain?: string | null,
     username?: string | null,
     title: string,
     description: string,
@@ -362,7 +372,7 @@ export type CreateSiteMutation = {
         __typename: "Content",
         id: string,
         siteID: string,
-        slug?: string | null,
+        slug: string,
         author?: string | null,
         title?: string | null,
         description?: string | null,
@@ -387,7 +397,8 @@ export type UpdateSiteMutation = {
   updateSite?:  {
     __typename: "Site",
     id: string,
-    domain?: string | null,
+    subdomain?: string | null,
+    customDomain?: string | null,
     username?: string | null,
     title: string,
     description: string,
@@ -397,7 +408,7 @@ export type UpdateSiteMutation = {
         __typename: "Content",
         id: string,
         siteID: string,
-        slug?: string | null,
+        slug: string,
         author?: string | null,
         title?: string | null,
         description?: string | null,
@@ -422,7 +433,8 @@ export type DeleteSiteMutation = {
   deleteSite?:  {
     __typename: "Site",
     id: string,
-    domain?: string | null,
+    subdomain?: string | null,
+    customDomain?: string | null,
     username?: string | null,
     title: string,
     description: string,
@@ -432,7 +444,7 @@ export type DeleteSiteMutation = {
         __typename: "Content",
         id: string,
         siteID: string,
-        slug?: string | null,
+        slug: string,
         author?: string | null,
         title?: string | null,
         description?: string | null,
@@ -458,7 +470,7 @@ export type GetContentQuery = {
     __typename: "Content",
     id: string,
     siteID: string,
-    slug?: string | null,
+    slug: string,
     author?: string | null,
     title?: string | null,
     description?: string | null,
@@ -485,7 +497,7 @@ export type ListContentsQuery = {
       __typename: "Content",
       id: string,
       siteID: string,
-      slug?: string | null,
+      slug: string,
       author?: string | null,
       title?: string | null,
       description?: string | null,
@@ -514,7 +526,7 @@ export type ContentBySiteAndSlugQuery = {
       __typename: "Content",
       id: string,
       siteID: string,
-      slug?: string | null,
+      slug: string,
       author?: string | null,
       title?: string | null,
       description?: string | null,
@@ -535,7 +547,8 @@ export type GetSiteQuery = {
   getSite?:  {
     __typename: "Site",
     id: string,
-    domain?: string | null,
+    subdomain?: string | null,
+    customDomain?: string | null,
     username?: string | null,
     title: string,
     description: string,
@@ -545,7 +558,7 @@ export type GetSiteQuery = {
         __typename: "Content",
         id: string,
         siteID: string,
-        slug?: string | null,
+        slug: string,
         author?: string | null,
         title?: string | null,
         description?: string | null,
@@ -573,7 +586,8 @@ export type ListSitesQuery = {
     items:  Array< {
       __typename: "Site",
       id: string,
-      domain?: string | null,
+      subdomain?: string | null,
+      customDomain?: string | null,
       username?: string | null,
       title: string,
       description: string,
@@ -588,21 +602,52 @@ export type ListSitesQuery = {
   } | null,
 };
 
-export type SiteByDomainQueryVariables = {
-  domain: string,
+export type SiteBySubdomainQueryVariables = {
+  subdomain: string,
   sortDirection?: ModelSortDirection | null,
   filter?: ModelSiteFilterInput | null,
   limit?: number | null,
   nextToken?: string | null,
 };
 
-export type SiteByDomainQuery = {
-  siteByDomain?:  {
+export type SiteBySubdomainQuery = {
+  siteBySubdomain?:  {
     __typename: "ModelSiteConnection",
     items:  Array< {
       __typename: "Site",
       id: string,
-      domain?: string | null,
+      subdomain?: string | null,
+      customDomain?: string | null,
+      username?: string | null,
+      title: string,
+      description: string,
+      contents?:  {
+        __typename: "ModelContentConnection",
+        nextToken?: string | null,
+      } | null,
+      createdAt: string,
+      updatedAt: string,
+    } | null >,
+    nextToken?: string | null,
+  } | null,
+};
+
+export type SiteByCustomDomainQueryVariables = {
+  customDomain: string,
+  sortDirection?: ModelSortDirection | null,
+  filter?: ModelSiteFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type SiteByCustomDomainQuery = {
+  siteByCustomDomain?:  {
+    __typename: "ModelSiteConnection",
+    items:  Array< {
+      __typename: "Site",
+      id: string,
+      subdomain?: string | null,
+      customDomain?: string | null,
       username?: string | null,
       title: string,
       description: string,
@@ -631,7 +676,8 @@ export type SiteByUsernameQuery = {
     items:  Array< {
       __typename: "Site",
       id: string,
-      domain?: string | null,
+      subdomain?: string | null,
+      customDomain?: string | null,
       username?: string | null,
       title: string,
       description: string,
@@ -655,7 +701,7 @@ export type OnCreateContentSubscription = {
     __typename: "Content",
     id: string,
     siteID: string,
-    slug?: string | null,
+    slug: string,
     author?: string | null,
     title?: string | null,
     description?: string | null,
@@ -675,7 +721,7 @@ export type OnUpdateContentSubscription = {
     __typename: "Content",
     id: string,
     siteID: string,
-    slug?: string | null,
+    slug: string,
     author?: string | null,
     title?: string | null,
     description?: string | null,
@@ -695,7 +741,7 @@ export type OnDeleteContentSubscription = {
     __typename: "Content",
     id: string,
     siteID: string,
-    slug?: string | null,
+    slug: string,
     author?: string | null,
     title?: string | null,
     description?: string | null,
@@ -714,7 +760,8 @@ export type OnCreateSiteSubscription = {
   onCreateSite?:  {
     __typename: "Site",
     id: string,
-    domain?: string | null,
+    subdomain?: string | null,
+    customDomain?: string | null,
     username?: string | null,
     title: string,
     description: string,
@@ -724,7 +771,7 @@ export type OnCreateSiteSubscription = {
         __typename: "Content",
         id: string,
         siteID: string,
-        slug?: string | null,
+        slug: string,
         author?: string | null,
         title?: string | null,
         description?: string | null,
@@ -748,7 +795,8 @@ export type OnUpdateSiteSubscription = {
   onUpdateSite?:  {
     __typename: "Site",
     id: string,
-    domain?: string | null,
+    subdomain?: string | null,
+    customDomain?: string | null,
     username?: string | null,
     title: string,
     description: string,
@@ -758,7 +806,7 @@ export type OnUpdateSiteSubscription = {
         __typename: "Content",
         id: string,
         siteID: string,
-        slug?: string | null,
+        slug: string,
         author?: string | null,
         title?: string | null,
         description?: string | null,
@@ -782,7 +830,8 @@ export type OnDeleteSiteSubscription = {
   onDeleteSite?:  {
     __typename: "Site",
     id: string,
-    domain?: string | null,
+    subdomain?: string | null,
+    customDomain?: string | null,
     username?: string | null,
     title: string,
     description: string,
@@ -792,7 +841,7 @@ export type OnDeleteSiteSubscription = {
         __typename: "Content",
         id: string,
         siteID: string,
-        slug?: string | null,
+        slug: string,
         author?: string | null,
         title?: string | null,
         description?: string | null,

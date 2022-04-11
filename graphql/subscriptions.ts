@@ -54,7 +54,8 @@ export const onCreateSite = /* GraphQL */ `
   subscription OnCreateSite($username: String) {
     onCreateSite(username: $username) {
       id
-      domain
+      subdomain
+      customDomain
       username
       title
       description
@@ -82,7 +83,8 @@ export const onUpdateSite = /* GraphQL */ `
   subscription OnUpdateSite($username: String) {
     onUpdateSite(username: $username) {
       id
-      domain
+      subdomain
+      customDomain
       username
       title
       description
@@ -110,7 +112,8 @@ export const onDeleteSite = /* GraphQL */ `
   subscription OnDeleteSite($username: String) {
     onDeleteSite(username: $username) {
       id
-      domain
+      subdomain
+      customDomain
       username
       title
       description
