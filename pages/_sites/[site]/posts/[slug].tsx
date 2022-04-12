@@ -70,6 +70,7 @@ export default function Post({ post }: Props) {
 
 // At build time, resolve domain to site and get content for siteID, slug combo
 export async function getStaticProps({ params: { site, slug } }) {
+  console.log('GET STATIC PROPS');
   const isCustomDomain = site.includes('.');
   console.log(site, slug, isCustomDomain);
   try {
@@ -78,7 +79,7 @@ export async function getStaticProps({ params: { site, slug } }) {
       const siteRes = (await API.graphql({
         query: siteByCustomDomain,
         variables: {
-          domain: site,
+          customDomain: site,
         },
       })) as { data: SiteByCustomDomainQuery; errors: any[] };
       if (!siteRes.data.siteByCustomDomain.items[0]) return { notFound: true };
@@ -116,6 +117,7 @@ export async function getStaticProps({ params: { site, slug } }) {
 
 // At build time, get all sites and their content and get content and return them as site, slug combos
 export async function getStaticPaths() {
+  console.log('GET STATIC PATHS');
   try {
     const sitesRes = (await API.graphql({
       query: ListSitesWithContents,
@@ -126,9 +128,16 @@ export async function getStaticPaths() {
         arr.push({
           params: { site: site.subdomain, slug: content.slug },
         });
+        if (site.customDomain) {
+          arr.push({
+            params: { site: site.customDomain, slug: content.slug },
+          });
+        }
       });
       return arr;
     }, []);
+
+    console.log(paths);
 
     return { paths, fallback: 'blocking' };
   } catch (error) {

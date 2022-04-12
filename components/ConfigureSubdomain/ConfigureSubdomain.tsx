@@ -65,7 +65,7 @@ export default function ConfigureSubdomain(props: Props): JSX.Element {
         authMode: 'AMAZON_COGNITO_USER_POOLS',
       })) as { data: CreateSiteMutation; errors: any[] };
 
-      router.push(`/addCustomDomain?site=${data.createSite.id}`);
+      router.push(`/dashboard?site=${data.createSite.id}`);
     } catch (e) {
       console.log(e);
     }

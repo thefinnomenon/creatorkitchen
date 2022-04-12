@@ -31,6 +31,7 @@ export default function SiteConfigPage({ url, site }: Props): JSX.Element {
   const [debouncedDomain] = useDebounce(domain, 1000);
   const [isDomainVerified, setIsDomainVerified] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [domainError, setDomainError] = useState('');
 
   useEffect(() => {
     async function checkSubdomain() {
@@ -80,6 +81,8 @@ export default function SiteConfigPage({ url, site }: Props): JSX.Element {
   }, []);
 
   const updateSiteRecord = async (name, subdomain, domain, description) => {
+    setDomainError('');
+    setIsDomainVerified(true);
     setIsSaving(true);
     try {
       const { data } = (await API.graphql({
@@ -107,7 +110,7 @@ export default function SiteConfigPage({ url, site }: Props): JSX.Element {
           }
         );
         if (response.status === 200) console.log('Updated domain');
-        else setError('');
+        else setDomainError(`${domain} is not available.`);
         verifyDomain(domain);
       } catch (e) {
         console.error(e);
@@ -197,7 +200,10 @@ export default function SiteConfigPage({ url, site }: Props): JSX.Element {
             type="text"
           />
         </div>
-        {!isDomainVerified && (
+        {domainError && (
+          <div className="px-5 text-left text-red-500">{domainError}</div>
+        )}
+        {!domainError && !isDomainVerified && (
           <div className="px-5 text-left text-red-500">
             Failed to verify domain. <br />
             Set the following records on your DNS provider:

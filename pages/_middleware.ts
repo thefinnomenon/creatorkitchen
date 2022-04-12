@@ -9,18 +9,33 @@ export default function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Get hostname of request (e.g. demo.vercel.pub)
-  const hostname = req.headers.get('host');
+  let hostname = req.headers.get('host');
   if (!hostname)
     return new Response(null, {
       status: 400,
       statusText: 'No hostname found in request headers',
     });
 
-  // Get subdomain (e.g. <currentHost>.domain.com)
-  let currentHost = hostname.replace(process.env.DOMAIN, '');
+  console.log(hostname);
 
-  // Remove trailing .
-  if (currentHost) currentHost = currentHost.slice(0, -1);
+  // Remove port when testing locally with real domain
+  if (!hostname.includes('localhost')) {
+    console.log(hostname);
+    hostname = hostname.split(':')[0];
+  }
+
+  // If hostname includes default domain then currentHost is the subdomain (if exists)
+  // else, currentHost is the custom domain
+  let currentHost = '';
+  if (hostname.includes(process.env.DOMAIN)) {
+    // Get subdomain (e.g. <currentHost>.domain.com)
+    let currentHost = hostname.replace(process.env.DOMAIN, '');
+
+    // Remove trailing .
+    if (currentHost) currentHost = currentHost.slice(0, -1);
+  } else {
+    currentHost = hostname;
+  }
 
   // Don't allow direct targeting of /_sites
   if (pathname.startsWith(`/_sites`))
@@ -28,7 +43,7 @@ export default function middleware(req: NextRequest) {
       status: 404,
     });
 
-  // console.log(currentHost, hostname, pathname);
+  console.log(currentHost, hostname, pathname);
 
   // If path is not an api route
   if (!pathname.includes('.') && !pathname.startsWith('/api')) {

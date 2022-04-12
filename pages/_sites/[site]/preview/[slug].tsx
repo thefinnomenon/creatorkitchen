@@ -72,7 +72,7 @@ export async function getServerSideProps({ params: { site, slug } }) {
       const siteRes = (await API.graphql({
         query: siteByCustomDomain,
         variables: {
-          domain: site,
+          customDomain: site,
         },
       })) as { data: SiteByCustomDomainQuery; errors: any[] };
       if (!siteRes.data.siteByCustomDomain.items[0]) return { notFound: true };
