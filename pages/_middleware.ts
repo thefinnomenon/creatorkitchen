@@ -16,14 +16,6 @@ export default function middleware(req: NextRequest) {
       statusText: 'No hostname found in request headers',
     });
 
-  console.log(hostname);
-
-  // Remove port when testing locally with real domain
-  if (!hostname.includes('localhost')) {
-    console.log(hostname);
-    hostname = hostname.split(':')[0];
-  }
-
   // If hostname includes default domain then currentHost is the subdomain (if exists)
   // else, currentHost is the custom domain
   let currentHost = '';

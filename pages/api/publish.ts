@@ -24,23 +24,27 @@ export default async function handler(req, res) {
   const { slug } = req.query;
 
   // Get hostname of request (e.g. demo.vercel.pub)
-  const domain = req.headers.host;
-  if (!domain)
+  let hostname = req.headers['host'];
+  if (!hostname)
     return new Response(null, {
       status: 400,
       statusText: 'No hostname found in request headers',
     });
 
-  // Get subdomain (e.g. <currentHost>.domain.com)
-  let subdomain = domain.replace(process.env.DOMAIN, '');
+  // If hostname includes default domain then get subdomain (if exists)
+  // else, hostname is the custom domain
+  let domain, subdomain;
+  if (hostname.includes(process.env.DOMAIN)) {
+    // Get subdomain (e.g. <currentHost>.domain.com)
+    let subdomain = hostname.replace(process.env.DOMAIN, '');
 
-  // Remove trailing .
-  if (subdomain) subdomain = subdomain.slice(0, -1);
+    // Remove trailing .
+    if (subdomain) subdomain = subdomain.slice(0, -1);
+  } else {
+    domain = hostname;
+  }
 
   console.log(domain, subdomain);
-
-  let isCustomDomain = false;
-  if (!subdomain) isCustomDomain = true;
 
   let user;
   try {
@@ -53,11 +57,11 @@ export default async function handler(req, res) {
 
   let siteObj;
   try {
-    if (isCustomDomain) {
+    if (domain) {
       const siteRes = (await API.graphql({
         query: siteByCustomDomain,
         variables: {
-          domain,
+          customDomain: domain,
         },
       })) as { data: SiteByCustomDomainQuery; errors: any[] };
       if (!siteRes.data.siteByCustomDomain.items[0]) return { notFound: true };
@@ -72,7 +76,6 @@ export default async function handler(req, res) {
       if (!siteRes.data.siteBySubdomain.items[0]) return { notFound: true };
       siteObj = siteRes.data.siteBySubdomain.items[0];
     }
-    console.log(siteObj);
 
     const { data } = (await API.graphql({
       query: contentBySiteAndSlug,

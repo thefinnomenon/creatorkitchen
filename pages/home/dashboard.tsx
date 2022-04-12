@@ -141,18 +141,7 @@ export default function EditPost() {
 
   // UPDATE URL
   useEffect(() => {
-    // If using a custom domain in development mode, it should be mapped to localhost in env/hosts
-    // e.g.   127.0.0.1  example.test
-    // To use, it will still need to have the port so we will add it
-    if (domain && process.env.NODE_ENV === 'development') {
-      setUrl(
-        `${PROTOCOL}${
-          domain ? `${domain}:3000` : `${subdomain}.${ROOT_DOMAIN}`
-        }`
-      );
-    } else {
-      setUrl(`${PROTOCOL}${domain ? domain : `${subdomain}.${ROOT_DOMAIN}`}`);
-    }
+    setUrl(`${PROTOCOL}${domain ? domain : `${subdomain}.${ROOT_DOMAIN}`}`);
   }, [domain, subdomain]);
 
   // GET USER DOMAIN
