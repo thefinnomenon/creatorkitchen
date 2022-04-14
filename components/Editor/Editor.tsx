@@ -17,14 +17,5 @@ export default function EditPost({ post, onChange, initialContent }: Props) {
     onChange({ ...post, content });
   }
 
-  return (
-    <>
-      {post && (
-        <Tiptap
-          content={initialContent}
-          onChange={(content) => handleChange(content)}
-        />
-      )}
-    </>
-  );
+  return <>{post && <Tiptap content={initialContent} onChange={(content) => handleChange(content)} />}</>;
 }

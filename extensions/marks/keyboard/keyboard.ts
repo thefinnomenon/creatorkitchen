@@ -1,9 +1,4 @@
-import {
-  Mark,
-  markInputRule,
-  markPasteRule,
-  mergeAttributes,
-} from '@tiptap/core';
+import { Mark, markInputRule, markPasteRule, mergeAttributes } from '@tiptap/core';
 
 export interface KeyboardOptions {
   HTMLAttributes: Record<string, any>;
@@ -40,11 +35,7 @@ export const Keyboard = Mark.create<KeyboardOptions>({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return [
-      'kbd',
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      0,
-    ];
+    return ['kbd', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
   },
 
   addCommands() {

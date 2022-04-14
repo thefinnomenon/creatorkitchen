@@ -35,9 +35,7 @@ export default function Unsplash({ setMedia }: Props): JSX.Element {
   const [results, setResults] = useState<[Photo]>();
 
   const handleSearch = async () => {
-    const res = await (
-      await fetch(`/api/unsplash?per_page=${NUM_OF_IMAGES}&query=${query}`)
-    ).json();
+    const res = await (await fetch(`/api/unsplash?per_page=${NUM_OF_IMAGES}&query=${query}`)).json();
 
     setResults(res.results);
   };
@@ -83,12 +81,7 @@ export default function Unsplash({ setMedia }: Props): JSX.Element {
                 }
               >
                 <div>
-                  <img
-                    key={image.id}
-                    src={image.urls.small}
-                    alt={image.alt_description}
-                    className="not-prose"
-                  />
+                  <img key={image.id} src={image.urls.small} alt={image.alt_description} className="not-prose" />
                   {/* <a
                     src={image.user.links.self}
                     className="relative opacity-0 group-hover:opacity-100 ml-1 top-[-2rem] text-sm"

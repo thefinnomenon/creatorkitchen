@@ -3,9 +3,7 @@ import { PluginKey, Plugin } from 'prosemirror-state';
 
 // @ts-ignore
 function nodeEqualsType({ types, node }) {
-  return (
-    (Array.isArray(types) && types.includes(node.type)) || node.type === types
-  );
+  return (Array.isArray(types) && types.includes(node.type)) || node.type === types;
 }
 
 /**

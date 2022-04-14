@@ -1,11 +1,5 @@
 import { Node } from '@tiptap/core';
-import {
-  ReactNodeViewRenderer,
-  NodeViewWrapper,
-  NodeViewContent,
-  mergeAttributes,
-  Editor,
-} from '@tiptap/react';
+import { ReactNodeViewRenderer, NodeViewWrapper, NodeViewContent, mergeAttributes, Editor } from '@tiptap/react';
 import { Tab } from '@headlessui/react';
 import ReactDOMServer from 'react-dom/server';
 import { RiLinkM } from 'react-icons/ri';
@@ -150,14 +144,8 @@ export function Media(props: Props): JSX.Element {
         <div className="flex-1 max-w-2xl px-1">{embed}</div>
       </div>
 
-      <div
-        contentEditable={false}
-        className="w-full text-center text-sm text-gray-500"
-      >
-        <div
-          className="mt-[-1.4rem]"
-          dangerouslySetInnerHTML={{ __html: props.node.attrs.caption }}
-        />
+      <div contentEditable={false} className="w-full text-center text-sm text-gray-500">
+        <div className="mt-[-1.4rem]" dangerouslySetInnerHTML={{ __html: props.node.attrs.caption }} />
       </div>
 
       {/* <NodeViewContent
@@ -183,9 +171,7 @@ const renderMediaInput = (setMedia) => (
             className={({ selected }) =>
               classNames(
                 'flex-1 font-medium bg-gray-100 border-b-2 border-gray-200',
-                selected
-                  ? 'text-blue-500 border-b-blue-500'
-                  : 'hover:bg-gray-300'
+                selected ? 'text-blue-500 border-b-blue-500' : 'hover:bg-gray-300'
               )
             }
           >

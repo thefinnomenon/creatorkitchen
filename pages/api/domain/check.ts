@@ -26,10 +26,7 @@ export default async function post(req: NextApiRequest, res: NextApiResponse) {
 
   const { domain, subdomain = false } = req.query;
 
-  if (Array.isArray(domain))
-    return res
-      .status(400)
-      .end('Bad request. domain parameter cannot be an array.');
+  if (Array.isArray(domain)) return res.status(400).end('Bad request. domain parameter cannot be an array.');
 
   try {
     if (subdomain) {
@@ -47,16 +44,13 @@ export default async function post(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).json(available);
     }
 
-    const response = await fetch(
-      `https://api.vercel.com/v6/domains/${domain}/config`,
-      {
-        method: HttpMethod.GET,
-        headers: {
-          Authorization: `Bearer ${process.env.VERCEL_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await fetch(`https://api.vercel.com/v6/domains/${domain}/config`, {
+      method: HttpMethod.GET,
+      headers: {
+        Authorization: `Bearer ${process.env.VERCEL_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
     const data = await response.json();
 

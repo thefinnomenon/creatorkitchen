@@ -44,8 +44,9 @@ export default function Home() {
                   username,
                 },
               })) as { data: SiteByUsernameQuery; errors: any[] };
+              const site = data.siteByUsername.items[0];
 
-              if (data.siteByUsername.items[0]) {
+              if (site) {
                 router.push('/dashboard');
               } else {
                 router.push('/createSite');

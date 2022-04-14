@@ -1,11 +1,5 @@
 import { Node } from '@tiptap/core';
-import {
-  ReactNodeViewRenderer,
-  NodeViewWrapper,
-  NodeViewContent,
-  mergeAttributes,
-  Editor,
-} from '@tiptap/react';
+import { ReactNodeViewRenderer, NodeViewWrapper, NodeViewContent, mergeAttributes, Editor } from '@tiptap/react';
 import { MdAttractions, MdOutlineLightbulb } from 'react-icons/md';
 import { FiAlertCircle, FiAlertTriangle, FiAlertOctagon } from 'react-icons/fi';
 import VisuallyHidden from '@reach/visually-hidden';

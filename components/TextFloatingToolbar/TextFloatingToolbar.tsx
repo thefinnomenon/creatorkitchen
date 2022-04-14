@@ -57,12 +57,9 @@ export default function TextFloatingToolbar({
       }
 
       // Sometime check for `empty` is not enough
-      const isEmptyTextBlock =
-        !state.doc.textBetween(from, to).length &&
-        isTextSelection(state.selection);
+      const isEmptyTextBlock = !state.doc.textBetween(from, to).length && isTextSelection(state.selection);
 
-      if (!view.hasFocus() || state.selection.empty || isEmptyTextBlock)
-        return false;
+      if (!view.hasFocus() || state.selection.empty || isEmptyTextBlock) return false;
 
       return true;
     };

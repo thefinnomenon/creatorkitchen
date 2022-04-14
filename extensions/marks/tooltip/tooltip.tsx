@@ -7,14 +7,8 @@ export interface TooltipOptions {
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     tooltip: {
-      setTooltip: (attributes: {
-        'data-tooltip-content': string;
-        activeLink: boolean;
-      }) => ReturnType;
-      toggleTooltip: (attributes: {
-        'data-tooltip-content': string;
-        activeLink: boolean;
-      }) => ReturnType;
+      setTooltip: (attributes: { 'data-tooltip-content': string; activeLink: boolean }) => ReturnType;
+      toggleTooltip: (attributes: { 'data-tooltip-content': string; activeLink: boolean }) => ReturnType;
       unsetTooltip: () => ReturnType;
     };
   }
@@ -71,16 +65,12 @@ export const Tooltip = Mark.create<TooltipOptions>({
       toggleTooltip:
         (attributes) =>
         ({ chain }) => {
-          return chain()
-            .toggleMark(this.name, attributes, { extendEmptyMarkRange: true })
-            .run();
+          return chain().toggleMark(this.name, attributes, { extendEmptyMarkRange: true }).run();
         },
       unsetTooltip:
         () =>
         ({ chain }) => {
-          return chain()
-            .unsetMark(this.name, { extendEmptyMarkRange: true })
-            .run();
+          return chain().unsetMark(this.name, { extendEmptyMarkRange: true }).run();
         },
     };
   },

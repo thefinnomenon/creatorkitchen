@@ -8,10 +8,7 @@ declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     audiolink: {
       setAudioLink: (attributes: { src: string; title: string }) => ReturnType;
-      toggleAudioLink: (attributes: {
-        src: string;
-        title: string;
-      }) => ReturnType;
+      toggleAudioLink: (attributes: { src: string; title: string }) => ReturnType;
       unsetAudioLink: () => ReturnType;
     };
   }
@@ -84,17 +81,13 @@ export const AudioLink = Mark.create<AudioLinkOptions>({
       toggleAudioLink:
         (attributes) =>
         ({ chain }) => {
-          return chain()
-            .toggleMark(this.name, attributes, { extendEmptyMarkRange: true })
-            .run();
+          return chain().toggleMark(this.name, attributes, { extendEmptyMarkRange: true }).run();
         },
 
       unsetAudioLink:
         () =>
         ({ chain }) => {
-          return chain()
-            .unsetMark(this.name, { extendEmptyMarkRange: true })
-            .run();
+          return chain().unsetMark(this.name, { extendEmptyMarkRange: true }).run();
         },
     };
   },

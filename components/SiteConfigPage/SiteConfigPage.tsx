@@ -2,17 +2,14 @@ import { API } from 'aws-amplify';
 import { useEffect, useState } from 'react';
 import { ClipLoader } from 'react-spinners';
 import { useDebounce } from 'use-debounce';
-import {
-  Site,
-  SiteBySubdomainQuery,
-  UpdateSiteMutation,
-} from '../../graphql/API';
+import { SiteBySubdomainQuery, UpdateSiteMutation } from '../../graphql/API';
 import { updateSite } from '../../graphql/mutations';
 import { siteBySubdomain } from '../../graphql/queries';
+import { Site } from '../../pages/home/dashboard';
 
 type Props = {
-  url: string;
   site: Site;
+  setSite: (updatedSite: Site) => void;
 } & typeof defaultProps;
 
 const defaultProps = Object.freeze({});
@@ -21,13 +18,13 @@ const initialState = Object.freeze({});
 let PROTOCOL = process.env.NEXT_PUBLIC_PROTOCOL;
 let ROOT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
-export default function SiteConfigPage({ url, site }: Props): JSX.Element {
+export default function SiteConfigPage({ site, setSite }: Props): JSX.Element {
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [title, setTitle] = useState(site.title);
-  const [description, setDescription] = useState(site.description);
-  const [subdomain, setSubdomain] = useState(site.subdomain);
+  const [title, setTitle] = useState(site.title || '');
+  const [description, setDescription] = useState(site.description || '');
+  const [subdomain, setSubdomain] = useState(site.subdomain || '');
   const [debouncedSubdomain] = useDebounce(subdomain, 1000);
-  const [domain, setDomain] = useState(site.customDomain);
+  const [domain, setDomain] = useState(site.customDomain || '');
   const [debouncedDomain] = useDebounce(domain, 1000);
   const [isDomainVerified, setIsDomainVerified] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,11 +41,7 @@ export default function SiteConfigPage({ url, site }: Props): JSX.Element {
             },
           })) as { data: SiteBySubdomainQuery; errors: any[] };
 
-          if (
-            !data.siteBySubdomain.items[0] ||
-            data.siteBySubdomain.items[0].id === site.id
-          )
-            setError(null);
+          if (!data.siteBySubdomain.items[0] || data.siteBySubdomain.items[0].id === site.id) setError(null);
           else setError(`${debouncedSubdomain}.creatorkitchen.net`);
         } catch (e) {
           console.log(e);
@@ -61,9 +54,7 @@ export default function SiteConfigPage({ url, site }: Props): JSX.Element {
   async function verifyDomain(domain: string) {
     if (domain.length > 0) {
       try {
-        const response = await fetch(
-          `${PROTOCOL}${ROOT_DOMAIN}/api/domain/check?domain=${domain}`
-        );
+        const response = await fetch(`${PROTOCOL}${ROOT_DOMAIN}/api/domain/check?domain=${domain}`);
         console.log(response);
         const data = await response.json();
         console.log(data);
@@ -80,7 +71,7 @@ export default function SiteConfigPage({ url, site }: Props): JSX.Element {
     verifyDomain(domain);
   }, []);
 
-  const updateSiteRecord = async (name, subdomain, domain, description) => {
+  const updateSiteRecord = async (title, subdomain, domain, description) => {
     setDomainError('');
     setIsDomainVerified(true);
     setIsSaving(true);
@@ -97,18 +88,16 @@ export default function SiteConfigPage({ url, site }: Props): JSX.Element {
         },
         authMode: 'AMAZON_COGNITO_USER_POOLS',
       })) as { data: UpdateSiteMutation; errors: any[] };
+      setSite({ ...site, title, description, subdomain });
     } catch (e) {
       console.log(e);
     }
 
-    if (domain !== site.customDomain) {
+    if (domain && domain !== site.customDomain) {
       try {
-        const response = await fetch(
-          `${PROTOCOL}${ROOT_DOMAIN}/api/domain?domain=${domain}&siteId=${site.id}`,
-          {
-            method: 'POST',
-          }
-        );
+        const response = await fetch(`${PROTOCOL}${ROOT_DOMAIN}/api/domain?domain=${domain}&siteId=${site.id}`, {
+          method: 'POST',
+        });
         if (response.status === 200) console.log('Updated domain');
         else setDomainError(`${domain} is not available.`);
         verifyDomain(domain);
@@ -131,12 +120,7 @@ export default function SiteConfigPage({ url, site }: Props): JSX.Element {
           description: { value: string };
         };
         const { name, subdomain, domain, description } = target;
-        updateSiteRecord(
-          name.value,
-          subdomain.value,
-          domain.value,
-          description.value
-        );
+        updateSiteRecord(name.value, subdomain.value, domain.value, description.value);
       }}
       className="w-full max-w-md pt-8  ml-4"
     >
@@ -181,11 +165,7 @@ export default function SiteConfigPage({ url, site }: Props): JSX.Element {
             <b>{error}</b> is not available. Please choose another subdomain.
           </p>
         )}
-        <div
-          className={` flex flex-start items-center ${
-            error && 'border-red-500 focus-within:ring-red-500'
-          }`}
-        >
+        <div className={` flex flex-start items-center ${error && 'border-red-500 focus-within:ring-red-500'}`}>
           <input
             className={`w-full px-5 py-3 text-gray-700 bg-white placeholder-gray-400 border border-gray-300 focus:border-transparent focus:ring-blue-500 rounded-lg ${
               !isDomainVerified && 'border-red-500 focus-within:ring-red-500'
@@ -200,9 +180,7 @@ export default function SiteConfigPage({ url, site }: Props): JSX.Element {
             type="text"
           />
         </div>
-        {domainError && (
-          <div className="px-5 text-left text-red-500">{domainError}</div>
-        )}
+        {domainError && <div className="px-5 text-left text-red-500">{domainError}</div>}
         {!domainError && !isDomainVerified && (
           <div className="px-5 text-left text-red-500">
             Failed to verify domain. <br />

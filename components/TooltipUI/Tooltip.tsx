@@ -22,8 +22,7 @@ export default function Tooltip({ editor, tooltip }: Props): JSX.Element {
   useEffect(() => {
     if (contentEditableRef.current) {
       // @ts-ignore
-      contentEditableRef.current.innerHTML =
-        editor.getAttributes('tooltip')['data-tooltip-content'] || '';
+      contentEditableRef.current.innerHTML = editor.getAttributes('tooltip')['data-tooltip-content'] || '';
     }
   }, [tooltip.current]);
 
@@ -33,12 +32,9 @@ export default function Tooltip({ editor, tooltip }: Props): JSX.Element {
       if (tooltip.current === 'hide') return false;
 
       // Sometime check for `empty` is not enough
-      const isEmptyTextBlock =
-        !state.doc.textBetween(from, to).length &&
-        isTextSelection(state.selection);
+      const isEmptyTextBlock = !state.doc.textBetween(from, to).length && isTextSelection(state.selection);
 
-      if (!view.hasFocus() || state.selection.empty || isEmptyTextBlock)
-        return false;
+      if (!view.hasFocus() || state.selection.empty || isEmptyTextBlock) return false;
 
       return true;
     };
@@ -73,8 +69,7 @@ export default function Tooltip({ editor, tooltip }: Props): JSX.Element {
               .extendMarkRange('tooltip')
               .setTooltip({
                 'data-tooltip-content': event.target.innerHTML,
-                activeLink:
-                  editor.isActive('link') || editor.isActive('audiolink'),
+                activeLink: editor.isActive('link') || editor.isActive('audiolink'),
               })
               .setTextSelection(editor.state.selection.$head.pos)
               .run();

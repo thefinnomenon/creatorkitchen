@@ -5,10 +5,7 @@ const unsplash = createApi({
   accessKey: process.env.UNSPLASH_API_KEY,
 });
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const query = req.query.query as string;
   const per_page = req.query.per_page as string;
 

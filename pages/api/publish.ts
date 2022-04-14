@@ -1,15 +1,7 @@
 import { Amplify, withSSRContext } from 'aws-amplify';
 import config from '../../aws-exports.js';
-import {
-  ContentBySiteAndSlugQuery,
-  SiteByCustomDomainQuery,
-  SiteBySubdomainQuery,
-} from '../../graphql/API';
-import {
-  contentBySiteAndSlug,
-  siteByCustomDomain,
-  siteBySubdomain,
-} from '../../graphql/queries';
+import { ContentBySiteAndSlugQuery, SiteByCustomDomainQuery, SiteBySubdomainQuery } from '../../graphql/API';
+import { contentBySiteAndSlug, siteByCustomDomain, siteBySubdomain } from '../../graphql/queries';
 
 // Amplify SSR configuration needs to be done within each API route
 Amplify.configure({ ...config, ssr: true });
@@ -50,9 +42,7 @@ export default async function handler(req, res) {
   try {
     user = await Auth.currentAuthenticatedUser();
   } catch (e) {
-    return res
-      .status(401)
-      .json({ message: 'You must be authenticated to publish' });
+    return res.status(401).json({ message: 'You must be authenticated to publish' });
   }
 
   let siteObj;

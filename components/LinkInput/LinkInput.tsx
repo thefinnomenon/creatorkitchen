@@ -23,23 +23,16 @@ export default function LinkInput({ editor, linkToolbar }: Props): JSX.Element {
       if (linkToolbar.current === 'hide') return false;
 
       // Sometime check for `empty` is not enough
-      const isEmptyTextBlock =
-        !state.doc.textBetween(from, to).length &&
-        isTextSelection(state.selection);
+      const isEmptyTextBlock = !state.doc.textBetween(from, to).length && isTextSelection(state.selection);
 
-      if (!view.hasFocus() || state.selection.empty || isEmptyTextBlock)
-        return false;
+      if (!view.hasFocus() || state.selection.empty || isEmptyTextBlock) return false;
 
       return true;
     };
   }
 
   const openInNewTab = (url: string): void => {
-    const newWindow = window.open(
-      url,
-      '_blank',
-      'noopener,noreferrer,nofollow'
-    );
+    const newWindow = window.open(url, '_blank', 'noopener,noreferrer,nofollow');
     if (newWindow) newWindow.opener = null;
   };
 
@@ -64,8 +57,7 @@ export default function LinkInput({ editor, linkToolbar }: Props): JSX.Element {
           .unsetAudioLink()
           .setLink({ href })
           .setTooltip({
-            'data-tooltip-content':
-              editor.getAttributes('tooltip')['data-tooltip-content'],
+            'data-tooltip-content': editor.getAttributes('tooltip')['data-tooltip-content'],
             activeLink: true,
           })
           .setTextSelection(editor.state.selection.$head.pos)
@@ -117,9 +109,7 @@ export default function LinkInput({ editor, linkToolbar }: Props): JSX.Element {
         />
         <ToolbarButton
           icon={<RiLinkUnlinkM />}
-          onClick={() =>
-            editor.chain().focus().extendMarkRange('link').unsetLink().run()
-          }
+          onClick={() => editor.chain().focus().extendMarkRange('link').unsetLink().run()}
           altText="Remove"
           disabled={!editor.getAttributes('link').href}
           isActive={false}

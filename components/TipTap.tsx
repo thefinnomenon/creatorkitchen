@@ -1,9 +1,4 @@
-import {
-  EditorContent,
-  isTextSelection,
-  ReactNodeViewRenderer,
-  useEditor,
-} from '@tiptap/react';
+import { EditorContent, isTextSelection, ReactNodeViewRenderer, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
 import Underline from '@tiptap/extension-underline';

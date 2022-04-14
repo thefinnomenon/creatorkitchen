@@ -21,10 +21,7 @@ export enum HttpMethod {
   PUT = 'PUT',
   TRACE = 'TRACE',
 }
-export default async function domain(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function domain(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
     case HttpMethod.POST:
       return createDomain(req, res);
@@ -45,10 +42,7 @@ export default async function domain(
  * @param req - Next.js API Request
  * @param res - Next.js API Response
  */
-export async function createDomain(
-  req: NextApiRequest,
-  res: NextApiResponse
-): Promise<void | NextApiResponse> {
+export async function createDomain(req: NextApiRequest, res: NextApiResponse): Promise<void | NextApiResponse> {
   const { Auth, API } = withSSRContext({ req });
   const { domain, siteId } = req.query;
 
@@ -100,17 +94,14 @@ export async function createDomain(
   }
 
   try {
-    const response = await fetch(
-      `https://api.vercel.com/v8/projects/${process.env.VERCEL_PROJECT_ID}/domains`,
-      {
-        body: `{\n  "name": "${domain}"\n}`,
-        headers: {
-          Authorization: `Bearer ${process.env.VERCEL_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        method: HttpMethod.POST,
-      }
-    );
+    const response = await fetch(`https://api.vercel.com/v8/projects/${process.env.VERCEL_PROJECT_ID}/domains`, {
+      body: `{\n  "name": "${domain}"\n}`,
+      headers: {
+        Authorization: `Bearer ${process.env.VERCEL_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      method: HttpMethod.POST,
+    });
 
     const data = await response.json();
 
@@ -125,17 +116,14 @@ export async function createDomain(
     console.log(`Created entry for ${domain}`);
 
     // www redirect
-    const response2 = await fetch(
-      `https://api.vercel.com/v8/projects/${process.env.VERCEL_PROJECT_ID}/domains`,
-      {
-        body: `{\n  "name": "www.${domain}",\n  "redirect": "${domain}", \n  "redirectStatusCode": 308\n}`,
-        headers: {
-          Authorization: `Bearer ${process.env.VERCEL_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        method: HttpMethod.POST,
-      }
-    );
+    const response2 = await fetch(`https://api.vercel.com/v8/projects/${process.env.VERCEL_PROJECT_ID}/domains`, {
+      body: `{\n  "name": "www.${domain}",\n  "redirect": "${domain}", \n  "redirectStatusCode": 308\n}`,
+      headers: {
+        Authorization: `Bearer ${process.env.VERCEL_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      method: HttpMethod.POST,
+    });
 
     const data2 = await response2.json();
 
@@ -184,10 +172,7 @@ export async function createDomain(
  * @param req - Next.js API Request
  * @param res - Next.js API Response
  */
-export async function deleteDomain(
-  req: NextApiRequest,
-  res: NextApiResponse
-): Promise<void | NextApiResponse> {
+export async function deleteDomain(req: NextApiRequest, res: NextApiResponse): Promise<void | NextApiResponse> {
   const { Auth, API } = withSSRContext({ req });
   const { domain, siteId } = req.query;
 

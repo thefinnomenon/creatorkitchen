@@ -228,6 +228,8 @@ export type SiteByUsernameWithContentsQuery = {
       subdomain?: string | null,
       customDomain?: string | null,
       username?: string | null,
+      title: string,
+      description: string,
       contents?:  {
         __typename: "ModelContentConnection",
         nextToken?: string | null,

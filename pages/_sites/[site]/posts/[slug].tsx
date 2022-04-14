@@ -7,10 +7,7 @@ import {
   siteByCustomDomain,
   getSite,
 } from '../../../../graphql/queries';
-import {
-  ListSitesWithContentQuery,
-  ListSitesWithContents,
-} from '../../../../graphql/customStatements';
+import { ListSitesWithContentQuery, ListSitesWithContents } from '../../../../graphql/customStatements';
 import Amplify from 'aws-amplify';
 import config from '../../../../aws-exports';
 Amplify.configure(config);
@@ -45,10 +42,7 @@ export default function Post({ post }: Props) {
 
   return (
     <>
-      <Script
-        src="https://unpkg.com/@popperjs/core@2"
-        strategy="beforeInteractive"
-      />
+      <Script src="https://unpkg.com/@popperjs/core@2" strategy="beforeInteractive" />
       <Script src="https://unpkg.com/tippy.js@6" strategy="beforeInteractive" />
       <Script id="initialize-tooltips" strategy="afterInteractive">
         {`tippy('[data-tooltip-content]', { interactive: true, allowHTML: true, arrow: tippy.roundArrow, theme: 'my-tippy', onShow(instance) {

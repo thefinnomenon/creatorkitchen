@@ -76,11 +76,7 @@ export type ListSitesWithContentQuery = {
 };
 
 export const ListSitesWithContents = /* GraphQL */ `
-  query ListSitesWithContents(
-    $filter: ModelSiteFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
+  query ListSitesWithContents($filter: ModelSiteFilterInput, $limit: Int, $nextToken: String) {
     listSites(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id

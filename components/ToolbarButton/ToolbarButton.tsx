@@ -25,9 +25,7 @@ export default function ToolbarButton(props: Props): JSX.Element {
     <button
       disabled={disabled}
       onClick={() => onClick()}
-      className={`p-2 ${disabled ? 'text-gray-300' : 'hover:bg-gray-300'} ${
-        isActive ? 'text-blue-500' : ''
-      }
+      className={`p-2 ${disabled ? 'text-gray-300' : 'hover:bg-gray-300'} ${isActive ? 'text-blue-500' : ''}
         ${isGroupStart ? 'border-l-2 border-gray-200' : ''}
       }`}
     >

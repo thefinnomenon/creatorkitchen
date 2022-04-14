@@ -5,10 +5,7 @@ import Suggestion, { SuggestionOptions } from '@tiptap/suggestion';
 
 export type CommandOptions = {
   HTMLAttributes: Record<string, any>;
-  renderLabel: (props: {
-    options: CommandOptions;
-    node: ProseMirrorNode;
-  }) => string;
+  renderLabel: (props: { options: CommandOptions; node: ProseMirrorNode }) => string;
   suggestion: Omit<SuggestionOptions, 'editor'>;
 };
 
@@ -34,71 +31,31 @@ export const Command = Node.create<CommandOptions>({
               editor.chain().focus().deleteRange(range).setParagraph().run();
               break;
             case 'h1':
-              editor
-                .chain()
-                .focus()
-                .deleteRange(range)
-                .setHeading({ level: 1 })
-                .run();
+              editor.chain().focus().deleteRange(range).setHeading({ level: 1 }).run();
               break;
             case 'h2':
-              editor
-                .chain()
-                .focus()
-                .deleteRange(range)
-                .setHeading({ level: 2 })
-                .run();
+              editor.chain().focus().deleteRange(range).setHeading({ level: 2 }).run();
               break;
             case 'h3':
-              editor
-                .chain()
-                .focus()
-                .deleteRange(range)
-                .setHeading({ level: 3 })
-                .run();
+              editor.chain().focus().deleteRange(range).setHeading({ level: 3 }).run();
               break;
             case 'h4':
-              editor
-                .chain()
-                .focus()
-                .deleteRange(range)
-                .setHeading({ level: 4 })
-                .run();
+              editor.chain().focus().deleteRange(range).setHeading({ level: 4 }).run();
               break;
             case 'h4':
-              editor
-                .chain()
-                .focus()
-                .deleteRange(range)
-                .setHeading({ level: 4 })
-                .run();
+              editor.chain().focus().deleteRange(range).setHeading({ level: 4 }).run();
               break;
             case 'ul':
-              editor
-                .chain()
-                .focus()
-                .deleteRange(range)
-                .toggleBulletList()
-                .run();
+              editor.chain().focus().deleteRange(range).toggleBulletList().run();
               break;
             case 'ol':
-              editor
-                .chain()
-                .focus()
-                .deleteRange(range)
-                .toggleOrderedList()
-                .run();
+              editor.chain().focus().deleteRange(range).toggleOrderedList().run();
               break;
             case 'blockquote':
               editor.chain().focus().deleteRange(range).setBlockquote().run();
               break;
             case 'hr':
-              editor
-                .chain()
-                .focus()
-                .deleteRange(range)
-                .setHorizontalRule()
-                .run();
+              editor.chain().focus().deleteRange(range).setHorizontalRule().run();
               break;
             case 'callout':
               editor.chain().focus().deleteRange(range).wrapIn('callout').run();
@@ -108,12 +65,7 @@ export const Command = Node.create<CommandOptions>({
               break;
             case 'table':
               console.log('Inserting table');
-              editor
-                .chain()
-                .focus()
-                .deleteRange(range)
-                .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-                .run();
+              editor.chain().focus().deleteRange(range).insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
               break;
             case 'media':
               editor
@@ -191,11 +143,7 @@ export const Command = Node.create<CommandOptions>({
   renderHTML({ node, HTMLAttributes }) {
     return [
       'span',
-      mergeAttributes(
-        { 'data-type': this.name },
-        this.options.HTMLAttributes,
-        HTMLAttributes
-      ),
+      mergeAttributes({ 'data-type': this.name }, this.options.HTMLAttributes, HTMLAttributes),
       this.options.renderLabel({
         options: this.options,
         node,
@@ -225,11 +173,7 @@ export const Command = Node.create<CommandOptions>({
           state.doc.nodesBetween(anchor - 1, anchor, (node, pos) => {
             if (node.type.name === this.name) {
               isCommand = true;
-              tr.insertText(
-                this.options.suggestion.char || '',
-                pos,
-                pos + node.nodeSize
-              );
+              tr.insertText(this.options.suggestion.char || '', pos, pos + node.nodeSize);
 
               return false;
             }

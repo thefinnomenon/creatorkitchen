@@ -10,9 +10,9 @@ export const configureAmplify = async () => {
     ssr: true,
   });
 
-  if (process && process.env.NODE_ENV === 'development') {
-    Amplify.Logger.LOG_LEVEL = 'DEBUG';
-  }
+  // if (process && process.env.NODE_ENV === 'development') {
+  //   Amplify.Logger.LOG_LEVEL = 'DEBUG';
+  // }
 
   // We want our users' files to be protected by default (i.e. readable by everyone, but only writable by the creating owner)
   // https://docs.amplify.aws/lib/storage/configureaccess/q/platform/js/

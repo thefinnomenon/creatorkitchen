@@ -9,10 +9,7 @@ const fetchGifs = (offset: number) => gf.trending({ offset, limit: 10 });
 
 // Render the React Component and pass it your fetchGifs as a prop
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const query = req.query.query as string;
   const limit = req.query.limit as string;
 

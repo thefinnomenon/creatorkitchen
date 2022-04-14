@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  forwardRef,
-  useImperativeHandle,
-} from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { CommandListItem } from '../../extensions/nodes/command/suggestion';
 
 type Props = {
@@ -29,9 +23,7 @@ export default forwardRef((props: Props, ref) => {
   };
 
   const upHandler = () => {
-    setSelectedIndex(
-      (selectedIndex + props.items.length - 1) % props.items.length
-    );
+    setSelectedIndex((selectedIndex + props.items.length - 1) % props.items.length);
     if (listRef.current) {
       // Note: Even if there is no matches (e.g. nothing shown) the last one is still highlighted
       //       but not in the dom
@@ -89,10 +81,7 @@ export default forwardRef((props: Props, ref) => {
   }));
 
   return (
-    <div
-      ref={listRef}
-      className="flex flex-col overflow-y-auto max-h-60 w-40 bg-gray-100 text-lg rounded-sm shadow-lg"
-    >
+    <div ref={listRef} className="flex flex-col overflow-y-auto max-h-60 w-40 bg-gray-100 text-lg rounded-sm shadow-lg">
       {props.items.map((item, index) => (
         <button
           className={`p-4 ${index === selectedIndex ? 'bg-gray-300' : ''}`}

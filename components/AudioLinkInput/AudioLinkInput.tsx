@@ -20,10 +20,7 @@ type Props = {
 const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
-export default function AudioLinkInput({
-  editor,
-  audioLinkToolbar,
-}: Props): JSX.Element {
+export default function AudioLinkInput({ editor, audioLinkToolbar }: Props): JSX.Element {
   const { src, title } = editor.getAttributes('audiolink');
   const [isPlaying, setIsPlaying] = useState(false);
   const [file, setFile] = useState<File>();
@@ -50,8 +47,7 @@ export default function AudioLinkInput({
                 title: file.name,
               })
               .setTooltip({
-                'data-tooltip-content':
-                  editor.getAttributes('tooltip')['data-tooltip-content'],
+                'data-tooltip-content': editor.getAttributes('tooltip')['data-tooltip-content'],
                 activeLink: true,
               })
               .setTextSelection(editor.state.selection.$head.pos)
@@ -94,9 +90,7 @@ export default function AudioLinkInput({
       }
 
       // Sometime check for `empty` is not enough
-      const isEmptyTextBlock =
-        !state.doc.textBetween(from, to).length &&
-        isTextSelection(state.selection);
+      const isEmptyTextBlock = !state.doc.textBetween(from, to).length && isTextSelection(state.selection);
 
       if (!view.hasFocus() || state.selection.empty || isEmptyTextBlock) {
         stopAudio();
@@ -108,11 +102,7 @@ export default function AudioLinkInput({
   }
 
   const openInNewTab = (url: string): void => {
-    const newWindow = window.open(
-      url,
-      '_blank',
-      'noopener,noreferrer,nofollow'
-    );
+    const newWindow = window.open(url, '_blank', 'noopener,noreferrer,nofollow');
     if (newWindow) newWindow.opener = null;
   };
 
@@ -174,12 +164,7 @@ export default function AudioLinkInput({
         <ToolbarButton
           icon={<RiLinkUnlinkM />}
           onClick={() => {
-            editor
-              .chain()
-              .focus()
-              .extendMarkRange('audiolink')
-              .unsetAudioLink()
-              .run();
+            editor.chain().focus().extendMarkRange('audiolink').unsetAudioLink().run();
           }}
           altText="Remove"
           disabled={!src}

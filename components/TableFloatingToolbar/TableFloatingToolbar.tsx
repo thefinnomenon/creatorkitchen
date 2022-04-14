@@ -40,18 +40,12 @@ type Props = {
 const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
-export default function TableFloatingToolbar({
-  editor,
-  toolbar,
-}: Props): JSX.Element {
+export default function TableFloatingToolbar({ editor, toolbar }: Props): JSX.Element {
   function shouldShow() {
     return ({ editor: Editor, view, state, oldState, from, to }) => {
       // console.log(state.selection.anchor.path);
       // If selection in table -> show toolbar
-      if (
-        state.selection.$anchor.node(1) &&
-        state.selection.$anchor.node(1).type.name === 'table'
-      ) {
+      if (state.selection.$anchor.node(1) && state.selection.$anchor.node(1).type.name === 'table') {
         return true;
       }
 
@@ -59,12 +53,9 @@ export default function TableFloatingToolbar({
       if (toolbar.current === 'hide') return false;
 
       // Sometime check for `empty` is not enough
-      const isEmptyTextBlock =
-        !state.doc.textBetween(from, to).length &&
-        isTextSelection(state.selection);
+      const isEmptyTextBlock = !state.doc.textBetween(from, to).length && isTextSelection(state.selection);
 
-      if (!view.hasFocus() || state.selection.empty || isEmptyTextBlock)
-        return false;
+      if (!view.hasFocus() || state.selection.empty || isEmptyTextBlock) return false;
 
       return true;
     };

@@ -1,20 +1,12 @@
 import API from '@aws-amplify/api';
 import { useRouter } from 'next/router';
-import {
-  siteByCustomDomain,
-  contentBySiteAndSlug,
-  siteBySubdomain,
-} from '../../../../graphql/queries';
+import { siteByCustomDomain, contentBySiteAndSlug, siteBySubdomain } from '../../../../graphql/queries';
 import Amplify from 'aws-amplify';
 import config from '../../../../aws-exports';
 Amplify.configure(config);
 import Script from 'next/script';
 import 'tippy.js/dist/svg-arrow.css';
-import {
-  SiteByCustomDomainQuery,
-  ContentBySiteAndSlugQuery,
-  SiteBySubdomainQuery,
-} from '../../../../graphql/API';
+import { SiteByCustomDomainQuery, ContentBySiteAndSlugQuery, SiteBySubdomainQuery } from '../../../../graphql/API';
 
 type PostType = {
   id: string;
@@ -36,10 +28,7 @@ export default function Post({ post }: Props) {
 
   return (
     <>
-      <Script
-        src="https://unpkg.com/@popperjs/core@2"
-        strategy="beforeInteractive"
-      />
+      <Script src="https://unpkg.com/@popperjs/core@2" strategy="beforeInteractive" />
       <Script src="https://unpkg.com/tippy.js@6" strategy="beforeInteractive" />
       <Script id="initialize-tooltips" strategy="afterInteractive">
         {`tippy('[data-tooltip-content]', { interactive: true, allowHTML: true, arrow: tippy.roundArrow, theme: 'my-tippy', onShow(instance) {

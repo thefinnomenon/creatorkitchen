@@ -15,9 +15,7 @@ export default function Giphy({ setMedia }: Props): JSX.Element {
   const [results, setResults] = useState();
 
   const handleSearch = async () => {
-    const res = await (
-      await fetch(`/api/giphy?limit=${NUM_OF_IMAGES}&query=${query}`)
-    ).json();
+    const res = await (await fetch(`/api/giphy?limit=${NUM_OF_IMAGES}&query=${query}`)).json();
 
     setResults(res.results.data);
   };

@@ -39,9 +39,7 @@ export default function Upload({ setMedia }: Props): JSX.Element {
           // @ts-ignore
           const type = determineTypeFromSrc(file.name);
           if (!type) {
-            setError(
-              'Sorry, currently only image and video files can be uploaded.'
-            );
+            setError('Sorry, currently only image and video files can be uploaded.');
             return;
           }
           const src = await uploadFile(file, setUploadProgress);
@@ -99,15 +97,10 @@ export default function Upload({ setMedia }: Props): JSX.Element {
 
   return (
     <div className="mx-auto border-4 border-dashed border-gray-300 w-11/12 bg-blue-50 flex justify-center items-center">
-      <div
-        {...getRootProps({ className: 'dropzone' })}
-        className="flex justify-center items-center flex-col p-2"
-      >
+      <div {...getRootProps({ className: 'dropzone' })} className="flex justify-center items-center flex-col p-2">
         <input {...getInputProps()} />
         <MdUploadFile className="flex-1 text-6xl" />
-        <div className="flex-1">
-          Drag & Drop your file here or click to select
-        </div>
+        <div className="flex-1">Drag & Drop your file here or click to select</div>
       </div>
     </div>
   );
