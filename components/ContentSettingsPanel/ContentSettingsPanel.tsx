@@ -1,7 +1,8 @@
 import VisuallyHidden from '@reach/visually-hidden';
+import debouncePromise from 'awesome-debounce-promise';
 import { API } from 'aws-amplify';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { Content, UpdateContentMutation } from '../../graphql/API';
 import { Site } from '../../pages/home/dashboard';
@@ -20,8 +21,6 @@ const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
 async function onSave(site: Site, id: string, setSite, values) {
-  console.log(site.id, id, values);
-
   const index = site.contents.findIndex((c) => c.id === id);
   if (index === -1) throw Error(`Failed to find ${id} in site contents`);
 
@@ -53,6 +52,17 @@ const isPlaceholderSlug = (str: string) => {
   return regexExp.test(str);
 };
 
+// Check if title unique (really if the slug it generates is unique...)
+const isUniqueTitle = (site, title: string, currentTitle: string) => {
+  if (title === currentTitle) return true;
+  return site.contents.findIndex((c) => c.slug === slugify(title)) === -1;
+};
+
+export const inputStyle = (error) =>
+  `mt-1 rounded-lg appearance-none w-full py-2 px-4 text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+    error && 'border border-red-500 focus:ring-red-500'
+  }`;
+
 type Inputs = {
   title: string;
   description: string;
@@ -60,6 +70,11 @@ type Inputs = {
 export default function ContentSettingsPanel(props: Props): JSX.Element {
   const { site, content, onDelete, setSite } = props;
   const [isSaving, setIsSaving] = useState(false);
+
+  const debouncedIsUniqueTitle = useMemo(
+    () => debouncePromise((value) => isUniqueTitle(site, value, content.title), 200),
+    [site, content.title]
+  );
 
   const getDefaults = (content: Content) => {
     return {
@@ -83,12 +98,6 @@ export default function ContentSettingsPanel(props: Props): JSX.Element {
     reset(getDefaults(content));
   }, [reset, content]);
 
-  // Check if title unique (really if the slug it generates is unique...)
-  const isUniqueTitle = (title: string) => {
-    if (title === content.title) return true;
-    return site.contents.findIndex((c) => c.slug === slugify(title)) === -1;
-  };
-
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setIsSaving(true);
     await onSave(site, content.id, setSite, { ...data, slug: slugify(title) });
@@ -98,7 +107,7 @@ export default function ContentSettingsPanel(props: Props): JSX.Element {
   return (
     <div className="h-screen max-w-md bg-gray-100">
       <h1 className="text-3xl font-semibold tracking-wide mb-4 pt-4 pl-4">Properties</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="m-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="m-4" autoComplete="off">
         <div>
           <div className="mb-4">
             <label htmlFor="title" className="text-gray-700">
@@ -106,14 +115,12 @@ export default function ContentSettingsPanel(props: Props): JSX.Element {
             </label>
             <input
               id="title"
-              className={`mt-1 rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.title && 'border-red-500'
-              }`}
+              className={inputStyle(errors.title)}
               placeholder="Enter content title"
               aria-invalid={errors.title ? 'true' : 'false'}
               {...register('title', {
                 required: true,
-                validate: isUniqueTitle,
+                validate: debouncedIsUniqueTitle,
               })}
             />
             {errors.title && errors.title.type === 'required' && (
@@ -121,7 +128,7 @@ export default function ContentSettingsPanel(props: Props): JSX.Element {
                 Title is required
               </p>
             )}
-            {errors.title && errors.title.type === 'isUniqueTitle' && (
+            {errors.title && errors.title.type === 'validate' && (
               <p role="alert" className="text-red-500 mt-1">
                 Title must be unique. Please choose another one.
               </p>
@@ -133,7 +140,7 @@ export default function ContentSettingsPanel(props: Props): JSX.Element {
             </label>
             <textarea
               id="description"
-              className="mt-1 rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`${inputStyle(errors.description)} align-top`}
               placeholder="Enter content description"
               {...register('description', { required: false })}
             />
@@ -146,12 +153,17 @@ export default function ContentSettingsPanel(props: Props): JSX.Element {
 
         <div className="">
           <div className="flex gap-4">
+            <button hidden id="hidden-submit" type="submit" />
             <button
               disabled={isSaving}
-              type="submit"
-              className="flex-1 bg-blue-600 text-white font-semibold h-10 rounded-lg hover:bg-blue-500"
+              onClick={() => {
+                setIsSaving(true);
+                document.getElementById('hidden-submit').click();
+              }}
+              type="button"
+              className="flex-1 flex justify-center items-center bg-blue-600 text-white font-semibold h-10 rounded-lg hover:bg-blue-500"
             >
-              {isSaving ? <ClipLoader /> : 'SAVE'}
+              {isSaving ? <ClipLoader color="white" size={'1.5rem'} /> : 'SAVE'}
             </button>
             <button
               onClick={() => onDelete(site.id, content.id)}

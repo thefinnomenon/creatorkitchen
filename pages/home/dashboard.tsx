@@ -20,13 +20,15 @@ import {
   UpdateContentMutation,
 } from '../../graphql/API';
 import { siteByUsernameWithContents } from '../../graphql/customStatements';
-import SiteConfigPage from '../../components/SiteConfigPage';
 import ContentToolbar from '../../components/ContentToolbar';
 import SiteSettingsPanel from '../../components/SiteSettingsPanel';
 
 const UPDATE_DEBOUNCE = 5000;
 const PROTOCOL = process.env.NEXT_PUBLIC_PROTOCOL;
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
+
+export const getSiteUrl = (site: Pick<Site, 'customDomain' | 'subdomain'>) =>
+  `${PROTOCOL}${site.customDomain ? site.customDomain : `${site.subdomain}.${ROOT_DOMAIN}`}`;
 
 export interface Site extends Omit<SiteBasic, 'contents'> {
   url: string;
@@ -138,7 +140,7 @@ export default function EditPost() {
     const s: Site = site;
 
     // Add URL to site
-    s.url = `${PROTOCOL}${site.customDomain ? site.customDomain : `${site.subdomain}.${ROOT_DOMAIN}`}`;
+    s.url = getSiteUrl(site);
 
     // Simplify the contents path
     s.contents = site.contents.items;
@@ -147,34 +149,9 @@ export default function EditPost() {
     SiteIdRef.current = s.id;
   }
 
-  // GET SELECTED CONTENT
-  async function onSelect(id) {
-    try {
-      //if (!checkIfSaved()) return;
-
-      // Selected site
-      if (id === 'site') {
-        IdRef.current = 'site';
-        setContent(null);
-        return;
-      }
-
-      const index = site.contents.findIndex((c) => c.id === id);
-      if (index === -1) throw Error(`Failed to find ${id} in site contents`);
-
-      //IdRef.current = id;
-      console.log(site.contents[index]);
-      setContent(site.contents[index]);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   // DELETE CONTENT
   async function onDelete(siteID, id) {
     setIsSaved(true);
-
-    console.log(siteID, id);
 
     (await API.graphql({
       query: deleteContent,
@@ -208,13 +185,13 @@ export default function EditPost() {
     <div className="w-full overflow-hidden h-screen flex">
       <ContentList
         site={site}
-        selectedId={content ? content.id : ''} //{IdRef.current ? IdRef.current : ''}
+        selectedId={content ? content.id : ''}
         onCreate={onCreate}
-        onSelect={onSelect}
+        setContent={setContent}
+        checkIfSaved={checkIfSaved}
         onSignOut={onSignOut}
       />
       <div className="md:mt-4 flex-1 items-stretch max-w-4xl">
-        {IdRef.current === 'site' && <SiteConfigPage site={site} setSite={() => {}} />}
         {content && (
           <>
             <ContentToolbar isSaved={isSaved} url={site.url} slug={content.slug} />
@@ -230,8 +207,10 @@ export default function EditPost() {
           </>
         )}
       </div>
-      {/* {content && <ContentSettingsPanel site={site} content={content} setSite={setSite} onDelete={onDelete} />} */}
-      {site && <SiteSettingsPanel site={site} setSite={setSite} />}
+      {content && content.id != 'site' && (
+        <ContentSettingsPanel site={site} content={content} setSite={setSite} onDelete={onDelete} />
+      )}
+      {content && content.id === 'site' && <SiteSettingsPanel site={site} setSite={setSite} />}
     </div>
   );
 }

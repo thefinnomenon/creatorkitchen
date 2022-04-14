@@ -1,13 +1,13 @@
-import VisuallyHidden from '@reach/visually-hidden';
 import { API } from 'aws-amplify';
+import debouncePromise from 'awesome-debounce-promise';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { useEffect, useState } from 'react';
-import { RiDeleteBinLine } from 'react-icons/ri';
-import { Content, DeleteSiteMutation, UpdateContentMutation } from '../../graphql/API';
-import { Site } from '../../pages/home/dashboard';
-import slugify from '../../utils/slugify';
-import { deleteSite, updateContent, updateSite } from '../../graphql/mutations';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { SiteBySubdomainQuery, UpdateContentMutation } from '../../graphql/API';
+import { Site, getSiteUrl } from '../../pages/home/dashboard';
+import { updateSite } from '../../graphql/mutations';
 import { ClipLoader } from 'react-spinners';
+import { inputStyle } from '../ContentSettingsPanel/ContentSettingsPanel';
+import { siteBySubdomain } from '../../graphql/queries';
 
 type Props = {
   site: Site;
@@ -18,8 +18,6 @@ const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
 async function onSave(site: Site, setSite, values) {
-  console.log(site.id, values);
-
   try {
     (await API.graphql({
       query: updateSite,
@@ -32,47 +30,72 @@ async function onSave(site: Site, setSite, values) {
       authMode: 'AMAZON_COGNITO_USER_POOLS',
     })) as { data: UpdateContentMutation; errors: any[] };
 
-    setSite({ ...site, ...values });
+    const url = getSiteUrl({ customDomain: site.customDomain, subdomain: site.subdomain, ...values });
+    setSite({ ...site, ...values, url });
   } catch (e) {
     console.error(e);
   }
 }
 
-async function onDelete(site: Site, setSite) {
+const isSubdomainAvailable = async (subdomain: string, currentSubdomain: string) => {
+  if (subdomain.length === 0) return false;
+  if (subdomain === currentSubdomain) return true;
+
   try {
-    (await API.graphql({
-      query: deleteSite,
+    const { data } = (await API.graphql({
+      query: siteBySubdomain,
       variables: {
-        input: {
-          id: site.id,
-        },
+        subdomain: subdomain,
       },
-      authMode: 'AMAZON_COGNITO_USER_POOLS',
-    })) as { data: DeleteSiteMutation; errors: any[] };
-
-    setSite(null);
+    })) as { data: SiteBySubdomainQuery; errors: any[] };
+    if (data.siteBySubdomain.items.length === 0) return true;
+    else return false;
   } catch (e) {
-    console.error(e);
+    console.log(e);
   }
-}
+};
+
+const verifyDomain = async (domain: string, setIsDomainVerified) => {
+  if (domain.length > 0) {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_PROTOCOL}${process.env.NEXT_PUBLIC_DOMAIN}/api/domain/check?domain=${domain}`
+      );
+      console.log(response);
+      const data = await response.json();
+      console.log(data);
+      if (data) setIsDomainVerified(true);
+      else setIsDomainVerified(false);
+    } catch (e) {
+      setIsDomainVerified(false);
+      console.error(e);
+    }
+  }
+};
 
 type Inputs = {
   title: string;
   description: string;
   subdomain: string;
-  domain: string;
+  //domain: string;
 };
 
 export default function SiteSettingsPanel(props: Props): JSX.Element {
   const { site, setSite } = props;
   const [isSaving, setIsSaving] = useState(false);
+  const [isDomainVerified, setIsDomainVerified] = useState(true);
+
+  const debouncedIsSubdomainAvailable = useMemo(
+    () => debouncePromise((value) => isSubdomainAvailable(value, site.subdomain), 200),
+    [site.subdomain]
+  );
 
   const getDefaults = (site: Site) => {
     return {
       title: site.title,
       description: site.description,
       subdomain: site.subdomain,
-      domain: site.customDomain,
+      //domain: site.customDomain,
     };
   };
 
@@ -92,13 +115,7 @@ export default function SiteSettingsPanel(props: Props): JSX.Element {
     reset(getDefaults(site));
   }, [reset, site]);
 
-  // Check if subdomain is available
-  const isSubdomainAvailable = async (title: string) => {
-    //TODO: Add subdomain check
-    return true;
-  };
-
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+  const onSubmit: SubmitHandler<Inputs> = async (data, event) => {
     setIsSaving(true);
     await onSave(site, setSite, data);
     setIsSaving(false);
@@ -107,7 +124,7 @@ export default function SiteSettingsPanel(props: Props): JSX.Element {
   return (
     <div className="h-screen max-w-md bg-gray-100">
       <h1 className="text-3xl font-semibold tracking-wide mb-4 pt-4 pl-4">Site Settings</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="m-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="m-4" autoComplete="off">
         <div>
           <div className="mb-4">
             <label htmlFor="title" className="text-gray-700">
@@ -115,10 +132,8 @@ export default function SiteSettingsPanel(props: Props): JSX.Element {
             </label>
             <input
               id="title"
-              className={`mt-1 rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.title && 'border-red-500'
-              }`}
-              placeholder="Enter content title"
+              className={inputStyle(errors.title)}
+              placeholder="Enter site title"
               aria-invalid={errors.title ? 'true' : 'false'}
               {...register('title', {
                 required: true,
@@ -136,38 +151,54 @@ export default function SiteSettingsPanel(props: Props): JSX.Element {
             </label>
             <textarea
               id="description"
-              className="mt-1 rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter content description"
+              className={`${inputStyle(errors.description)} align-top`}
+              placeholder="Enter site description"
               {...register('description', { required: false })}
             />
           </div>
-          <label htmlFor="Subdomain" className="text-gray-700">
+          <label htmlFor="Subdomain" className="text-gray-700 mt-0">
             Subdomain
           </label>
-          <div
-            className={`mb-4 flex mt-1 rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full text-gray-700 placeholder-gray-400 shadow-sm text-base focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent  ${
-              errors.subdomain && 'border-red-500 focus-within:ring-red-500'
-            }`}
-          >
-            <input
-              className="flex-1 py-2 px-4 border-none rounded-l-lg focus:outline-none focus:ring-0 placeholder-gray-400"
-              id="subdomain"
-              required
-              placeholder="mscott"
-            />
-            <span className="flex-5 h-full py-2 px-4 text-gray-500 bg-white items-center rounded-r-lg border-l border-gray-300">
-              .creatorkitchen.net
-            </span>
+          <div className="mb-4 mt-1">
+            <div
+              className={`flex rounded-lg flex-1 appearance-none border-gray-300 w-full text-gray-700 placeholder-gray-400 shadow-sm text-base focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent  ${
+                errors.subdomain && 'border border-red-500 focus-within:ring-red-500'
+              }`}
+            >
+              <input
+                className="w-full py-2 px-4 flex-shrink flex-grow flex-1 leading-normal border border-none rounded-l-lg focus:outline-none focus:ring-0 placeholder-gray-400"
+                id="subdomain"
+                spellCheck={false}
+                placeholder="mscott"
+                aria-invalid={errors.subdomain ? 'true' : 'false'}
+                {...register('subdomain', {
+                  required: true,
+                  validate: debouncedIsSubdomainAvailable,
+                })}
+              />
+              <span className="flex leading-normal border-grey-light px-3 whitespace-no-wrap text-grey-dark text-sm text-gray-500 bg-white items-center rounded-r-lg border-l border-gray-300">
+                .{process.env.NEXT_PUBLIC_DOMAIN}
+              </span>
+            </div>
+            {errors.subdomain && errors.subdomain.type === 'required' && (
+              <p role="alert" className="text-red-500 mt-1">
+                Subdomain is required
+              </p>
+            )}
+            {errors.subdomain && errors.subdomain.type === 'validate' && (
+              <p role="alert" className="text-red-500 mt-1">
+                {subdomain}.{process.env.NEXT_PUBLIC_DOMAIN} is not available.
+              </p>
+            )}
           </div>
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <label htmlFor="domain" className="text-gray-700">
               Custom Domain
             </label>
             <input
               id="domain"
-              className={`mt-1 rounded-lg border-transparent flex-1 appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.domain && 'border-red-500'
-              }`}
+              spellCheck={false}
+              className={inputStyle(errors.domain)}
               placeholder="creedthoughts.gov"
               aria-invalid={errors.domain ? 'true' : 'false'}
               {...register('domain', {
@@ -179,25 +210,22 @@ export default function SiteSettingsPanel(props: Props): JSX.Element {
                 Sorry, this domain is not available. Please choose another.
               </p>
             )}
-          </div>
+          </div> */}
         </div>
 
-        <div className="">
-          <div className="flex gap-4">
-            <button
-              disabled={isSaving}
-              type="submit"
-              className="flex-1 bg-blue-600 text-white font-semibold h-10 rounded-lg hover:bg-blue-500"
-            >
-              {isSaving ? <ClipLoader /> : 'SAVE'}
-            </button>
-            {/* <button onClick={() => onDelete(site.id)} type="button" className="rounded-lg p-2 hover:bg-gray-200">
-              <div className="text-2xl text-red-500">
-                <VisuallyHidden>Delete content</VisuallyHidden>
-                <RiDeleteBinLine />
-              </div>
-            </button> */}
-          </div>
+        <div className="flex gap-4">
+          <button hidden id="hidden-submit" type="submit" />
+          <button
+            disabled={isSaving}
+            onClick={() => {
+              setIsSaving(true);
+              document.getElementById('hidden-submit').click();
+            }}
+            type="button"
+            className="flex-1 flex justify-center items-center bg-blue-600 text-white font-semibold h-10 rounded-lg hover:bg-blue-500"
+          >
+            {isSaving ? <ClipLoader color="white" size={'1.5rem'} /> : 'SAVE'}
+          </button>
         </div>
       </form>
     </div>

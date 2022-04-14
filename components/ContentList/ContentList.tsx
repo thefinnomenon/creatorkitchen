@@ -1,11 +1,13 @@
 import { VscDiffAdded } from 'react-icons/vsc';
 import VisuallyHidden from '@reach/visually-hidden';
 import { Site } from '../../pages/home/dashboard';
+import { Content } from '../../graphql/API';
 
 type Props = {
   site: Site;
   selectedId: string;
-  onSelect(id: string): void;
+  setContent(content: Content): void;
+  checkIfSaved(): boolean;
   onCreate(): void;
   onSignOut(): void;
 } & typeof defaultProps;
@@ -13,7 +15,28 @@ type Props = {
 const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
-export default function ContentList({ site, selectedId, onSelect, onCreate, onSignOut }: Props): JSX.Element {
+async function onSelect(site: Site, id: string, setContent, checkIfSaved) {
+  //if (!checkIfSaved()) return;
+
+  if (id === 'site') {
+    setContent({ id: 'site' });
+    return;
+  }
+
+  const index = site.contents.findIndex((c) => c.id === id);
+  if (index === -1) throw Error(`Failed to find ${id} in site contents`);
+
+  setContent(site.contents[index]);
+}
+
+export default function ContentList({
+  site,
+  selectedId,
+  setContent,
+  checkIfSaved,
+  onCreate,
+  onSignOut,
+}: Props): JSX.Element {
   return (
     <div className="max-w-md bg-gray-100">
       <div className="min-h-screen flex flex-col justify-between">
@@ -26,14 +49,17 @@ export default function ContentList({ site, selectedId, onSelect, onCreate, onSi
             </button>
           </div>
           <div>
-            <button className="text-gray-500 hover:text-blue-500" onClick={() => onSelect('site')}>
+            <button
+              className={`text-gray-500 hover:text-blue-500 ${selectedId === 'site' && 'text-blue-500'}`}
+              onClick={() => onSelect(site, 'site', setContent, checkIfSaved)}
+            >
               <h2 className="text-md font-semibold tracking-wide mb-4 pt-4 pl-4 ">{site.url.split('//')[1]}</h2>
             </button>
           </div>
           {site.contents.map((content) => (
             <div
               key={content.id}
-              onClick={() => onSelect(content.id)}
+              onClick={() => onSelect(site, content.id, setContent, checkIfSaved)}
               className={`overflow-y-auto cursor-pointer p-4 hover:bg-gray-300 ${
                 content.id === selectedId ? 'text-blue-600 bg-gray-300' : ''
               }`}
