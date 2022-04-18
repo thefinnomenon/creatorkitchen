@@ -23,7 +23,7 @@ import Callout from '../components/Callout';
 import Media from '../components/Media';
 import suggestion from '../extensions/nodes/command/suggestion';
 import { applyDevTools } from 'prosemirror-dev-toolkit';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import TextFloatingToolbar from './TextFloatingToolbar';
 import LinkInput from './LinkInput';
 import TableFloatingToolbar from './TableFloatingToolbar';
@@ -33,12 +33,14 @@ import AudioLink from '../extensions/marks/audio';
 import AudioLinkInput from './AudioLinkInput';
 import Tooltip from '../extensions/marks/tooltip';
 import TooltipUI from './TooltipUI';
+import { ClipLoader } from 'react-spinners';
+import { Site } from '../pages/home/dashboard';
 
 const DEBUG = process && process.env.NODE_ENV === 'development';
 
 type Props = {
-  content: string;
-  onChange(value: string): void;
+  initialContent: string;
+  onChange(site: Site, currIndex: string, value: string): void;
   preview: boolean;
 } & typeof defaultProps;
 
@@ -60,7 +62,8 @@ const highlightCodeblocks = (content) => {
   return new XMLSerializer().serializeToString(doc);
 };
 
-export default function Tiptap({ content, preview, onChange }) {
+export default function Tiptap({ initialContent, onChange, preview }) {
+  const [isLoading, setIsLoading] = useState(false);
   const [previewContent, setPreviewContent] = useState('');
   const linkToolbar = useRef<MenuState>('hide');
   const audioLinkToolbar = useRef<MenuState>('hide');
@@ -208,7 +211,12 @@ export default function Tiptap({ content, preview, onChange }) {
     parseOptions: {
       preserveWhitespace: 'full',
     },
-    content,
+    onBeforeCreate: ({ editor }) => {
+      setIsLoading(true);
+    },
+    onCreate: ({ editor }) => {
+      setIsLoading(false);
+    },
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
@@ -217,26 +225,37 @@ export default function Tiptap({ content, preview, onChange }) {
     injectCSS: false,
   });
 
-  useEffect(() => {
-    if (editor && DEBUG) {
-      // applyDevTools(editor.view);
-    }
-    if (editor) {
-      onChange(editor.getHTML());
-    }
-  }, [editor]);
+  // useEffect(() => {
+  //   if (editor && DEBUG) {
+  //     // applyDevTools(editor.view);
+  //   }
+  //   // if (editor) {
+  //   //   onChange(editor.getHTML());
+  //   // }
+  // }, [editor]);
+
+  // useEffect(() => {
+  //   if (editor) {
+  //     editor.setEditable(!preview);
+  //   }
+  // }, [editor, preview]);
 
   useEffect(() => {
     if (editor) {
-      editor.setEditable(!preview);
+      console.log('Setting editor content to ', initialContent);
+      editor.commands.setContent(initialContent);
     }
-  }, [editor, preview]);
+  }, [editor, initialContent]);
 
-  useEffect(() => {
-    if (editor) {
-      editor.commands.setContent(content);
-    }
-  }, [editor, content]);
+  // NOTE: This happens really quick so it's not worth even showing
+  // the loader but to avoid a flash while it is laying out, we can
+  // just render an empty div
+  if (isLoading) return <div />;
+  // return (
+  //   <div className="h-screen flex justify-center items-center">
+  //     <ClipLoader />
+  //   </div>
+  // );
 
   return (
     <>

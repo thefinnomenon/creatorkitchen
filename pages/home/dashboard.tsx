@@ -2,10 +2,9 @@ import API from '@aws-amplify/api';
 import { useRouter } from 'next/router';
 import { useDebounce } from 'use-debounce';
 import { useEffect, useRef, useState } from 'react';
-import { useUndoState } from 'rooks';
 import ContentList from '../../components/ContentList';
 import { v4 as uuidv4 } from 'uuid';
-import { createContent, deleteContent, updateContent } from '../../graphql/mutations';
+import { createContent, createSite, deleteContent, updateContent } from '../../graphql/mutations';
 import { Auth } from 'aws-amplify';
 import { signOut } from '../../lib/amplify';
 import Tiptap from '../../components/TipTap';
@@ -23,7 +22,7 @@ import { siteByUsernameWithContents } from '../../graphql/customStatements';
 import ContentToolbar from '../../components/ContentToolbar';
 import SiteSettingsPanel from '../../components/SiteSettingsPanel';
 
-const UPDATE_DEBOUNCE = 5000;
+const UPDATE_DEBOUNCE = 2000;
 const PROTOCOL = process.env.NEXT_PUBLIC_PROTOCOL;
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -42,18 +41,18 @@ const initialState = Object.freeze({});
 
 export default function EditPost() {
   const router = useRouter();
-  const [site, setSite, undoSetSite] = useUndoState(null, { maxSize: 2 }) as [
-    Site,
-    (previousState: Site) => Site,
-    () => void
-  ];
+  const [site, setSite] = useState<Site>();
+  const [currIndex, setCurrIndex] = useState(null);
   const [content, setContent] = useState<Content>();
   const [debouncedContent] = useDebounce(content, UPDATE_DEBOUNCE);
   const [isSaved, setIsSaved] = useState(true);
-  const SiteIdRef = useRef('');
   const IdRef = useRef('');
 
   // Checks if current content autosaved before changing
+  // NOTE: This is super important because without checking if there
+  // is an autosave pending before changing the selected content, you
+  // will introduce a subtle bug where the autosave executes on the new
+  // selected content instead of the intended one
   const checkIfSaved = (wait = true) => {
     if (!isSaved) {
       if (wait) {
@@ -67,7 +66,7 @@ export default function EditPost() {
 
   // CREATE NEW CONTENT
   async function onCreate() {
-    //if (checkIfSaved()) return;
+    if (!checkIfSaved()) return;
 
     const { data } = (await API.graphql({
       query: createContent,
@@ -80,74 +79,81 @@ export default function EditPost() {
       authMode: 'AMAZON_COGNITO_USER_POOLS',
     })) as { data: CreateContentMutation; errors: any[] };
 
-    //IdRef.current = data.createContent.id;
     setSite({ ...site, contents: [data.createContent, ...site.contents] });
-    setContent(data.createContent);
+    setCurrIndex('0');
   }
 
+  // When debouncedContent updates, autosave
   useEffect(() => {
-    //setIsSaved(false);
-    //onUpdateContent(debouncedContent);
+    if (debouncedContent) {
+      onAutoSaveEditorContents(debouncedContent);
+    }
   }, [debouncedContent]);
 
   // UPDATE CONTENT FROM EDITOR
-  async function onUpdateContent(values) {
-    if (!SiteIdRef.current || !IdRef.current) return;
-    const siteID = SiteIdRef.current;
-    const id = IdRef.current;
+  async function onAutoSaveEditorContents(editorContent) {
+    // The autosave was cleared so do nothing
+    if (isSaved) return;
+
+    // console.log('Autosave content, ', debouncedContent);
+    // console.log(site.id, site.contents[currIndex].title);
 
     (await API.graphql({
       query: updateContent,
       variables: {
         input: {
-          id,
-          siteID,
-          ...values,
+          id: site.contents[currIndex].id,
+          siteID: site.id,
+          content: editorContent,
         },
       },
       authMode: 'AMAZON_COGNITO_USER_POOLS',
     })) as { data: UpdateContentMutation; errors: any[] };
+
+    setSite({
+      ...site,
+      contents: Object.assign([], site.contents, {
+        [currIndex]: { ...site.contents[currIndex], content: editorContent },
+      }),
+    });
 
     setIsSaved(true);
   }
 
   // LOAD USER SITE ON LOAD
   useEffect(() => {
-    fetchSite();
-  }, []);
+    async function fetchSite() {
+      const { username } = await Auth.currentAuthenticatedUser();
+      const { data } = (await API.graphql({
+        query: siteByUsernameWithContents,
+        variables: { username },
+      })) as { data: SiteByUsernameWithContentsQuery; errors: any[] };
+      const site = data.siteByUsername.items[0];
 
-  // GET USER DOMAIN
-  async function fetchSite() {
-    const { username } = await Auth.currentAuthenticatedUser();
-    const { data } = (await API.graphql({
-      query: siteByUsernameWithContents,
-      variables: { username },
-    })) as { data: SiteByUsernameWithContentsQuery; errors: any[] };
-    const site = data.siteByUsername.items[0];
+      if (!site) {
+        router.push('/');
+        return;
+      }
 
-    if (!site) {
-      router.push('/');
-      return;
+      // HACK: '-1' is the same as no domain, since it is a index I can't set it to null
+      site.customDomain = site.customDomain === '-1' ? '' : site.customDomain;
+
+      // Sort content alphabetically by title (this has the added bonus of floating untitled ('') to the top)
+      site.contents.items.sort((a, b) => (a.title > b.title ? 1 : -1));
+
+      // @ts-ignore: I am using my extended type and will handle the differences
+      const s: Site = site;
+
+      // Add URL to site
+      s.url = getSiteUrl(site);
+
+      // Simplify the contents path
+      s.contents = site.contents.items;
+
+      setSite(s);
     }
-
-    // HACK: '-1' is the same as no domain, since it is a index I can't set it to null
-    site.customDomain = site.customDomain === '-1' ? '' : site.customDomain;
-
-    // Sort content by most recently updated
-    site.contents.items.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
-
-    // @ts-ignore: I am using my extended type and will handle the differences
-    const s: Site = site;
-
-    // Add URL to site
-    s.url = getSiteUrl(site);
-
-    // Simplify the contents path
-    s.contents = site.contents.items;
-
-    setSite(s);
-    SiteIdRef.current = s.id;
-  }
+    fetchSite();
+  }, [router, setSite]);
 
   // DELETE CONTENT
   async function onDelete(siteID, id) {
@@ -159,8 +165,8 @@ export default function EditPost() {
       authMode: 'AMAZON_COGNITO_USER_POOLS',
     })) as { data: DeleteContentMutation; errors: any[] };
 
+    setCurrIndex(null);
     setSite({ ...site, contents: site.contents.filter((c) => c.id !== id) });
-    setContent(null);
   }
 
   // SIGNOUT
@@ -181,23 +187,28 @@ export default function EditPost() {
       </div>
     );
 
+  // HACK: For now I am determining if on site page by setting
+  // currIndex to 'site'. In the end I want a filesystem-esque viewer
+  // and will handle this there
+  const isContent = currIndex !== null && currIndex !== 'site';
+
   return (
     <div className="w-full overflow-hidden h-screen flex">
       <ContentList
         site={site}
-        selectedId={content ? content.id : ''}
         onCreate={onCreate}
-        setContent={setContent}
+        currIndex={currIndex}
+        setCurrIndex={setCurrIndex}
         checkIfSaved={checkIfSaved}
         onSignOut={onSignOut}
       />
       <div className="md:mt-4 flex-1 items-stretch max-w-4xl">
-        {content && (
+        {isContent && (
           <>
-            <ContentToolbar isSaved={isSaved} url={site.url} slug={content.slug} />
+            <ContentToolbar isSaved={isSaved} url={site.url} slug={site.contents[currIndex].slug} />
             <div className="overflow-auto">
               <Tiptap
-                content={content.content}
+                initialContent={site.contents[currIndex].content}
                 onChange={(content) => {
                   setIsSaved(false);
                   setContent(content);
@@ -207,10 +218,16 @@ export default function EditPost() {
           </>
         )}
       </div>
-      {content && content.id != 'site' && (
-        <ContentSettingsPanel site={site} content={content} setSite={setSite} onDelete={onDelete} />
+      {isContent && (
+        <ContentSettingsPanel
+          site={site}
+          currIndex={currIndex}
+          setSite={setSite}
+          onDelete={onDelete}
+          setCurrIndex={setCurrIndex}
+        />
       )}
-      {content && content.id === 'site' && <SiteSettingsPanel site={site} setSite={setSite} />}
+      {currIndex !== null && !isContent && <SiteSettingsPanel site={site} setSite={setSite} />}
     </div>
   );
 }

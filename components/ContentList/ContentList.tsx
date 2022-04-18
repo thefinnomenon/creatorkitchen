@@ -1,12 +1,12 @@
 import { VscDiffAdded } from 'react-icons/vsc';
 import VisuallyHidden from '@reach/visually-hidden';
 import { Site } from '../../pages/home/dashboard';
-import { Content } from '../../graphql/API';
 
 type Props = {
   site: Site;
-  selectedId: string;
-  setContent(content: Content): void;
+  //setContent(content: Content): void;
+  currIndex: string;
+  setCurrIndex(index: string): void;
   checkIfSaved(): boolean;
   onCreate(): void;
   onSignOut(): void;
@@ -15,24 +15,25 @@ type Props = {
 const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
-async function onSelect(site: Site, id: string, setContent, checkIfSaved) {
-  //if (!checkIfSaved()) return;
+async function onSelect(site: Site, id: string, currIndex, setCurrIndex, checkIfSaved) {
+  if (!checkIfSaved()) return;
+  console.log(currIndex);
 
   if (id === 'site') {
-    setContent({ id: 'site' });
+    setCurrIndex('site');
     return;
   }
 
   const index = site.contents.findIndex((c) => c.id === id);
   if (index === -1) throw Error(`Failed to find ${id} in site contents`);
 
-  setContent(site.contents[index]);
+  setCurrIndex(index);
 }
 
 export default function ContentList({
   site,
-  selectedId,
-  setContent,
+  setCurrIndex,
+  currIndex,
   checkIfSaved,
   onCreate,
   onSignOut,
@@ -50,24 +51,21 @@ export default function ContentList({
           </div>
           <div>
             <button
-              className={`text-gray-500 hover:text-blue-500 ${selectedId === 'site' && 'text-blue-500'}`}
-              onClick={() => onSelect(site, 'site', setContent, checkIfSaved)}
+              className={`text-gray-500 hover:text-blue-500 ${currIndex === 'site' && 'text-blue-500'}`}
+              onClick={() => onSelect(site, 'site', currIndex, setCurrIndex, checkIfSaved)}
             >
               <h2 className="text-md font-semibold tracking-wide mb-4 pt-4 pl-4 ">{site.url.split('//')[1]}</h2>
             </button>
           </div>
-          {site.contents.map((content) => (
+          {site.contents.map((content, index) => (
             <div
               key={content.id}
-              onClick={() => onSelect(site, content.id, setContent, checkIfSaved)}
+              onClick={() => onSelect(site, content.id, currIndex, setCurrIndex, checkIfSaved)}
               className={`overflow-y-auto cursor-pointer p-4 hover:bg-gray-300 ${
-                content.id === selectedId ? 'text-blue-600 bg-gray-300' : ''
+                currIndex !== null && Number(currIndex) === index ? 'text-blue-600 bg-gray-300' : ''
               }`}
             >
-              <h2 className={`text-xl`}>
-                {/* {!content.title ? 'Untitled' : content.title} */}
-                {!content.title ? content.updatedAt : content.title}
-              </h2>
+              <h2 className={`text-xl`}>{!content.title ? 'Untitled' : content.title}</h2>
             </div>
           ))}
         </div>

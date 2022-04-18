@@ -214,14 +214,9 @@ export default function SiteSettingsPanel(props: Props): JSX.Element {
         </div>
 
         <div className="flex gap-4">
-          <button hidden id="hidden-submit" type="submit" />
           <button
             disabled={isSaving}
-            onClick={() => {
-              setIsSaving(true);
-              document.getElementById('hidden-submit').click();
-            }}
-            type="button"
+            type="submit"
             className="flex-1 flex justify-center items-center bg-blue-600 text-white font-semibold h-10 rounded-lg hover:bg-blue-500"
           >
             {isSaving ? <ClipLoader color="white" size={'1.5rem'} /> : 'SAVE'}

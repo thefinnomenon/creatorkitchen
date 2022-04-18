@@ -13,4 +13,6 @@ export default {
   },
 };
 
-export const Callout = () => <Tiptap content="<callout></callout>" preview onChange={(value) => console.log(value)} />;
+export const Callout = () => (
+  <Tiptap initialContent="<callout></callout>" preview onChange={(value) => console.log(value)} />
+);

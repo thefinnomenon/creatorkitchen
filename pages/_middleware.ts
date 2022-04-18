@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export default function middleware(req: NextRequest) {
-  // Clone the request url
   const url = req.nextUrl.clone();
 
   // Get pathname of request (e.g. /blog-slug)
@@ -18,16 +17,9 @@ export default function middleware(req: NextRequest) {
 
   // If hostname includes default domain then currentHost is the subdomain (if exists)
   // else, currentHost is the custom domain
-  let currentHost = '';
-  if (hostname.includes(process.env.DOMAIN)) {
-    // Get subdomain (e.g. <currentHost>.domain.com)
-    let currentHost = hostname.replace(process.env.DOMAIN, '');
-
-    // Remove trailing .
-    if (currentHost) currentHost = currentHost.slice(0, -1);
-  } else {
-    currentHost = hostname;
-  }
+  let currentHost = hostname.includes(process.env.DOMAIN)
+    ? hostname.replace(process.env.DOMAIN, '').slice(0, -1)
+    : hostname;
 
   // Don't allow direct targeting of /_sites
   if (pathname.startsWith(`/_sites`))
@@ -35,7 +27,7 @@ export default function middleware(req: NextRequest) {
       status: 404,
     });
 
-  console.log(currentHost, hostname, pathname);
+  // console.log(`Middleware routing: currentHost(${currentHost}), hostname(${hostname}), pathname(${pathname})`);
 
   // If path is not an api route
   if (!pathname.includes('.') && !pathname.startsWith('/api')) {

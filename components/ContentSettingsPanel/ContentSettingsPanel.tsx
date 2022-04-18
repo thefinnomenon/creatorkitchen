@@ -12,18 +12,16 @@ import { ClipLoader } from 'react-spinners';
 
 type Props = {
   site: Site;
-  content: Content;
+  currIndex: string;
   onDelete(siteID: string, id: string): void;
   setSite(site: Site): void;
+  setCurrIndex(index: string): void;
 } & typeof defaultProps;
 
 const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
-async function onSave(site: Site, id: string, setSite, values) {
-  const index = site.contents.findIndex((c) => c.id === id);
-  if (index === -1) throw Error(`Failed to find ${id} in site contents`);
-
+async function onSave(site: Site, id: string, currIndex, setSite, setCurrIndex, values) {
   try {
     (await API.graphql({
       query: updateContent,
@@ -38,8 +36,16 @@ async function onSave(site: Site, id: string, setSite, values) {
     })) as { data: UpdateContentMutation; errors: any[] };
 
     const updatedSite = { ...site };
-    updatedSite.contents[index] = { ...site.contents[index], ...values };
-    setSite(updatedSite);
+    updatedSite.contents[currIndex] = { ...site.contents[currIndex], ...values };
+    // If title changed we need to re-sort the content list and update the currIndex
+    if ('title' in values) {
+      updatedSite.contents.sort((a, b) => (a.title > b.title ? 1 : -1));
+      const index = site.contents.findIndex((c) => c.id === id);
+      setSite(updatedSite);
+      setCurrIndex(index);
+    } else {
+      setSite(updatedSite);
+    }
   } catch (e) {
     console.error(e);
   }
@@ -68,8 +74,9 @@ type Inputs = {
   description: string;
 };
 export default function ContentSettingsPanel(props: Props): JSX.Element {
-  const { site, content, onDelete, setSite } = props;
+  const { site, currIndex, onDelete, setSite, setCurrIndex } = props;
   const [isSaving, setIsSaving] = useState(false);
+  const content = site.contents[currIndex];
 
   const debouncedIsUniqueTitle = useMemo(
     () => debouncePromise((value) => isUniqueTitle(site, value, content.title), 200),
@@ -100,7 +107,7 @@ export default function ContentSettingsPanel(props: Props): JSX.Element {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setIsSaving(true);
-    await onSave(site, content.id, setSite, { ...data, slug: slugify(title) });
+    await onSave(site, content.id, currIndex, setSite, setCurrIndex, { ...data, slug: slugify(title) });
     setIsSaving(false);
   };
 
@@ -153,14 +160,9 @@ export default function ContentSettingsPanel(props: Props): JSX.Element {
 
         <div className="">
           <div className="flex gap-4">
-            <button hidden id="hidden-submit" type="submit" />
             <button
               disabled={isSaving}
-              onClick={() => {
-                setIsSaving(true);
-                document.getElementById('hidden-submit').click();
-              }}
-              type="button"
+              type="submit"
               className="flex-1 flex justify-center items-center bg-blue-600 text-white font-semibold h-10 rounded-lg hover:bg-blue-500"
             >
               {isSaving ? <ClipLoader color="white" size={'1.5rem'} /> : 'SAVE'}
