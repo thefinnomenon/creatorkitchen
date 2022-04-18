@@ -112,75 +112,71 @@ export default function ContentSettingsPanel(props: Props): JSX.Element {
   };
 
   return (
-    <div className="h-screen max-w-md bg-gray-100">
-      <h1 className="text-3xl font-semibold tracking-wide mb-4 pt-4 pl-4">Properties</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="m-4" autoComplete="off">
-        <div>
-          <div className="mb-4">
-            <label htmlFor="title" className="text-gray-700">
-              Title
-            </label>
-            <input
-              id="title"
-              className={inputStyle(errors.title)}
-              placeholder="Enter content title"
-              aria-invalid={errors.title ? 'true' : 'false'}
-              {...register('title', {
-                required: true,
-                validate: debouncedIsUniqueTitle,
-              })}
-            />
-            {errors.title && errors.title.type === 'required' && (
-              <p role="alert" className="text-red-500 mt-1">
-                Title is required
-              </p>
-            )}
-            {errors.title && errors.title.type === 'validate' && (
-              <p role="alert" className="text-red-500 mt-1">
-                Title must be unique. Please choose another one.
-              </p>
-            )}
-          </div>
-          <div className="mb-4">
-            <label htmlFor="description" className="text-gray-700">
-              Description
-            </label>
-            <textarea
-              id="description"
-              className={`${inputStyle(errors.description)} align-top`}
-              placeholder="Enter content description"
-              {...register('description', { required: false })}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="text-gray-700">URL</label>
-            <p className="mt-1 text-gray-500 text-sm">{`${site.url}/${slugify(title)}`}</p>
-          </div>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col max-w-xs bg-gray-100" autoComplete="off">
+      <h1 className="text-3xl font-semibold tracking-wide p-4">Content Settings</h1>
+      <div className="flex-auto overflow-y-scroll p-4">
+        <div className="mb-4">
+          <label htmlFor="title" className="text-gray-700">
+            Title
+          </label>
+          <input
+            id="title"
+            className={inputStyle(errors.title)}
+            placeholder="Enter content title"
+            aria-invalid={errors.title ? 'true' : 'false'}
+            {...register('title', {
+              required: true,
+              validate: debouncedIsUniqueTitle,
+            })}
+          />
+          {errors.title && errors.title.type === 'required' && (
+            <p role="alert" className="text-red-500 mt-1">
+              Title is required
+            </p>
+          )}
+          {errors.title && errors.title.type === 'validate' && (
+            <p role="alert" className="text-red-500 mt-1">
+              Title must be unique. Please choose another one.
+            </p>
+          )}
         </div>
+        <div className="mb-4">
+          <label htmlFor="description" className="text-gray-700">
+            Description
+          </label>
+          <textarea
+            id="description"
+            className={`${inputStyle(errors.description)} align-top`}
+            placeholder="Enter content description"
+            {...register('description', { required: false })}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="text-gray-700">URL</label>
+          <p className="mt-1 text-gray-500 text-sm">{`${site.url}/${slugify(title)}`}</p>
+        </div>
+      </div>
 
-        <div className="">
-          <div className="flex gap-4">
-            <button
-              disabled={isSaving}
-              type="submit"
-              className="flex-1 flex justify-center items-center bg-blue-600 text-white font-semibold h-10 rounded-lg hover:bg-blue-500"
-            >
-              {isSaving ? <ClipLoader color="white" size={'1.5rem'} /> : 'SAVE'}
-            </button>
-            <button
-              onClick={() => onDelete(site.id, content.id)}
-              type="button"
-              className="rounded-lg p-2 hover:bg-gray-200"
-            >
-              <div className="text-2xl text-red-500">
-                <VisuallyHidden>Delete content</VisuallyHidden>
-                <RiDeleteBinLine />
-              </div>
-            </button>
+      <div className="flex flex-shrink-0 flex-grow-0 flex-auto gap-4 p-4">
+        <button
+          disabled={isSaving}
+          type="submit"
+          className="flex-1 flex justify-center items-center bg-blue-600 text-white font-semibold h-10 rounded-lg hover:bg-blue-500"
+        >
+          {isSaving ? <ClipLoader color="white" size={'1.5rem'} /> : 'SAVE'}
+        </button>
+        <button
+          onClick={() => onDelete(site.id, content.id)}
+          type="button"
+          className="rounded-lg p-2 hover:bg-gray-200"
+        >
+          <div className="text-2xl text-red-500">
+            <VisuallyHidden>Delete content</VisuallyHidden>
+            <RiDeleteBinLine />
           </div>
-        </div>
-      </form>
-    </div>
+        </button>
+      </div>
+    </form>
   );
 }
 

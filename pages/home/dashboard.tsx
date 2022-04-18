@@ -193,7 +193,7 @@ export default function EditPost() {
   const isContent = currIndex !== null && currIndex !== 'site';
 
   return (
-    <div className="w-full overflow-hidden h-screen flex">
+    <div className="w-full overflow-hidden h-screen flex items-stretch justify-between">
       <ContentList
         site={site}
         onCreate={onCreate}
@@ -202,7 +202,7 @@ export default function EditPost() {
         checkIfSaved={checkIfSaved}
         onSignOut={onSignOut}
       />
-      <div className="md:mt-4 flex-1 items-stretch max-w-4xl">
+      <div className="md:mt-4 flex-1 items-stretch max-w-3xl mb-4">
         {isContent && (
           <>
             <ContentToolbar isSaved={isSaved} url={site.url} slug={site.contents[currIndex].slug} />
