@@ -222,13 +222,15 @@ export default function EditPost() {
         {isContent && (
           <>
             <ContentToolbar isSaved={isSaved} url={site.url} slug={site.contents[currIndex].slug} />
-            <Tiptap
-              initialContent={initialContent}
-              onChange={(content) => {
-                setIsSaved(false);
-                setContent(content);
-              }}
-            />
+            <div>
+              <Tiptap
+                initialContent={initialContent}
+                onChange={(content) => {
+                  setIsSaved(false);
+                  setContent(content);
+                }}
+              />
+            </div>
           </>
         )}
       </div>
