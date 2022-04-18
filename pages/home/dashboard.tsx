@@ -1,7 +1,7 @@
 import API from '@aws-amplify/api';
 import { useRouter } from 'next/router';
 import { useDebounce } from 'use-debounce';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ContentList from '../../components/ContentList';
 import { v4 as uuidv4 } from 'uuid';
 import { createContent, createSite, deleteContent, updateContent } from '../../graphql/mutations';
@@ -43,7 +43,8 @@ export default function EditPost() {
   const router = useRouter();
   const [site, setSite] = useState<Site>();
   const [currIndex, setCurrIndex] = useState(null);
-  const [content, setContent] = useState<Content>();
+  const [initialContent, setInitialContent] = useState('');
+  const [content, setContent] = useState('');
   const [debouncedContent] = useDebounce(content, UPDATE_DEBOUNCE);
   const [isSaved, setIsSaved] = useState(true);
   const IdRef = useRef('');
@@ -81,6 +82,7 @@ export default function EditPost() {
 
     setSite({ ...site, contents: [data.createContent, ...site.contents] });
     setCurrIndex('0');
+    IdRef.current = data.createContent.id;
   }
 
   // When debouncedContent updates, autosave
@@ -90,13 +92,25 @@ export default function EditPost() {
     }
   }, [debouncedContent]);
 
+  // HACK: This isn't ideal but a change in TipTap causes a change in the site contents which
+  // then causes a change in TipTap's intialValue which then causes it to set the editor to
+  // the new contents. This would be fine but the parsing always messes up spacing and I haven't
+  // been able to figure out why. So... the hack for now is to only update the initial value when
+  // we change between content.
+  useEffect(() => {
+    if (IdRef.current) {
+      const index = site.contents.findIndex((c) => c.id === IdRef.current);
+      setInitialContent(site.contents[index].content);
+    }
+  }, [IdRef.current]);
+
   // UPDATE CONTENT FROM EDITOR
   async function onAutoSaveEditorContents(editorContent) {
     // The autosave was cleared so do nothing
     if (isSaved) return;
 
-    // console.log('Autosave content, ', debouncedContent);
-    // console.log(site.id, site.contents[currIndex].title);
+    console.log('Autosave content, ', debouncedContent);
+    console.log(site.id, site.contents[currIndex].title);
 
     (await API.graphql({
       query: updateContent,
@@ -166,6 +180,7 @@ export default function EditPost() {
     })) as { data: DeleteContentMutation; errors: any[] };
 
     setCurrIndex(null);
+    IdRef.current = null;
     setSite({ ...site, contents: site.contents.filter((c) => c.id !== id) });
   }
 
@@ -193,22 +208,23 @@ export default function EditPost() {
   const isContent = currIndex !== null && currIndex !== 'site';
 
   return (
-    <div className="w-full overflow-hidden h-screen flex items-stretch justify-between">
+    <div className="h-screen flex justify-between overflow-y-hidden">
       <ContentList
         site={site}
+        IdRef={IdRef}
         onCreate={onCreate}
         currIndex={currIndex}
         setCurrIndex={setCurrIndex}
         checkIfSaved={checkIfSaved}
         onSignOut={onSignOut}
       />
-      <div className="md:mt-4 flex-1 items-stretch max-w-3xl mb-4">
+      <div className="flex-1 max-w-3xl overflow-y-hidden">
         {isContent && (
           <>
             <ContentToolbar isSaved={isSaved} url={site.url} slug={site.contents[currIndex].slug} />
-            <div className="overflow-auto">
+            <div className="overflow-y-auto">
               <Tiptap
-                initialContent={site.contents[currIndex].content}
+                initialContent={initialContent}
                 onChange={(content) => {
                   setIsSaved(false);
                   setContent(content);

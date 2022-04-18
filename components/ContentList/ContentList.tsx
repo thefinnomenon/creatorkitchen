@@ -1,10 +1,11 @@
 import { VscDiffAdded } from 'react-icons/vsc';
 import VisuallyHidden from '@reach/visually-hidden';
 import { Site } from '../../pages/home/dashboard';
+import { Ref } from 'react';
 
 type Props = {
   site: Site;
-  //setContent(content: Content): void;
+  IdRef: any;
   currIndex: string;
   setCurrIndex(index: string): void;
   checkIfSaved(): boolean;
@@ -15,9 +16,8 @@ type Props = {
 const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
-async function onSelect(site: Site, id: string, currIndex, setCurrIndex, checkIfSaved) {
+async function onSelect(site: Site, id: string, IdRef, setCurrIndex, checkIfSaved) {
   if (!checkIfSaved()) return;
-  console.log(currIndex);
 
   if (id === 'site') {
     setCurrIndex('site');
@@ -28,10 +28,12 @@ async function onSelect(site: Site, id: string, currIndex, setCurrIndex, checkIf
   if (index === -1) throw Error(`Failed to find ${id} in site contents`);
 
   setCurrIndex(index);
+  IdRef.current = id;
 }
 
 export default function ContentList({
   site,
+  IdRef,
   setCurrIndex,
   currIndex,
   checkIfSaved,
@@ -59,7 +61,7 @@ export default function ContentList({
         {site.contents.map((content, index) => (
           <div
             key={content.id}
-            onClick={() => onSelect(site, content.id, currIndex, setCurrIndex, checkIfSaved)}
+            onClick={() => onSelect(site, content.id, IdRef, setCurrIndex, checkIfSaved)}
             className={`overflow-y-auto cursor-pointer p-4 hover:bg-gray-300 ${
               currIndex !== null && Number(currIndex) === index ? 'text-blue-600 bg-gray-300' : ''
             }`}

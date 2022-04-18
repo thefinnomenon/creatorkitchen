@@ -15,7 +15,7 @@ const initialState = Object.freeze({});
 export default function ContentToolbar({ isSaved, url, slug }: Props): JSX.Element {
   const [isPublishing, setIsPublishing] = useState(false);
   return (
-    <div className="flex items-center justify-between px-4 pb-2">
+    <div className="flex-1 flex items-center justify-between p-3">
       {isSaved ? <p className="text-gray-400">Saved</p> : <div />}
       <div className="flex items-stretch">
         <a
