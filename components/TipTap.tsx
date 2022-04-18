@@ -72,7 +72,7 @@ export default function Tiptap({ initialContent, onChange, preview }) {
   const textToolbar = useRef<MenuState>('show');
 
   const editorClass =
-    'p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor whitespace-pre-wrap break-words';
+    'p-6 prose prose-md md:prose-lg lg:prose-xl xl:prose-2xl focus:outline-none center-editor whitespace-pre-wrap break-words overflow-scroll';
 
   const LinkWithShortcut = Link.extend({
     // @ts-ignore

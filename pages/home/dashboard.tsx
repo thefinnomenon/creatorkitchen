@@ -222,15 +222,13 @@ export default function EditPost() {
         {isContent && (
           <>
             <ContentToolbar isSaved={isSaved} url={site.url} slug={site.contents[currIndex].slug} />
-            <div className="overflow-y-auto">
-              <Tiptap
-                initialContent={initialContent}
-                onChange={(content) => {
-                  setIsSaved(false);
-                  setContent(content);
-                }}
-              />
-            </div>
+            <Tiptap
+              initialContent={initialContent}
+              onChange={(content) => {
+                setIsSaved(false);
+                setContent(content);
+              }}
+            />
           </>
         )}
       </div>
