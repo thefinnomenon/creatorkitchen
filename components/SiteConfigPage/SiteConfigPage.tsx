@@ -49,7 +49,7 @@ export default function SiteConfigPage({ site, setSite }: Props): JSX.Element {
       }
     }
     checkSubdomain();
-  }, [debouncedSubdomain]);
+  }, [site.id, debouncedSubdomain]);
 
   async function verifyDomain(domain: string) {
     if (domain.length > 0) {

@@ -109,9 +109,6 @@ export default function EditPost() {
     // The autosave was cleared so do nothing
     if (isSaved) return;
 
-    console.log('Autosave content, ', debouncedContent);
-    console.log(site.id, site.contents[currIndex].title);
-
     (await API.graphql({
       query: updateContent,
       variables: {

@@ -3,9 +3,9 @@
 import { Amplify, withSSRContext } from 'aws-amplify';
 import config from '../../../aws-exports.js';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { GetSiteQuery, UpdateSiteMutation } from '../../../graphql/API';
+import { GetSiteQuery, SiteByCustomDomainQuery, UpdateSiteMutation } from '../../../graphql/API';
 import { updateSite } from '../../../graphql/mutations';
-import { getSite } from '../../../graphql/queries';
+import { getSite, siteByCustomDomain } from '../../../graphql/queries';
 
 // Amplify SSR configuration needs to be done within each API route
 Amplify.configure({ ...config, ssr: true });
@@ -48,6 +48,9 @@ export async function createDomain(req: NextApiRequest, res: NextApiResponse): P
 
   console.log(`Create Domain ${domain}`);
 
+  // Custom domain cannot include the service domain
+  if (domain.includes(process.env.DOMAIN)) return res.status(403).end();
+
   if (Array.isArray(domain) || Array.isArray(siteId))
     return res.status(400).end('Bad request. Query parameters are not valid.');
 
@@ -61,6 +64,7 @@ export async function createDomain(req: NextApiRequest, res: NextApiResponse): P
   }
 
   try {
+    // CHECK that site exists, user is owner, and if already has custom domain
     const { data } = (await API.graphql({
       query: getSite,
       variables: {
@@ -89,6 +93,21 @@ export async function createDomain(req: NextApiRequest, res: NextApiResponse): P
     } else {
       console.log('Site does not have custom domain set');
     }
+
+    // CHECK if domain is already in use
+    if (!domain) {
+      const siteByDomainRes = (await API.graphql({
+        query: siteByCustomDomain,
+        variables: {
+          customDomain: domain,
+        },
+      })) as { data: SiteByCustomDomainQuery; errors: any[] };
+
+      if (siteByDomainRes.data.siteByCustomDomain.items.length !== 0)
+        return res.status(400).json({
+          message: 'Domain in use',
+        });
+    }
   } catch (e) {
     console.log(e);
   }
@@ -115,27 +134,27 @@ export async function createDomain(req: NextApiRequest, res: NextApiResponse): P
 
     console.log(`Created entry for ${domain}`);
 
-    // www redirect
-    const response2 = await fetch(`https://api.vercel.com/v8/projects/${process.env.VERCEL_PROJECT_ID}/domains`, {
-      body: `{\n  "name": "www.${domain}",\n  "redirect": "${domain}", \n  "redirectStatusCode": 308\n}`,
-      headers: {
-        Authorization: `Bearer ${process.env.VERCEL_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      method: HttpMethod.POST,
-    });
+    // add www redirect
+    // const response2 = await fetch(`https://api.vercel.com/v8/projects/${process.env.VERCEL_PROJECT_ID}/domains`, {
+    //   body: `{\n  "name": "www.${domain}",\n  "redirect": "${domain}", \n  "redirectStatusCode": 308\n}`,
+    //   headers: {
+    //     Authorization: `Bearer ${process.env.VERCEL_API_KEY}`,
+    //     'Content-Type': 'application/json',
+    //   },
+    //   method: HttpMethod.POST,
+    // });
 
-    const data2 = await response2.json();
+    // const data2 = await response2.json();
 
-    if (response2.status === 400) return res.status(400).end();
+    // if (response2.status === 400) return res.status(400).end();
 
-    // Domain is already owned by another team but you can request delegation to access it
-    if (data2.error?.code === 'forbidden') return res.status(403).end();
+    // // Domain is already owned by another team but you can request delegation to access it
+    // if (data2.error?.code === 'forbidden') return res.status(403).end();
 
-    // Domain is already being used by a different project
-    if (data2.error?.code === 'domain_taken') return res.status(409).end();
+    // // Domain is already being used by a different project
+    // if (data2.error?.code === 'domain_taken') return res.status(409).end();
 
-    console.log(`Created entry and redirect for www.${domain}`);
+    // console.log(`Created entry and redirect for www.${domain}`);
 
     // Domain is successfully added, update site
     try {
@@ -222,17 +241,17 @@ export async function deleteDomain(req: NextApiRequest, res: NextApiResponse): P
 
   try {
     // Remove www redirect
-    const response = await fetch(
-      `https://api.vercel.com/v8/projects/${process.env.VERCEL_PROJECT_ID}/domains/www.${domain}`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.VERCEL_API_KEY}`,
-        },
-        method: HttpMethod.DELETE,
-      }
-    );
+    // const response = await fetch(
+    //   `https://api.vercel.com/v8/projects/${process.env.VERCEL_PROJECT_ID}/domains/www.${domain}`,
+    //   {
+    //     headers: {
+    //       Authorization: `Bearer ${process.env.VERCEL_API_KEY}`,
+    //     },
+    //     method: HttpMethod.DELETE,
+    //   }
+    // );
 
-    console.log('Removed www redirect');
+    // console.log('Removed www redirect');
 
     const response2 = await fetch(
       `https://api.vercel.com/v8/projects/${process.env.VERCEL_PROJECT_ID}/domains/${domain}`,

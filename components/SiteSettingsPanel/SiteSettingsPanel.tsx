@@ -17,7 +17,15 @@ type Props = {
 const defaultProps = Object.freeze({});
 const initialState = Object.freeze({});
 
+const PROTOCOL = process.env.NEXT_PUBLIC_PROTOCOL;
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
+
 async function onSave(site: Site, setSite, values) {
+  // HACK: customDomain is index. Using '-1' as null.
+  const customDomain = !values.domain ? '-1' : values.domain;
+  values.customDomain = values.domain;
+  delete values.domain;
+
   try {
     (await API.graphql({
       query: updateSite,
@@ -25,6 +33,7 @@ async function onSave(site: Site, setSite, values) {
         input: {
           id: site.id,
           ...values,
+          customDomain,
         },
       },
       authMode: 'AMAZON_COGNITO_USER_POOLS',
@@ -37,8 +46,22 @@ async function onSave(site: Site, setSite, values) {
   }
 }
 
+const saveDomain = async (site, domain) => {
+  if (domain === site.customDomain) return true;
+
+  try {
+    const response = await fetch(`${PROTOCOL}${ROOT_DOMAIN}/api/domain?domain=${domain}&siteId=${site.id}`, {
+      method: 'POST',
+    });
+    return response.status === 200;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
+};
+
 const isSubdomainAvailable = async (subdomain: string, currentSubdomain: string) => {
-  if (subdomain.length === 0) return false;
+  if (!subdomain) return false;
   if (subdomain === currentSubdomain) return true;
 
   try {
@@ -55,21 +78,17 @@ const isSubdomainAvailable = async (subdomain: string, currentSubdomain: string)
   }
 };
 
-const verifyDomain = async (domain: string, setIsDomainVerified) => {
-  if (domain.length > 0) {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_PROTOCOL}${process.env.NEXT_PUBLIC_DOMAIN}/api/domain/check?domain=${domain}`
-      );
-      console.log(response);
-      const data = await response.json();
-      console.log(data);
-      if (data) setIsDomainVerified(true);
-      else setIsDomainVerified(false);
-    } catch (e) {
-      setIsDomainVerified(false);
-      console.error(e);
-    }
+const isDomainVerified = async (domain: string) => {
+  if (!domain) return true;
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_PROTOCOL}${process.env.NEXT_PUBLIC_DOMAIN}/api/domain/check?domain=${domain}`
+    );
+    return await response.json();
+  } catch (e) {
+    console.error(e);
+    return false;
   }
 };
 
@@ -77,25 +96,26 @@ type Inputs = {
   title: string;
   description: string;
   subdomain: string;
-  //domain: string;
+  domain: string;
 };
 
 export default function SiteSettingsPanel(props: Props): JSX.Element {
   const { site, setSite } = props;
   const [isSaving, setIsSaving] = useState(false);
-  const [isDomainVerified, setIsDomainVerified] = useState(true);
 
   const debouncedIsSubdomainAvailable = useMemo(
     () => debouncePromise((value) => isSubdomainAvailable(value, site.subdomain), 200),
     [site.subdomain]
   );
 
+  const debouncedIsDomainVerified = useMemo(() => debouncePromise((value) => isDomainVerified(value), 200), []);
+
   const getDefaults = (site: Site) => {
     return {
       title: site.title,
       description: site.description,
       subdomain: site.subdomain,
-      //domain: site.customDomain,
+      domain: site.customDomain,
     };
   };
 
@@ -104,6 +124,7 @@ export default function SiteSettingsPanel(props: Props): JSX.Element {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
   } = useForm<Inputs>({
     defaultValues: getDefaults(site),
@@ -115,8 +136,14 @@ export default function SiteSettingsPanel(props: Props): JSX.Element {
     reset(getDefaults(site));
   }, [reset, site]);
 
-  const onSubmit: SubmitHandler<Inputs> = async (data, event) => {
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setIsSaving(true);
+    const createdDomain = await saveDomain(site, data.domain);
+    if (!createdDomain) {
+      setIsSaving(false);
+      setError('domain', { type: 'manual', message: 'This domain is not available' });
+      return;
+    }
     await onSave(site, setSite, data);
     setIsSaving(false);
   };
@@ -155,61 +182,89 @@ export default function SiteSettingsPanel(props: Props): JSX.Element {
             {...register('description', { required: false })}
           />
         </div>
-        <label htmlFor="Subdomain" className="text-gray-700 mt-0">
-          Subdomain
-        </label>
-        <div className="mb-4 mt-1">
-          <div
-            className={`flex rounded-lg flex-1 appearance-none border-gray-300 w-full text-gray-700 placeholder-gray-400 shadow-sm text-base focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent  ${
-              errors.subdomain && 'border border-red-500 focus-within:ring-red-500'
-            }`}
-          >
-            <input
-              className="w-full py-2 px-4 flex-shrink flex-grow flex-1 leading-normal border border-none rounded-l-lg focus:outline-none focus:ring-0 placeholder-gray-400"
-              id="subdomain"
-              spellCheck={false}
-              placeholder="mscott"
-              aria-invalid={errors.subdomain ? 'true' : 'false'}
-              {...register('subdomain', {
-                required: true,
-                validate: debouncedIsSubdomainAvailable,
-              })}
-            />
-            <span className="flex leading-normal border-grey-light px-3 whitespace-no-wrap text-grey-dark text-sm text-gray-500 bg-white items-center rounded-r-lg border-l border-gray-300">
-              .{process.env.NEXT_PUBLIC_DOMAIN}
-            </span>
+        <div className="mb-4">
+          <label htmlFor="Subdomain" className="text-gray-700 mt-0">
+            Subdomain
+          </label>
+          <div className="mt-1">
+            <div
+              className={`flex rounded-lg flex-1 appearance-none border-gray-300 w-full text-gray-700 placeholder-gray-400 shadow-sm text-base focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent  ${
+                errors.subdomain && 'border border-red-500 focus-within:ring-red-500'
+              }`}
+            >
+              <input
+                className="w-full py-2 px-4 flex-shrink flex-grow flex-1 leading-normal border border-none rounded-l-lg focus:outline-none focus:ring-0 placeholder-gray-400"
+                id="subdomain"
+                spellCheck={false}
+                placeholder="mscott"
+                aria-invalid={errors.subdomain ? 'true' : 'false'}
+                {...register('subdomain', {
+                  required: true,
+                  validate: debouncedIsSubdomainAvailable,
+                })}
+              />
+              <span className="flex leading-normal border-grey-light px-3 whitespace-no-wrap text-grey-dark text-sm text-gray-500 bg-white items-center rounded-r-lg border-l border-gray-300">
+                .{process.env.NEXT_PUBLIC_DOMAIN}
+              </span>
+            </div>
+            {errors.subdomain && errors.subdomain.type === 'required' && (
+              <p role="alert" className="text-red-500 mt-1">
+                Subdomain is required
+              </p>
+            )}
+            {errors.subdomain && errors.subdomain.type === 'validate' && (
+              <p role="alert" className="text-red-500 mt-1">
+                {subdomain}.{process.env.NEXT_PUBLIC_DOMAIN} is not available.
+              </p>
+            )}
           </div>
-          {errors.subdomain && errors.subdomain.type === 'required' && (
-            <p role="alert" className="text-red-500 mt-1">
-              Subdomain is required
-            </p>
+        </div>
+        <div className="mb-4">
+          <label htmlFor="domain" className="text-gray-700">
+            Custom Domain
+          </label>
+          <input
+            id="domain"
+            spellCheck={false}
+            className={inputStyle(errors.domain)}
+            placeholder="creedthoughts.gov"
+            aria-invalid={errors.domain ? 'true' : 'false'}
+            {...register('domain', {
+              validate: debouncedIsDomainVerified,
+            })}
+          />
+          {errors.domain && errors.domain.type === 'validate' && (
+            <div role="alert" className="text-red-500 mt-1">
+              Failed to verify domain. <br />
+              Set the following records on your DNS provider:
+              <br />
+              <table className="text-left table-fixed w-full">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>A</td>
+                    <td>@</td>
+                    <td>76.76.21.21</td>
+                  </tr>
+                </tbody>
+              </table>
+              or, set the nameservers for this domain to: <br />
+              ns1.vercel-dns.com <br />
+              ns2.vercel-dns.com
+            </div>
           )}
-          {errors.subdomain && errors.subdomain.type === 'validate' && (
+          {errors.domain && errors.domain.type === 'manual' && (
             <p role="alert" className="text-red-500 mt-1">
-              {subdomain}.{process.env.NEXT_PUBLIC_DOMAIN} is not available.
+              {errors.domain.message}
             </p>
           )}
         </div>
-        {/* <div className="mb-4">
-            <label htmlFor="domain" className="text-gray-700">
-              Custom Domain
-            </label>
-            <input
-              id="domain"
-              spellCheck={false}
-              className={inputStyle(errors.domain)}
-              placeholder="creedthoughts.gov"
-              aria-invalid={errors.domain ? 'true' : 'false'}
-              {...register('domain', {
-                required: false,
-              })}
-            />
-            {errors.domain && errors.domain.type === 'required' && (
-              <p role="alert" className="text-red-500 mt-1">
-                Sorry, this domain is not available. Please choose another.
-              </p>
-            )}
-          </div> */}
       </div>
 
       <div className="flex flex-shrink-0 flex-grow-0 flex-auto p-4">
