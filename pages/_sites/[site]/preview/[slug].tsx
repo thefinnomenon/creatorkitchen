@@ -54,7 +54,7 @@ export default function Post({ post }: Props) {
 // - Retrieves content by querying contentBySiteAndSlug with site ID and @slug
 export async function getServerSideProps({ params: { site, slug } }) {
   const isCustomDomain = site.includes('.');
-  //console.log('Preview: ,', site, slug, isCustomDomain);
+  console.log('Preview: ,', site, slug, isCustomDomain);
   try {
     let siteObj;
     if (isCustomDomain) {
@@ -76,7 +76,7 @@ export async function getServerSideProps({ params: { site, slug } }) {
       if (!siteRes.data.siteBySubdomain.items[0]) return { notFound: true };
       siteObj = siteRes.data.siteBySubdomain.items[0];
     }
-    //console.log(site);
+    console.log(site);
     const { data } = (await API.graphql({
       query: contentBySiteAndSlug,
       variables: {
@@ -85,7 +85,7 @@ export async function getServerSideProps({ params: { site, slug } }) {
       },
     })) as { data: ContentBySiteAndSlugQuery; errors: any[] };
     if (!data.contentBySiteAndSlug.items[0]) return { notFound: true };
-    //console.log(data.contentBySiteAndSlug.items[0]);
+    console.log(data.contentBySiteAndSlug.items[0]);
 
     return {
       props: {

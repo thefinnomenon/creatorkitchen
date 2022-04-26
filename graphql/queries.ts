@@ -7,12 +7,33 @@ export const getContent = /* GraphQL */ `
     getContent(id: $id, siteID: $siteID) {
       id
       siteID
+      parentID
       slug
+      published {
+        items {
+          id
+          siteID
+          parentID
+          slug
+          author
+          title
+          description
+          content
+          media
+          status
+          originalCreatedAt
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       author
       title
       description
       content
       media
+      status
+      originalCreatedAt
       createdAt
       updatedAt
     }
@@ -38,12 +59,57 @@ export const listContents = /* GraphQL */ `
       items {
         id
         siteID
+        parentID
         slug
+        published {
+          nextToken
+        }
         author
         title
         description
         content
         media
+        status
+        originalCreatedAt
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const contentByParentID = /* GraphQL */ `
+  query ContentByParentID(
+    $parentID: ID!
+    $siteID: ModelIDKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelContentFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    contentByParentID(
+      parentID: $parentID
+      siteID: $siteID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        siteID
+        parentID
+        slug
+        published {
+          nextToken
+        }
+        author
+        title
+        description
+        content
+        media
+        status
+        originalCreatedAt
         createdAt
         updatedAt
       }
@@ -71,12 +137,18 @@ export const contentBySiteAndSlug = /* GraphQL */ `
       items {
         id
         siteID
+        parentID
         slug
+        published {
+          nextToken
+        }
         author
         title
         description
         content
         media
+        status
+        originalCreatedAt
         createdAt
         updatedAt
       }
@@ -97,12 +169,15 @@ export const getSite = /* GraphQL */ `
         items {
           id
           siteID
+          parentID
           slug
           author
           title
           description
           content
           media
+          status
+          originalCreatedAt
           createdAt
           updatedAt
         }

@@ -10,12 +10,33 @@ export const createContent = /* GraphQL */ `
     createContent(input: $input, condition: $condition) {
       id
       siteID
+      parentID
       slug
+      published {
+        items {
+          id
+          siteID
+          parentID
+          slug
+          author
+          title
+          description
+          content
+          media
+          status
+          originalCreatedAt
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       author
       title
       description
       content
       media
+      status
+      originalCreatedAt
       createdAt
       updatedAt
     }
@@ -29,12 +50,33 @@ export const updateContent = /* GraphQL */ `
     updateContent(input: $input, condition: $condition) {
       id
       siteID
+      parentID
       slug
+      published {
+        items {
+          id
+          siteID
+          parentID
+          slug
+          author
+          title
+          description
+          content
+          media
+          status
+          originalCreatedAt
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       author
       title
       description
       content
       media
+      status
+      originalCreatedAt
       createdAt
       updatedAt
     }
@@ -48,12 +90,33 @@ export const deleteContent = /* GraphQL */ `
     deleteContent(input: $input, condition: $condition) {
       id
       siteID
+      parentID
       slug
+      published {
+        items {
+          id
+          siteID
+          parentID
+          slug
+          author
+          title
+          description
+          content
+          media
+          status
+          originalCreatedAt
+          createdAt
+          updatedAt
+        }
+        nextToken
+      }
       author
       title
       description
       content
       media
+      status
+      originalCreatedAt
       createdAt
       updatedAt
     }
@@ -75,12 +138,15 @@ export const createSite = /* GraphQL */ `
         items {
           id
           siteID
+          parentID
           slug
           author
           title
           description
           content
           media
+          status
+          originalCreatedAt
           createdAt
           updatedAt
         }
@@ -107,12 +173,15 @@ export const updateSite = /* GraphQL */ `
         items {
           id
           siteID
+          parentID
           slug
           author
           title
           description
           content
           media
+          status
+          originalCreatedAt
           createdAt
           updatedAt
         }
@@ -139,12 +208,15 @@ export const deleteSite = /* GraphQL */ `
         items {
           id
           siteID
+          parentID
           slug
           author
           title
           description
           content
           media
+          status
+          originalCreatedAt
           createdAt
           updatedAt
         }

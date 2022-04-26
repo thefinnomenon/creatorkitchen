@@ -1,4 +1,4 @@
-import { Content, ListContentsQuery } from './API';
+import { Content, ContentStatus, ListContentsQuery } from './API';
 
 export const siteByUsernameWithContents = /* GraphQL */ `
   query SiteByUsernameWithContents(
@@ -34,6 +34,18 @@ export const siteByUsernameWithContents = /* GraphQL */ `
             updatedAt
             createdAt
             description
+            status
+            published {
+              items {
+                id
+                siteID
+                slug
+                createdAt
+                updatedAt
+                status
+              }
+              nextToken
+            }
           }
         }
         createdAt
@@ -43,6 +55,38 @@ export const siteByUsernameWithContents = /* GraphQL */ `
     }
   }
 `;
+
+export type ContentAndPublishedBySiteAndSlugQuery = {
+  contentBySiteAndSlug?: {
+    __typename: 'ModelContentConnection';
+    items: Array<{
+      __typename: 'Content';
+      id: string;
+      siteID: string;
+      slug: string;
+      published?: {
+        items: Array<{
+          __typename: 'Content';
+          id: string;
+          siteID: string;
+          slug: string;
+          status: ContentStatus;
+          createdAt: string;
+          updatedAt: string;
+        } | null>;
+      };
+      author?: string | null;
+      title?: string | null;
+      description?: string | null;
+      content?: string | null;
+      media?: string | null;
+      status?: ContentStatus | null;
+      createdAt: string;
+      updatedAt: string;
+    } | null>;
+    nextToken?: string | null;
+  } | null;
+};
 
 export type ListSitesWithContentQuery = {
   listSites?: {
@@ -58,6 +102,18 @@ export type ListSitesWithContentQuery = {
           __typename: 'Content';
           id: string;
           siteID: string;
+          published?: {
+            items: Array<{
+              __typename: 'Content';
+              id: string;
+              siteID: string;
+              slug: string;
+              createdAt: string;
+              updatedAt: string;
+              status: ContentStatus;
+            } | null>;
+          };
+          status: ContentStatus;
           slug: string;
           author?: string | null;
           title?: string | null;
@@ -95,8 +151,76 @@ export const ListSitesWithContents = /* GraphQL */ `
             updatedAt
             createdAt
             description
+            status
+            published {
+              nextToken
+              items {
+                id
+                siteID
+                slug
+                author
+                title
+                description
+                content
+                media
+                status
+                createdAt
+                updatedAt
+              }
+            }
           }
         }
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+
+export const contentAndPublishedBySiteAndSlug = /* GraphQL */ `
+  query ContentAndPublishedBySiteAndSlug(
+    $slug: String!
+    $siteID: ModelIDKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelContentFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    contentBySiteAndSlug(
+      slug: $slug
+      siteID: $siteID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        siteID
+        slug
+        published {
+          nextToken
+          items {
+            id
+            siteID
+            slug
+            author
+            title
+            description
+            content
+            media
+            status
+            createdAt
+            updatedAt
+          }
+        }
+        author
+        title
+        description
+        content
+        media
+        status
         createdAt
         updatedAt
       }

@@ -1,6 +1,13 @@
 import { Amplify, withSSRContext } from 'aws-amplify';
 import config from '../../aws-exports.js';
-import { ContentBySiteAndSlugQuery, SiteByCustomDomainQuery, SiteBySubdomainQuery } from '../../graphql/API';
+import {
+  ContentBySiteAndSlugQuery,
+  ContentStatus,
+  CreateContentMutation,
+  SiteByCustomDomainQuery,
+  SiteBySubdomainQuery,
+} from '../../graphql/API';
+import { createContent } from '../../graphql/mutations';
 import { contentBySiteAndSlug, siteByCustomDomain, siteBySubdomain } from '../../graphql/queries';
 
 // Amplify SSR configuration needs to be done within each API route
@@ -27,11 +34,7 @@ export default async function handler(req, res) {
   // else, hostname is the custom domain
   let domain, subdomain;
   if (hostname.includes(process.env.DOMAIN)) {
-    // Get subdomain (e.g. <currentHost>.domain.com)
-    let subdomain = hostname.replace(process.env.DOMAIN, '');
-
-    // Remove trailing .
-    if (subdomain) subdomain = subdomain.slice(0, -1);
+    subdomain = hostname.replace(process.env.DOMAIN, '').slice(0, -1);
   } else {
     domain = hostname;
   }
@@ -67,6 +70,8 @@ export default async function handler(req, res) {
       siteObj = siteRes.data.siteBySubdomain.items[0];
     }
 
+    console.log(siteObj);
+
     const { data } = (await API.graphql({
       query: contentBySiteAndSlug,
       variables: {
@@ -74,17 +79,45 @@ export default async function handler(req, res) {
         slug,
       },
     })) as { data: ContentBySiteAndSlugQuery; errors: any[] };
-    if (!data.contentBySiteAndSlug.items[0]) return { notFound: true };
+    if (!data.contentBySiteAndSlug.items[0])
+      return new Response(null, {
+        status: 404,
+        statusText: 'Failed to find content',
+      });
 
     if (data.contentBySiteAndSlug.items[0].author !== user.username)
       return new Response(null, {
         status: 401,
         statusText: 'User is not authorized to publish',
       });
+
+    const draft = data.contentBySiteAndSlug.items[0];
+    console.log(draft);
+    const originalCreatedAt = draft.createdAt;
+    const draftID = draft.id;
+    delete draft.id;
+    delete draft.published;
+    delete draft.createdAt;
+    delete draft.updatedAt;
+
+    const createRes = (await API.graphql({
+      query: createContent,
+      variables: {
+        input: {
+          ...draft,
+          parentID: draftID,
+          status: ContentStatus.PUBLISHED,
+          originalCreatedAt,
+        },
+      },
+      authMode: 'AMAZON_COGNITO_USER_POOLS',
+    })) as { data: CreateContentMutation; errors: any[] };
+    console.log(createRes.data.createContent);
   } catch (error) {
+    console.log(error);
     return new Response(null, {
-      status: 404,
-      statusText: 'Content not found',
+      status: 500,
+      statusText: 'Failed to publish',
     });
   }
 

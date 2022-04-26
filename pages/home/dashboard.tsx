@@ -17,6 +17,7 @@ import {
   DeleteContentMutation,
   SiteByUsernameWithContentsQuery,
   UpdateContentMutation,
+  ContentStatus,
 } from '../../graphql/API';
 import { siteByUsernameWithContents } from '../../graphql/customStatements';
 import ContentToolbar from '../../components/ContentToolbar';
@@ -75,11 +76,15 @@ export default function EditPost() {
         input: {
           slug: uuidv4(),
           siteID: site.id,
+          status: ContentStatus.DRAFT,
+          // NOTE: This can't be null since it is used as an index
+          parentID: '-1',
         },
       },
       authMode: 'AMAZON_COGNITO_USER_POOLS',
     })) as { data: CreateContentMutation; errors: any[] };
 
+    // @ts-ignore
     setSite({ ...site, contents: [data.createContent, ...site.contents] });
     setCurrIndex('0');
     IdRef.current = data.createContent.id;
@@ -149,6 +154,9 @@ export default function EditPost() {
       // HACK: '-1' is the same as no domain, since it is a index I can't set it to null
       site.customDomain = site.customDomain === '-1' ? '' : site.customDomain;
 
+      // Only show drafts
+      site.contents.items = site.contents.items.filter((content) => content.status !== ContentStatus.PUBLISHED);
+
       // Sort content alphabetically by title (this has the added bonus of floating untitled ('') to the top)
       site.contents.items.sort((a, b) => (a.title > b.title ? 1 : -1));
 
@@ -159,6 +167,7 @@ export default function EditPost() {
       s.url = getSiteUrl(site);
 
       // Simplify the contents path
+      // @ts-ignore
       s.contents = site.contents.items;
 
       setSite(s);

@@ -6,8 +6,14 @@ import {
   siteBySubdomain,
   siteByCustomDomain,
   getSite,
+  contentByParentID,
 } from '../../../../graphql/queries';
-import { ListSitesWithContentQuery, ListSitesWithContents } from '../../../../graphql/customStatements';
+import {
+  contentAndPublishedBySiteAndSlug,
+  ContentAndPublishedBySiteAndSlugQuery,
+  ListSitesWithContentQuery,
+  ListSitesWithContents,
+} from '../../../../graphql/customStatements';
 import Amplify from 'aws-amplify';
 import config from '../../../../aws-exports';
 Amplify.configure(config);
@@ -19,6 +25,8 @@ import {
   SiteBySubdomainQuery,
   SiteByCustomDomainQuery,
   GetSiteQuery,
+  ContentStatus,
+  ContentByParentIDQuery,
 } from '../../../../graphql/API';
 
 type PostType = {
@@ -64,9 +72,9 @@ export default function Post({ post }: Props) {
 
 // At build time, resolve domain to site and get content for siteID, slug combo
 export async function getStaticProps({ params: { site, slug } }) {
-  //console.log('GET STATIC PROPS');
+  console.log('GET STATIC PROPS');
   const isCustomDomain = site.includes('.');
-  //console.log(site, slug, isCustomDomain);
+  console.log(site, slug, isCustomDomain);
   try {
     let siteObj;
     if (isCustomDomain) {
@@ -88,20 +96,38 @@ export async function getStaticProps({ params: { site, slug } }) {
       if (!siteRes.data.siteBySubdomain.items[0]) return { notFound: true };
       siteObj = siteRes.data.siteBySubdomain.items[0];
     }
-    //console.log(site);
-    const { data } = (await API.graphql({
-      query: contentBySiteAndSlug,
+    console.log(site);
+    const draftRes = (await API.graphql({
+      query: contentAndPublishedBySiteAndSlug,
       variables: {
         siteID: { eq: siteObj.id },
         slug,
       },
-    })) as { data: ContentBySiteAndSlugQuery; errors: any[] };
-    if (!data.contentBySiteAndSlug.items[0]) return { notFound: true };
-    //console.log(data.contentBySiteAndSlug.items[0]);
+    })) as { data: ContentAndPublishedBySiteAndSlugQuery; errors: any[] };
+    if (!draftRes.data.contentBySiteAndSlug.items[0]) return { notFound: true };
+
+    console.log('DRAFT, ', draftRes.data.contentBySiteAndSlug.items[0]);
+
+    const { data } = (await API.graphql({
+      query: contentByParentID,
+      variables: {
+        siteID: { eq: siteObj.id },
+        parentID: draftRes.data.contentBySiteAndSlug.items[0].id,
+      },
+    })) as { data: ContentByParentIDQuery; errors: any[] };
+    if (!data.contentByParentID.items[0]) return { notFound: true };
+
+    console.log(data.contentByParentID.items);
+    // Filter out draft
+    // const publishedVersions = publishedVersionsItems.items.filter(
+    //   (published) => published.status === ContentStatus.PUBLISHED
+    // );
+    // Sort by updatedAt so we can build the newest published version
+    data.contentByParentID.items.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
 
     return {
       props: {
-        post: data.contentBySiteAndSlug.items[0],
+        post: data.contentByParentID.items[0],
       },
     };
   } catch (error) {
@@ -130,8 +156,6 @@ export async function getStaticPaths() {
       });
       return arr;
     }, []);
-
-    //console.log(paths);
 
     return { paths, fallback: 'blocking' };
   } catch (error) {

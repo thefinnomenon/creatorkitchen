@@ -1,3 +1,8 @@
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+}
+
 type Content 
   @model
   @auth(rules: [
@@ -6,12 +11,16 @@ type Content
   ]) {
   id: ID! @primaryKey(sortKeyFields: ["siteID"])
   siteID: ID! @index(name: "bySite")
+  parentID: ID! @index(name: "byParent", queryField: "contentByParentID", sortKeyFields: ["siteID"])
   slug: String! @index(name: "contentBySiteAndSlug", queryField: "contentBySiteAndSlug", sortKeyFields: ["siteID"])
+  published: [Content] @hasMany(indexName: "byParent", fields: ["parentID"])
   author: String
   title: String
   description: String
   content: String
   media: AWSJSON
+  status: ContentStatus
+  originalCreatedAt: AWSDateTime
 }
 
 # TODO: Ensure subdomain and domain are unique in update
