@@ -72,9 +72,9 @@ export default function Post({ post }: Props) {
 
 // At build time, resolve domain to site and get content for siteID, slug combo
 export async function getStaticProps({ params: { site, slug } }) {
-  console.log('GET STATIC PROPS');
+  //console.log('GET STATIC PROPS');
   const isCustomDomain = site.includes('.');
-  console.log(site, slug, isCustomDomain);
+  //console.log(site, slug, isCustomDomain);
   try {
     let siteObj;
     if (isCustomDomain) {
@@ -96,7 +96,7 @@ export async function getStaticProps({ params: { site, slug } }) {
       if (!siteRes.data.siteBySubdomain.items[0]) return { notFound: true };
       siteObj = siteRes.data.siteBySubdomain.items[0];
     }
-    console.log(site);
+    //console.log(site);
     const draftRes = (await API.graphql({
       query: contentAndPublishedBySiteAndSlug,
       variables: {
@@ -106,7 +106,7 @@ export async function getStaticProps({ params: { site, slug } }) {
     })) as { data: ContentAndPublishedBySiteAndSlugQuery; errors: any[] };
     if (!draftRes.data.contentBySiteAndSlug.items[0]) return { notFound: true };
 
-    console.log('DRAFT, ', draftRes.data.contentBySiteAndSlug.items[0]);
+    //console.log('DRAFT, ', draftRes.data.contentBySiteAndSlug.items[0]);
 
     const { data } = (await API.graphql({
       query: contentByParentID,
@@ -117,12 +117,8 @@ export async function getStaticProps({ params: { site, slug } }) {
     })) as { data: ContentByParentIDQuery; errors: any[] };
     if (!data.contentByParentID.items[0]) return { notFound: true };
 
-    console.log(data.contentByParentID.items);
-    // Filter out draft
-    // const publishedVersions = publishedVersionsItems.items.filter(
-    //   (published) => published.status === ContentStatus.PUBLISHED
-    // );
-    // Sort by updatedAt so we can build the newest published version
+    //console.log(data.contentByParentID.items);
+
     data.contentByParentID.items.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
 
     return {

@@ -112,7 +112,7 @@ export default async function handler(req, res) {
       },
       authMode: 'AMAZON_COGNITO_USER_POOLS',
     })) as { data: CreateContentMutation; errors: any[] };
-    console.log(createRes.data.createContent);
+    //console.log(createRes.data.createContent);
   } catch (error) {
     console.log(error);
     return new Response(null, {
@@ -130,7 +130,7 @@ export default async function handler(req, res) {
     // Rebuild the page to publish the new updates
     // This API is called with the current domain (e.g. chris.creatorkitchen.net/publish?...),
     // so the proper routing will happen automatically
-    console.log(`[Next.js] Revalidating /posts/${slug}`);
+    //console.log(`[Next.js] Revalidating /posts/${slug}`);
     await res.unstable_revalidate(`/posts/${slug}`);
     return res.json({ revalidated: true });
   } catch (err) {
