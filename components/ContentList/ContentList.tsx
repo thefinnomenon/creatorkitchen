@@ -1,10 +1,11 @@
 import { VscDiffAdded } from 'react-icons/vsc';
 import VisuallyHidden from '@reach/visually-hidden';
-import { Site } from '../../pages/home/dashboard';
+import { Author, Site } from '../../pages/home/dashboard';
 import { Ref } from 'react';
 
 type Props = {
   site: Site;
+  author: Author;
   IdRef: any;
   currIndex: string;
   setCurrIndex(index: string): void;
@@ -24,6 +25,11 @@ async function onSelect(site: Site, id: string, IdRef, setCurrIndex, checkIfSave
     return;
   }
 
+  if (id === 'author') {
+    setCurrIndex('author');
+    return;
+  }
+
   const index = site.contents.findIndex((c) => c.id === id);
   if (index === -1) throw Error(`Failed to find ${id} in site contents`);
 
@@ -33,6 +39,7 @@ async function onSelect(site: Site, id: string, IdRef, setCurrIndex, checkIfSave
 
 export default function ContentList({
   site,
+  author,
   IdRef,
   setCurrIndex,
   currIndex,
@@ -47,6 +54,21 @@ export default function ContentList({
         <button onClick={() => onCreate()} className="p-2 pt-3">
           <VisuallyHidden>Create new content</VisuallyHidden>
           <VscDiffAdded className="text-4xl text-gray-500 hover:text-blue-500" />
+        </button>
+      </div>
+      <div>
+        <button
+          className={` text-gray-500 hover:text-blue-500 ${currIndex === 'author' && 'text-blue-500'}`}
+          onClick={() => onSelect(site, 'author', currIndex, setCurrIndex, checkIfSaved)}
+        >
+          <h2 className="text-md font-semibold tracking-wide mb-4 pt-4 pl-4 ">
+            <img
+              src={author.avatarUrl || 'default-avatar.png'}
+              className={`inline-block align-middle w-8 h-8 rounded-full mr-4`}
+              alt="avatar"
+            />
+            {author.name}
+          </h2>
         </button>
       </div>
       <div>

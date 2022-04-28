@@ -30,12 +30,12 @@ export type StorageProgress = {
 };
 
 // Upload @file to S3 bucket with unique Id and update @setUploadProgress with current progress
-export const uploadFile = async (file, setUploadProgress = (p) => {}) => {
+export const uploadFile = async (file, setUploadProgress = (p) => {}, useUserID = false) => {
   try {
     const user = await Auth.currentAuthenticatedUser();
     const ext = file.name.match(/\.[0-9a-z]+$/i)[0];
     if (!ext) throw Error('Invalid filename');
-    const fileName = `${uuidv4()}${ext}`;
+    const fileName = `${useUserID ? user.username : uuidv4()}${ext}`;
 
     const res = await Storage.put(fileName, file, {
       progressCallback(progress: StorageProgress) {

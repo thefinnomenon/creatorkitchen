@@ -14,13 +14,26 @@ type Content
   parentID: ID! @index(name: "byParent", queryField: "contentByParentID", sortKeyFields: ["siteID"])
   slug: String! @index(name: "contentBySiteAndSlug", queryField: "contentBySiteAndSlug", sortKeyFields: ["siteID"])
   published: [Content] @hasMany(indexName: "byParent", fields: ["parentID"])
-  author: String
+  author: Author! @hasOne
   title: String
   description: String
   content: String
   media: AWSJSON
   status: ContentStatus
   originalCreatedAt: AWSDateTime
+}
+
+type Author
+  @model
+  @auth(rules: [
+    { allow: owner, ownerField: "username" },
+    { allow: public, operations: [read] }
+  ]) {
+  id: ID!
+  avatarUrl: String!
+  name: String!
+  bio: String!
+  links: AWSJSON
 }
 
 # TODO: Ensure subdomain and domain are unique in update

@@ -25,7 +25,6 @@ export const siteByUsernameWithContents = /* GraphQL */ `
         contents {
           nextToken
           items {
-            author
             id
             content
             title
@@ -142,7 +141,6 @@ export const ListSitesWithContents = /* GraphQL */ `
         contents {
           nextToken
           items {
-            author
             id
             content
             title
@@ -158,7 +156,6 @@ export const ListSitesWithContents = /* GraphQL */ `
                 id
                 siteID
                 slug
-                author
                 title
                 description
                 content
@@ -205,7 +202,13 @@ export const contentAndPublishedBySiteAndSlug = /* GraphQL */ `
             id
             siteID
             slug
-            author
+            author {
+              id
+              avatarUrl
+              name
+              bio
+              links
+            }
             title
             description
             content
@@ -215,7 +218,13 @@ export const contentAndPublishedBySiteAndSlug = /* GraphQL */ `
             updatedAt
           }
         }
-        author
+        author {
+          id
+          avatarUrl
+          name
+          bio
+          links
+        }
         title
         description
         content

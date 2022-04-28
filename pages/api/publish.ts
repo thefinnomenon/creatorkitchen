@@ -39,7 +39,7 @@ export default async function handler(req, res) {
     domain = hostname;
   }
 
-  console.log(domain, subdomain);
+  //console.log(domain, subdomain);
 
   let user;
   try {
@@ -70,7 +70,7 @@ export default async function handler(req, res) {
       siteObj = siteRes.data.siteBySubdomain.items[0];
     }
 
-    console.log(siteObj);
+    //console.log(siteObj);
 
     const { data } = (await API.graphql({
       query: contentBySiteAndSlug,
@@ -79,27 +79,30 @@ export default async function handler(req, res) {
         slug,
       },
     })) as { data: ContentBySiteAndSlugQuery; errors: any[] };
+    //console.log(data.contentBySiteAndSlug.items);
     if (!data.contentBySiteAndSlug.items[0])
       return new Response(null, {
         status: 404,
         statusText: 'Failed to find content',
       });
 
-    if (data.contentBySiteAndSlug.items[0].author !== user.username)
+    if (data.contentBySiteAndSlug.items[0].author.id !== user.username)
       return new Response(null, {
         status: 401,
         statusText: 'User is not authorized to publish',
       });
 
     const draft = data.contentBySiteAndSlug.items[0];
-    console.log(draft);
+    //console.log(draft);
     const originalCreatedAt = draft.createdAt;
     const draftID = draft.id;
     delete draft.id;
     delete draft.published;
     delete draft.createdAt;
     delete draft.updatedAt;
+    delete draft.author;
 
+    //console.log(user);
     const createRes = (await API.graphql({
       query: createContent,
       variables: {
@@ -108,11 +111,12 @@ export default async function handler(req, res) {
           parentID: draftID,
           status: ContentStatus.PUBLISHED,
           originalCreatedAt,
+          contentAuthorId: user.username,
         },
       },
       authMode: 'AMAZON_COGNITO_USER_POOLS',
     })) as { data: CreateContentMutation; errors: any[] };
-    //console.log(createRes.data.createContent);
+    console.log(createRes.data.createContent);
   } catch (error) {
     console.log(error);
     return new Response(null, {

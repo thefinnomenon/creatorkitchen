@@ -18,10 +18,14 @@ import {
   SiteByUsernameWithContentsQuery,
   UpdateContentMutation,
   ContentStatus,
+  Author as AuthorBasic,
+  GetAuthorQuery,
 } from '../../graphql/API';
 import { siteByUsernameWithContents } from '../../graphql/customStatements';
 import ContentToolbar from '../../components/ContentToolbar';
 import SiteSettingsPanel from '../../components/SiteSettingsPanel';
+import { getAuthor } from '../../graphql/queries';
+import AuthorPanel from '../../components/AuthorPanel';
 
 const UPDATE_DEBOUNCE = 2000;
 const PROTOCOL = process.env.NEXT_PUBLIC_PROTOCOL;
@@ -35,6 +39,10 @@ export interface Site extends Omit<SiteBasic, 'contents'> {
   contents: Content[];
 }
 
+export interface Author extends Omit<AuthorBasic, 'links'> {
+  links: { email?: string; twitter?: string };
+}
+
 type Props = {} & typeof defaultProps;
 
 const defaultProps = Object.freeze({});
@@ -43,6 +51,7 @@ const initialState = Object.freeze({});
 export default function EditPost() {
   const router = useRouter();
   const [site, setSite] = useState<Site>();
+  const [author, setAuthor] = useState<Author>();
   const [currIndex, setCurrIndex] = useState(null);
   const [initialContent, setInitialContent] = useState('');
   const [content, setContent] = useState('');
@@ -70,24 +79,30 @@ export default function EditPost() {
   async function onCreate() {
     if (!checkIfSaved()) return;
 
-    const { data } = (await API.graphql({
-      query: createContent,
-      variables: {
-        input: {
-          slug: uuidv4(),
-          siteID: site.id,
-          status: ContentStatus.DRAFT,
-          // NOTE: This can't be null since it is used as an index
-          parentID: '-1',
+    try {
+      const { username } = await Auth.currentAuthenticatedUser();
+      const { data } = (await API.graphql({
+        query: createContent,
+        variables: {
+          input: {
+            slug: uuidv4(),
+            siteID: site.id,
+            status: ContentStatus.DRAFT,
+            // NOTE: This can't be null since it is used as an index
+            parentID: '-1',
+            contentAuthorId: author.id,
+          },
         },
-      },
-      authMode: 'AMAZON_COGNITO_USER_POOLS',
-    })) as { data: CreateContentMutation; errors: any[] };
+        authMode: 'AMAZON_COGNITO_USER_POOLS',
+      })) as { data: CreateContentMutation; errors: any[] };
 
-    // @ts-ignore
-    setSite({ ...site, contents: [data.createContent, ...site.contents] });
-    setCurrIndex('0');
-    IdRef.current = data.createContent.id;
+      // @ts-ignore
+      setSite({ ...site, contents: [data.createContent, ...site.contents] });
+      setCurrIndex('0');
+      IdRef.current = data.createContent.id;
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   // When debouncedContent updates, autosave
@@ -136,7 +151,7 @@ export default function EditPost() {
     setIsSaved(true);
   }
 
-  // LOAD USER SITE ON LOAD
+  // LOAD USER SITE AND AUTHOR ON LOAD
   useEffect(() => {
     async function fetchSite() {
       const { username } = await Auth.currentAuthenticatedUser();
@@ -147,6 +162,17 @@ export default function EditPost() {
       const site = data.siteByUsername.items[0];
 
       if (!site) {
+        router.push('/');
+        return;
+      }
+
+      const { data: authorData } = (await API.graphql({
+        query: getAuthor,
+        variables: { id: username },
+      })) as { data: GetAuthorQuery; errors: any[] };
+      const author = authorData.getAuthor;
+
+      if (!author) {
         router.push('/');
         return;
       }
@@ -171,6 +197,7 @@ export default function EditPost() {
       s.contents = site.contents.items;
 
       setSite(s);
+      setAuthor({ ...author, links: JSON.parse(author.links) });
     }
     fetchSite();
   }, [router, setSite]);
@@ -201,7 +228,7 @@ export default function EditPost() {
     }
   }
 
-  if (!site)
+  if (!site || !author)
     return (
       <div className="h-screen flex justify-center items-center">
         <ClipLoader />
@@ -211,12 +238,13 @@ export default function EditPost() {
   // HACK: For now I am determining if on site page by setting
   // currIndex to 'site'. In the end I want a filesystem-esque viewer
   // and will handle this there
-  const isContent = currIndex !== null && currIndex !== 'site';
+  const isContent = currIndex !== null && currIndex !== 'site' && currIndex !== 'author';
 
   return (
     <div className="h-screen flex justify-between overflow-y-hidden">
       <ContentList
         site={site}
+        author={author}
         IdRef={IdRef}
         onCreate={onCreate}
         currIndex={currIndex}
@@ -249,7 +277,8 @@ export default function EditPost() {
           setCurrIndex={setCurrIndex}
         />
       )}
-      {currIndex !== null && !isContent && <SiteSettingsPanel site={site} setSite={setSite} />}
+      {currIndex === 'site' && <SiteSettingsPanel site={site} setSite={setSite} />}
+      {currIndex === 'author' && <AuthorPanel author={author} setAuthor={setAuthor} />}
     </div>
   );
 }

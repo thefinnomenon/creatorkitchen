@@ -15,7 +15,6 @@ export const getContent = /* GraphQL */ `
           siteID
           parentID
           slug
-          author
           title
           description
           content
@@ -24,10 +23,20 @@ export const getContent = /* GraphQL */ `
           originalCreatedAt
           createdAt
           updatedAt
+          contentAuthorId
         }
         nextToken
       }
-      author
+      author {
+        id
+        avatarUrl
+        name
+        bio
+        links
+        createdAt
+        updatedAt
+        username
+      }
       title
       description
       content
@@ -36,6 +45,7 @@ export const getContent = /* GraphQL */ `
       originalCreatedAt
       createdAt
       updatedAt
+      contentAuthorId
     }
   }
 `;
@@ -64,7 +74,16 @@ export const listContents = /* GraphQL */ `
         published {
           nextToken
         }
-        author
+        author {
+          id
+          avatarUrl
+          name
+          bio
+          links
+          createdAt
+          updatedAt
+          username
+        }
         title
         description
         content
@@ -73,6 +92,7 @@ export const listContents = /* GraphQL */ `
         originalCreatedAt
         createdAt
         updatedAt
+        contentAuthorId
       }
       nextToken
     }
@@ -103,7 +123,16 @@ export const contentByParentID = /* GraphQL */ `
         published {
           nextToken
         }
-        author
+        author {
+          id
+          avatarUrl
+          name
+          bio
+          links
+          createdAt
+          updatedAt
+          username
+        }
         title
         description
         content
@@ -112,6 +141,7 @@ export const contentByParentID = /* GraphQL */ `
         originalCreatedAt
         createdAt
         updatedAt
+        contentAuthorId
       }
       nextToken
     }
@@ -142,7 +172,16 @@ export const contentBySiteAndSlug = /* GraphQL */ `
         published {
           nextToken
         }
-        author
+        author {
+          id
+          avatarUrl
+          name
+          bio
+          links
+          createdAt
+          updatedAt
+          username
+        }
         title
         description
         content
@@ -151,6 +190,42 @@ export const contentBySiteAndSlug = /* GraphQL */ `
         originalCreatedAt
         createdAt
         updatedAt
+        contentAuthorId
+      }
+      nextToken
+    }
+  }
+`;
+export const getAuthor = /* GraphQL */ `
+  query GetAuthor($id: ID!) {
+    getAuthor(id: $id) {
+      id
+      avatarUrl
+      name
+      bio
+      links
+      createdAt
+      updatedAt
+      username
+    }
+  }
+`;
+export const listAuthors = /* GraphQL */ `
+  query ListAuthors(
+    $filter: ModelAuthorFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listAuthors(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        avatarUrl
+        name
+        bio
+        links
+        createdAt
+        updatedAt
+        username
       }
       nextToken
     }
@@ -171,7 +246,6 @@ export const getSite = /* GraphQL */ `
           siteID
           parentID
           slug
-          author
           title
           description
           content
@@ -180,6 +254,7 @@ export const getSite = /* GraphQL */ `
           originalCreatedAt
           createdAt
           updatedAt
+          contentAuthorId
         }
         nextToken
       }

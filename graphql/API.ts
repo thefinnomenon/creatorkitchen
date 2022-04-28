@@ -108,7 +108,7 @@ export type Content = {
   parentID: string,
   slug: string,
   published?: ModelContentConnection | null,
-  author?: string | null,
+  author: Author,
   title?: string | null,
   description?: string | null,
   content?: string | null,
@@ -117,6 +117,19 @@ export type Content = {
   originalCreatedAt?: string | null,
   createdAt: string,
   updatedAt: string,
+  contentAuthorId: string,
+};
+
+export type Author = {
+  __typename: "Author",
+  id: string,
+  avatarUrl: string,
+  name: string,
+  bio: string,
+  links?: string | null,
+  createdAt: string,
+  updatedAt: string,
+  username?: string | null,
 };
 
 export enum ContentStatus {
@@ -140,7 +153,6 @@ export type ModelContentFilterInput = {
   siteID?: ModelIDInput | null,
   parentID?: ModelIDInput | null,
   slug?: ModelStringInput | null,
-  author?: ModelStringInput | null,
   title?: ModelStringInput | null,
   description?: ModelStringInput | null,
   content?: ModelStringInput | null,
@@ -150,6 +162,7 @@ export type ModelContentFilterInput = {
   and?: Array< ModelContentFilterInput | null > | null,
   or?: Array< ModelContentFilterInput | null > | null,
   not?: ModelContentFilterInput | null,
+  contentAuthorId?: ModelIDInput | null,
 };
 
 export type ModelContentStatusInput = {
@@ -162,19 +175,18 @@ export type CreateContentInput = {
   siteID: string,
   parentID: string,
   slug: string,
-  author?: string | null,
   title?: string | null,
   description?: string | null,
   content?: string | null,
   media?: string | null,
   status?: ContentStatus | null,
   originalCreatedAt?: string | null,
+  contentAuthorId: string,
 };
 
 export type ModelContentConditionInput = {
   parentID?: ModelIDInput | null,
   slug?: ModelStringInput | null,
-  author?: ModelStringInput | null,
   title?: ModelStringInput | null,
   description?: ModelStringInput | null,
   content?: ModelStringInput | null,
@@ -184,6 +196,7 @@ export type ModelContentConditionInput = {
   and?: Array< ModelContentConditionInput | null > | null,
   or?: Array< ModelContentConditionInput | null > | null,
   not?: ModelContentConditionInput | null,
+  contentAuthorId?: ModelIDInput | null,
 };
 
 export type UpdateContentInput = {
@@ -191,18 +204,48 @@ export type UpdateContentInput = {
   siteID: string,
   parentID?: string | null,
   slug?: string | null,
-  author?: string | null,
   title?: string | null,
   description?: string | null,
   content?: string | null,
   media?: string | null,
   status?: ContentStatus | null,
   originalCreatedAt?: string | null,
+  contentAuthorId?: string | null,
 };
 
 export type DeleteContentInput = {
   id: string,
   siteID: string,
+};
+
+export type CreateAuthorInput = {
+  id?: string | null,
+  avatarUrl: string,
+  name: string,
+  bio: string,
+  links?: string | null,
+};
+
+export type ModelAuthorConditionInput = {
+  avatarUrl?: ModelStringInput | null,
+  name?: ModelStringInput | null,
+  bio?: ModelStringInput | null,
+  links?: ModelStringInput | null,
+  and?: Array< ModelAuthorConditionInput | null > | null,
+  or?: Array< ModelAuthorConditionInput | null > | null,
+  not?: ModelAuthorConditionInput | null,
+};
+
+export type UpdateAuthorInput = {
+  id: string,
+  avatarUrl?: string | null,
+  name?: string | null,
+  bio?: string | null,
+  links?: string | null,
+};
+
+export type DeleteAuthorInput = {
+  id: string,
 };
 
 export type CreateSiteInput = {
@@ -238,6 +281,23 @@ export type DeleteSiteInput = {
   id: string,
 };
 
+export type ModelAuthorFilterInput = {
+  id?: ModelIDInput | null,
+  avatarUrl?: ModelStringInput | null,
+  name?: ModelStringInput | null,
+  bio?: ModelStringInput | null,
+  links?: ModelStringInput | null,
+  and?: Array< ModelAuthorFilterInput | null > | null,
+  or?: Array< ModelAuthorFilterInput | null > | null,
+  not?: ModelAuthorFilterInput | null,
+};
+
+export type ModelAuthorConnection = {
+  __typename: "ModelAuthorConnection",
+  items:  Array<Author | null >,
+  nextToken?: string | null,
+};
+
 export type SiteByUsernameWithContentsQueryVariables = {
   username: string,
   sortDirection?: ModelSortDirection | null,
@@ -262,7 +322,14 @@ export type SiteByUsernameWithContentsQuery = {
         nextToken?: string | null,
         items:  Array< {
           __typename: "Content",
-          author?: string | null,
+          author:  {
+            __typename: "Author",
+            id: string,
+            avatarUrl: string,
+            name: string,
+            bio: string,
+            links?: string | null,
+          },
           id: string,
           content?: string | null,
           title?: string | null,
@@ -314,7 +381,14 @@ export type ListSitesWithContentsQuery = {
         nextToken?: string | null,
         items:  Array< {
           __typename: "Content",
-          author?: string | null,
+          author:  {
+            __typename: "Author",
+            id: string,
+            avatarUrl: string,
+            name: string,
+            bio: string,
+            links?: string | null,
+          },
           id: string,
           content?: string | null,
           title?: string | null,
@@ -332,7 +406,14 @@ export type ListSitesWithContentsQuery = {
               id: string,
               siteID: string,
               slug: string,
-              author?: string | null,
+              author:  {
+                __typename: "Author",
+                id: string,
+                avatarUrl: string,
+                name: string,
+                bio: string,
+                links?: string | null,
+              },
               title?: string | null,
               description?: string | null,
               content?: string | null,
@@ -376,7 +457,14 @@ export type ContentAndPublishedBySiteAndSlugQuery = {
           id: string,
           siteID: string,
           slug: string,
-          author?: string | null,
+          author:  {
+            __typename: "Author",
+            id: string,
+            avatarUrl: string,
+            name: string,
+            bio: string,
+            links?: string | null,
+          },
           title?: string | null,
           description?: string | null,
           content?: string | null,
@@ -386,7 +474,14 @@ export type ContentAndPublishedBySiteAndSlugQuery = {
           updatedAt: string,
         } | null >,
       } | null,
-      author?: string | null,
+      author:  {
+        __typename: "Author",
+        id: string,
+        avatarUrl: string,
+        name: string,
+        bio: string,
+        links?: string | null,
+      },
       title?: string | null,
       description?: string | null,
       content?: string | null,
@@ -419,7 +514,6 @@ export type CreateContentMutation = {
         siteID: string,
         parentID: string,
         slug: string,
-        author?: string | null,
         title?: string | null,
         description?: string | null,
         content?: string | null,
@@ -428,10 +522,21 @@ export type CreateContentMutation = {
         originalCreatedAt?: string | null,
         createdAt: string,
         updatedAt: string,
+        contentAuthorId: string,
       } | null >,
       nextToken?: string | null,
     } | null,
-    author?: string | null,
+    author:  {
+      __typename: "Author",
+      id: string,
+      avatarUrl: string,
+      name: string,
+      bio: string,
+      links?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      username?: string | null,
+    },
     title?: string | null,
     description?: string | null,
     content?: string | null,
@@ -440,6 +545,7 @@ export type CreateContentMutation = {
     originalCreatedAt?: string | null,
     createdAt: string,
     updatedAt: string,
+    contentAuthorId: string,
   } | null,
 };
 
@@ -463,7 +569,6 @@ export type UpdateContentMutation = {
         siteID: string,
         parentID: string,
         slug: string,
-        author?: string | null,
         title?: string | null,
         description?: string | null,
         content?: string | null,
@@ -472,10 +577,21 @@ export type UpdateContentMutation = {
         originalCreatedAt?: string | null,
         createdAt: string,
         updatedAt: string,
+        contentAuthorId: string,
       } | null >,
       nextToken?: string | null,
     } | null,
-    author?: string | null,
+    author:  {
+      __typename: "Author",
+      id: string,
+      avatarUrl: string,
+      name: string,
+      bio: string,
+      links?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      username?: string | null,
+    },
     title?: string | null,
     description?: string | null,
     content?: string | null,
@@ -484,6 +600,7 @@ export type UpdateContentMutation = {
     originalCreatedAt?: string | null,
     createdAt: string,
     updatedAt: string,
+    contentAuthorId: string,
   } | null,
 };
 
@@ -507,7 +624,6 @@ export type DeleteContentMutation = {
         siteID: string,
         parentID: string,
         slug: string,
-        author?: string | null,
         title?: string | null,
         description?: string | null,
         content?: string | null,
@@ -516,10 +632,21 @@ export type DeleteContentMutation = {
         originalCreatedAt?: string | null,
         createdAt: string,
         updatedAt: string,
+        contentAuthorId: string,
       } | null >,
       nextToken?: string | null,
     } | null,
-    author?: string | null,
+    author:  {
+      __typename: "Author",
+      id: string,
+      avatarUrl: string,
+      name: string,
+      bio: string,
+      links?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      username?: string | null,
+    },
     title?: string | null,
     description?: string | null,
     content?: string | null,
@@ -528,6 +655,64 @@ export type DeleteContentMutation = {
     originalCreatedAt?: string | null,
     createdAt: string,
     updatedAt: string,
+    contentAuthorId: string,
+  } | null,
+};
+
+export type CreateAuthorMutationVariables = {
+  input: CreateAuthorInput,
+  condition?: ModelAuthorConditionInput | null,
+};
+
+export type CreateAuthorMutation = {
+  createAuthor?:  {
+    __typename: "Author",
+    id: string,
+    avatarUrl: string,
+    name: string,
+    bio: string,
+    links?: string | null,
+    createdAt: string,
+    updatedAt: string,
+    username?: string | null,
+  } | null,
+};
+
+export type UpdateAuthorMutationVariables = {
+  input: UpdateAuthorInput,
+  condition?: ModelAuthorConditionInput | null,
+};
+
+export type UpdateAuthorMutation = {
+  updateAuthor?:  {
+    __typename: "Author",
+    id: string,
+    avatarUrl: string,
+    name: string,
+    bio: string,
+    links?: string | null,
+    createdAt: string,
+    updatedAt: string,
+    username?: string | null,
+  } | null,
+};
+
+export type DeleteAuthorMutationVariables = {
+  input: DeleteAuthorInput,
+  condition?: ModelAuthorConditionInput | null,
+};
+
+export type DeleteAuthorMutation = {
+  deleteAuthor?:  {
+    __typename: "Author",
+    id: string,
+    avatarUrl: string,
+    name: string,
+    bio: string,
+    links?: string | null,
+    createdAt: string,
+    updatedAt: string,
+    username?: string | null,
   } | null,
 };
 
@@ -553,7 +738,6 @@ export type CreateSiteMutation = {
         siteID: string,
         parentID: string,
         slug: string,
-        author?: string | null,
         title?: string | null,
         description?: string | null,
         content?: string | null,
@@ -562,6 +746,7 @@ export type CreateSiteMutation = {
         originalCreatedAt?: string | null,
         createdAt: string,
         updatedAt: string,
+        contentAuthorId: string,
       } | null >,
       nextToken?: string | null,
     } | null,
@@ -592,7 +777,6 @@ export type UpdateSiteMutation = {
         siteID: string,
         parentID: string,
         slug: string,
-        author?: string | null,
         title?: string | null,
         description?: string | null,
         content?: string | null,
@@ -601,6 +785,7 @@ export type UpdateSiteMutation = {
         originalCreatedAt?: string | null,
         createdAt: string,
         updatedAt: string,
+        contentAuthorId: string,
       } | null >,
       nextToken?: string | null,
     } | null,
@@ -631,7 +816,6 @@ export type DeleteSiteMutation = {
         siteID: string,
         parentID: string,
         slug: string,
-        author?: string | null,
         title?: string | null,
         description?: string | null,
         content?: string | null,
@@ -640,6 +824,7 @@ export type DeleteSiteMutation = {
         originalCreatedAt?: string | null,
         createdAt: string,
         updatedAt: string,
+        contentAuthorId: string,
       } | null >,
       nextToken?: string | null,
     } | null,
@@ -668,7 +853,6 @@ export type GetContentQuery = {
         siteID: string,
         parentID: string,
         slug: string,
-        author?: string | null,
         title?: string | null,
         description?: string | null,
         content?: string | null,
@@ -677,10 +861,21 @@ export type GetContentQuery = {
         originalCreatedAt?: string | null,
         createdAt: string,
         updatedAt: string,
+        contentAuthorId: string,
       } | null >,
       nextToken?: string | null,
     } | null,
-    author?: string | null,
+    author:  {
+      __typename: "Author",
+      id: string,
+      avatarUrl: string,
+      name: string,
+      bio: string,
+      links?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      username?: string | null,
+    },
     title?: string | null,
     description?: string | null,
     content?: string | null,
@@ -689,6 +884,7 @@ export type GetContentQuery = {
     originalCreatedAt?: string | null,
     createdAt: string,
     updatedAt: string,
+    contentAuthorId: string,
   } | null,
 };
 
@@ -714,7 +910,17 @@ export type ListContentsQuery = {
         __typename: "ModelContentConnection",
         nextToken?: string | null,
       } | null,
-      author?: string | null,
+      author:  {
+        __typename: "Author",
+        id: string,
+        avatarUrl: string,
+        name: string,
+        bio: string,
+        links?: string | null,
+        createdAt: string,
+        updatedAt: string,
+        username?: string | null,
+      },
       title?: string | null,
       description?: string | null,
       content?: string | null,
@@ -723,6 +929,7 @@ export type ListContentsQuery = {
       originalCreatedAt?: string | null,
       createdAt: string,
       updatedAt: string,
+      contentAuthorId: string,
     } | null >,
     nextToken?: string | null,
   } | null,
@@ -750,7 +957,17 @@ export type ContentByParentIDQuery = {
         __typename: "ModelContentConnection",
         nextToken?: string | null,
       } | null,
-      author?: string | null,
+      author:  {
+        __typename: "Author",
+        id: string,
+        avatarUrl: string,
+        name: string,
+        bio: string,
+        links?: string | null,
+        createdAt: string,
+        updatedAt: string,
+        username?: string | null,
+      },
       title?: string | null,
       description?: string | null,
       content?: string | null,
@@ -759,6 +976,7 @@ export type ContentByParentIDQuery = {
       originalCreatedAt?: string | null,
       createdAt: string,
       updatedAt: string,
+      contentAuthorId: string,
     } | null >,
     nextToken?: string | null,
   } | null,
@@ -786,7 +1004,17 @@ export type ContentBySiteAndSlugQuery = {
         __typename: "ModelContentConnection",
         nextToken?: string | null,
       } | null,
-      author?: string | null,
+      author:  {
+        __typename: "Author",
+        id: string,
+        avatarUrl: string,
+        name: string,
+        bio: string,
+        links?: string | null,
+        createdAt: string,
+        updatedAt: string,
+        username?: string | null,
+      },
       title?: string | null,
       description?: string | null,
       content?: string | null,
@@ -795,6 +1023,49 @@ export type ContentBySiteAndSlugQuery = {
       originalCreatedAt?: string | null,
       createdAt: string,
       updatedAt: string,
+      contentAuthorId: string,
+    } | null >,
+    nextToken?: string | null,
+  } | null,
+};
+
+export type GetAuthorQueryVariables = {
+  id: string,
+};
+
+export type GetAuthorQuery = {
+  getAuthor?:  {
+    __typename: "Author",
+    id: string,
+    avatarUrl: string,
+    name: string,
+    bio: string,
+    links?: string | null,
+    createdAt: string,
+    updatedAt: string,
+    username?: string | null,
+  } | null,
+};
+
+export type ListAuthorsQueryVariables = {
+  filter?: ModelAuthorFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type ListAuthorsQuery = {
+  listAuthors?:  {
+    __typename: "ModelAuthorConnection",
+    items:  Array< {
+      __typename: "Author",
+      id: string,
+      avatarUrl: string,
+      name: string,
+      bio: string,
+      links?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      username?: string | null,
     } | null >,
     nextToken?: string | null,
   } | null,
@@ -821,7 +1092,6 @@ export type GetSiteQuery = {
         siteID: string,
         parentID: string,
         slug: string,
-        author?: string | null,
         title?: string | null,
         description?: string | null,
         content?: string | null,
@@ -830,6 +1100,7 @@ export type GetSiteQuery = {
         originalCreatedAt?: string | null,
         createdAt: string,
         updatedAt: string,
+        contentAuthorId: string,
       } | null >,
       nextToken?: string | null,
     } | null,
@@ -975,7 +1246,6 @@ export type OnCreateContentSubscription = {
         siteID: string,
         parentID: string,
         slug: string,
-        author?: string | null,
         title?: string | null,
         description?: string | null,
         content?: string | null,
@@ -984,10 +1254,21 @@ export type OnCreateContentSubscription = {
         originalCreatedAt?: string | null,
         createdAt: string,
         updatedAt: string,
+        contentAuthorId: string,
       } | null >,
       nextToken?: string | null,
     } | null,
-    author?: string | null,
+    author:  {
+      __typename: "Author",
+      id: string,
+      avatarUrl: string,
+      name: string,
+      bio: string,
+      links?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      username?: string | null,
+    },
     title?: string | null,
     description?: string | null,
     content?: string | null,
@@ -996,6 +1277,7 @@ export type OnCreateContentSubscription = {
     originalCreatedAt?: string | null,
     createdAt: string,
     updatedAt: string,
+    contentAuthorId: string,
   } | null,
 };
 
@@ -1018,7 +1300,6 @@ export type OnUpdateContentSubscription = {
         siteID: string,
         parentID: string,
         slug: string,
-        author?: string | null,
         title?: string | null,
         description?: string | null,
         content?: string | null,
@@ -1027,10 +1308,21 @@ export type OnUpdateContentSubscription = {
         originalCreatedAt?: string | null,
         createdAt: string,
         updatedAt: string,
+        contentAuthorId: string,
       } | null >,
       nextToken?: string | null,
     } | null,
-    author?: string | null,
+    author:  {
+      __typename: "Author",
+      id: string,
+      avatarUrl: string,
+      name: string,
+      bio: string,
+      links?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      username?: string | null,
+    },
     title?: string | null,
     description?: string | null,
     content?: string | null,
@@ -1039,6 +1331,7 @@ export type OnUpdateContentSubscription = {
     originalCreatedAt?: string | null,
     createdAt: string,
     updatedAt: string,
+    contentAuthorId: string,
   } | null,
 };
 
@@ -1061,7 +1354,6 @@ export type OnDeleteContentSubscription = {
         siteID: string,
         parentID: string,
         slug: string,
-        author?: string | null,
         title?: string | null,
         description?: string | null,
         content?: string | null,
@@ -1070,10 +1362,21 @@ export type OnDeleteContentSubscription = {
         originalCreatedAt?: string | null,
         createdAt: string,
         updatedAt: string,
+        contentAuthorId: string,
       } | null >,
       nextToken?: string | null,
     } | null,
-    author?: string | null,
+    author:  {
+      __typename: "Author",
+      id: string,
+      avatarUrl: string,
+      name: string,
+      bio: string,
+      links?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      username?: string | null,
+    },
     title?: string | null,
     description?: string | null,
     content?: string | null,
@@ -1082,6 +1385,61 @@ export type OnDeleteContentSubscription = {
     originalCreatedAt?: string | null,
     createdAt: string,
     updatedAt: string,
+    contentAuthorId: string,
+  } | null,
+};
+
+export type OnCreateAuthorSubscriptionVariables = {
+  username?: string | null,
+};
+
+export type OnCreateAuthorSubscription = {
+  onCreateAuthor?:  {
+    __typename: "Author",
+    id: string,
+    avatarUrl: string,
+    name: string,
+    bio: string,
+    links?: string | null,
+    createdAt: string,
+    updatedAt: string,
+    username?: string | null,
+  } | null,
+};
+
+export type OnUpdateAuthorSubscriptionVariables = {
+  username?: string | null,
+};
+
+export type OnUpdateAuthorSubscription = {
+  onUpdateAuthor?:  {
+    __typename: "Author",
+    id: string,
+    avatarUrl: string,
+    name: string,
+    bio: string,
+    links?: string | null,
+    createdAt: string,
+    updatedAt: string,
+    username?: string | null,
+  } | null,
+};
+
+export type OnDeleteAuthorSubscriptionVariables = {
+  username?: string | null,
+};
+
+export type OnDeleteAuthorSubscription = {
+  onDeleteAuthor?:  {
+    __typename: "Author",
+    id: string,
+    avatarUrl: string,
+    name: string,
+    bio: string,
+    links?: string | null,
+    createdAt: string,
+    updatedAt: string,
+    username?: string | null,
   } | null,
 };
 
@@ -1106,7 +1464,6 @@ export type OnCreateSiteSubscription = {
         siteID: string,
         parentID: string,
         slug: string,
-        author?: string | null,
         title?: string | null,
         description?: string | null,
         content?: string | null,
@@ -1115,6 +1472,7 @@ export type OnCreateSiteSubscription = {
         originalCreatedAt?: string | null,
         createdAt: string,
         updatedAt: string,
+        contentAuthorId: string,
       } | null >,
       nextToken?: string | null,
     } | null,
@@ -1144,7 +1502,6 @@ export type OnUpdateSiteSubscription = {
         siteID: string,
         parentID: string,
         slug: string,
-        author?: string | null,
         title?: string | null,
         description?: string | null,
         content?: string | null,
@@ -1153,6 +1510,7 @@ export type OnUpdateSiteSubscription = {
         originalCreatedAt?: string | null,
         createdAt: string,
         updatedAt: string,
+        contentAuthorId: string,
       } | null >,
       nextToken?: string | null,
     } | null,
@@ -1182,7 +1540,6 @@ export type OnDeleteSiteSubscription = {
         siteID: string,
         parentID: string,
         slug: string,
-        author?: string | null,
         title?: string | null,
         description?: string | null,
         content?: string | null,
@@ -1191,6 +1548,7 @@ export type OnDeleteSiteSubscription = {
         originalCreatedAt?: string | null,
         createdAt: string,
         updatedAt: string,
+        contentAuthorId: string,
       } | null >,
       nextToken?: string | null,
     } | null,

@@ -5,8 +5,8 @@ import '@aws-amplify/ui-react/styles.css';
 import Link from 'next/link';
 import { useEffect } from 'react';
 import { API, Auth } from 'aws-amplify';
-import { siteByUsername } from '../../graphql/queries';
-import { SiteByUsernameQuery } from '../../graphql/API';
+import { getAuthor, siteByUsername } from '../../graphql/queries';
+import { GetAuthorQuery, SiteByUsernameQuery } from '../../graphql/API';
 import { ClipLoader } from 'react-spinners';
 
 export default function Home() {
@@ -47,10 +47,16 @@ export default function Home() {
               const site = data.siteByUsername.items[0];
 
               if (site) {
-                router.push('/dashboard');
-              } else {
-                router.push('/createSite');
-              }
+                const { data } = (await API.graphql({
+                  query: getAuthor,
+                  variables: {
+                    id: username,
+                  },
+                })) as { data: GetAuthorQuery; errors: any[] };
+                const author = data.getAuthor;
+                if (author) router.push('/dashboard');
+                else router.push('/createAuthor');
+              } else router.push('/createSite');
             } catch (e) {
               console.log(e);
             }

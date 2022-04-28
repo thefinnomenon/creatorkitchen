@@ -15,7 +15,6 @@ export const onCreateContent = /* GraphQL */ `
           siteID
           parentID
           slug
-          author
           title
           description
           content
@@ -24,10 +23,20 @@ export const onCreateContent = /* GraphQL */ `
           originalCreatedAt
           createdAt
           updatedAt
+          contentAuthorId
         }
         nextToken
       }
-      author
+      author {
+        id
+        avatarUrl
+        name
+        bio
+        links
+        createdAt
+        updatedAt
+        username
+      }
       title
       description
       content
@@ -36,6 +45,7 @@ export const onCreateContent = /* GraphQL */ `
       originalCreatedAt
       createdAt
       updatedAt
+      contentAuthorId
     }
   }
 `;
@@ -52,7 +62,6 @@ export const onUpdateContent = /* GraphQL */ `
           siteID
           parentID
           slug
-          author
           title
           description
           content
@@ -61,10 +70,20 @@ export const onUpdateContent = /* GraphQL */ `
           originalCreatedAt
           createdAt
           updatedAt
+          contentAuthorId
         }
         nextToken
       }
-      author
+      author {
+        id
+        avatarUrl
+        name
+        bio
+        links
+        createdAt
+        updatedAt
+        username
+      }
       title
       description
       content
@@ -73,6 +92,7 @@ export const onUpdateContent = /* GraphQL */ `
       originalCreatedAt
       createdAt
       updatedAt
+      contentAuthorId
     }
   }
 `;
@@ -89,7 +109,6 @@ export const onDeleteContent = /* GraphQL */ `
           siteID
           parentID
           slug
-          author
           title
           description
           content
@@ -98,10 +117,20 @@ export const onDeleteContent = /* GraphQL */ `
           originalCreatedAt
           createdAt
           updatedAt
+          contentAuthorId
         }
         nextToken
       }
-      author
+      author {
+        id
+        avatarUrl
+        name
+        bio
+        links
+        createdAt
+        updatedAt
+        username
+      }
       title
       description
       content
@@ -110,6 +139,49 @@ export const onDeleteContent = /* GraphQL */ `
       originalCreatedAt
       createdAt
       updatedAt
+      contentAuthorId
+    }
+  }
+`;
+export const onCreateAuthor = /* GraphQL */ `
+  subscription OnCreateAuthor($username: String) {
+    onCreateAuthor(username: $username) {
+      id
+      avatarUrl
+      name
+      bio
+      links
+      createdAt
+      updatedAt
+      username
+    }
+  }
+`;
+export const onUpdateAuthor = /* GraphQL */ `
+  subscription OnUpdateAuthor($username: String) {
+    onUpdateAuthor(username: $username) {
+      id
+      avatarUrl
+      name
+      bio
+      links
+      createdAt
+      updatedAt
+      username
+    }
+  }
+`;
+export const onDeleteAuthor = /* GraphQL */ `
+  subscription OnDeleteAuthor($username: String) {
+    onDeleteAuthor(username: $username) {
+      id
+      avatarUrl
+      name
+      bio
+      links
+      createdAt
+      updatedAt
+      username
     }
   }
 `;
@@ -128,7 +200,6 @@ export const onCreateSite = /* GraphQL */ `
           siteID
           parentID
           slug
-          author
           title
           description
           content
@@ -137,6 +208,7 @@ export const onCreateSite = /* GraphQL */ `
           originalCreatedAt
           createdAt
           updatedAt
+          contentAuthorId
         }
         nextToken
       }
@@ -160,7 +232,6 @@ export const onUpdateSite = /* GraphQL */ `
           siteID
           parentID
           slug
-          author
           title
           description
           content
@@ -169,6 +240,7 @@ export const onUpdateSite = /* GraphQL */ `
           originalCreatedAt
           createdAt
           updatedAt
+          contentAuthorId
         }
         nextToken
       }
@@ -192,7 +264,6 @@ export const onDeleteSite = /* GraphQL */ `
           siteID
           parentID
           slug
-          author
           title
           description
           content
@@ -201,6 +272,7 @@ export const onDeleteSite = /* GraphQL */ `
           originalCreatedAt
           createdAt
           updatedAt
+          contentAuthorId
         }
         nextToken
       }

@@ -66,7 +66,7 @@ export default function CreateSite(props: Props): JSX.Element {
         authMode: 'AMAZON_COGNITO_USER_POOLS',
       })) as { data: CreateSiteMutation; errors: any[] };
 
-      router.push(`/dashboard`);
+      router.push(`/createAuthor`);
     } catch (e) {
       console.log(e);
     }
