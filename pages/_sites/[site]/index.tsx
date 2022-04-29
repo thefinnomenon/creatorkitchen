@@ -68,11 +68,11 @@ export default function Post({ site, author }: Props) {
           <div className="bg-black h-[2px] w-6/12 opacity-30 my-10 mx-auto" />
           <ul>
             {site.contents.items.map((post) => (
-              <li key={post.id}>
+              <li key={post.id} className="mb-8">
                 <div className="opacity-70 hover:opacity-100">
                   <a href={`${getSiteUrl(site)}/posts/${post.slug}`}>
                     <h1 className="text-2xl mb-1">{post.title}</h1>
-                    <p className="mb-3">{new Date(post.createdAt).toLocaleDateString()}</p>
+                    <p className="mb-3">{new Date(post.originalCreatedAt).toLocaleDateString()}</p>
                     <p>{post.description}</p>
                   </a>
                 </div>
@@ -125,6 +125,29 @@ export async function getServerSideProps({ params: { site } }) {
     data.getSite.contents.items = data.getSite.contents.items.filter(
       (content) => content.status === ContentStatus.PUBLISHED
     );
+
+    const contentIds = data.getSite.contents.items.map((content) => content.parentID);
+
+    // Filter out versions of published content
+    data.getSite.contents.items = data.getSite.contents.items.filter(
+      (content) => content.status === ContentStatus.PUBLISHED
+    );
+
+    // Filter out old versions
+    const newestVersions = {};
+    data.getSite.contents.items.forEach((content) => {
+      if (content.parentID in newestVersions) {
+        if (newestVersions[content.parentID].createdAt < content.createdAt) newestVersions[content.parentID] = content;
+      } else {
+        newestVersions[content.parentID] = content;
+      }
+    });
+
+    // @ts-ignore
+    data.getSite.contents.items = Object.entries(newestVersions).map((e) => e[1]);
+
+    // Sort posts by newest
+    data.getSite.contents.items.sort((content) => (content.createdAt > content.createdAt ? 1 : -1));
 
     const { data: authorData } = (await API.graphql({
       query: getAuthor,
