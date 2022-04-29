@@ -22,6 +22,9 @@ import { Author } from '../../home/dashboard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { faTwitter } from '@fortawesome/free-brands-svg-icons';
+import Link from 'next/link';
+import NavBar from '../../../components/NavBar';
+import Script from 'next/script';
 
 type PostType = {
   id: string;
@@ -51,6 +54,15 @@ export default function Post({ site, author }: Props) {
 
   return (
     <>
+      <Script src="https://unpkg.com/@popperjs/core@2" strategy="beforeInteractive" />
+      <Script src="https://unpkg.com/tippy.js@6" strategy="beforeInteractive" />
+      <Script id="initialize-tooltips" strategy="afterInteractive">
+        {`tippy('[data-tooltip-content]', { interactive: true, allowHTML: true, arrow: tippy.roundArrow, theme: 'my-tippy', onShow(instance) {
+        instance.popper.hidden = instance.reference.dataset.tooltipContent ? false : true;
+      	instance.setContent(instance.reference.dataset.tooltipContent);
+      } })`}
+      </Script>
+      <NavBar />
       <div className="w-full min-h-screen bg-white flex justify-center items-stretch">
         <div className="md:mt-4 flex-1 max-w-2xl min-w-0 bg-white">
           <div className="flex flex-col justify-center items-center mt-8 gap-4">
@@ -70,11 +82,13 @@ export default function Post({ site, author }: Props) {
             {site.contents.items.map((post) => (
               <li key={post.id} className="mb-8">
                 <div className="opacity-70 hover:opacity-100">
-                  <a href={`${getSiteUrl(site)}/posts/${post.slug}`}>
-                    <h1 className="text-2xl mb-1">{post.title}</h1>
-                    <p className="mb-3">{new Date(post.originalCreatedAt).toLocaleDateString()}</p>
-                    <p>{post.description}</p>
-                  </a>
+                  <Link href={`${getSiteUrl(site)}/posts/${post.slug}`}>
+                    <a>
+                      <h1 className="text-2xl mb-1">{post.title}</h1>
+                      <p className="mb-3">{new Date(post.originalCreatedAt).toLocaleDateString()}</p>
+                      <p>{post.description}</p>
+                    </a>
+                  </Link>
                 </div>
               </li>
             ))}
